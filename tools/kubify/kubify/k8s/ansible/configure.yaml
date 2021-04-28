@@ -1,0 +1,11 @@
+- name: Configure cluster
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    local_domain: ""
+    cluster_ip: ""
+  roles:
+    - role: dnsmasq
+      tags: dnsmasq
+    - role: trust_ca_cert
+      tags: trust_ca_cert

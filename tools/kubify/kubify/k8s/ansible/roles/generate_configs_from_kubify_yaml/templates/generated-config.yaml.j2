@@ -1,0 +1,16 @@
+kind: ConfigMap 
+apiVersion: v1 
+metadata:
+  name: "{{ app_name }}-generated"
+  labels:
+    app: "{{ app_name }}"
+    kubify_version: "{{ kubify_version }}"
+{% set generated_config = kubify_config | json_query("config") | default({}, true) %}
+{% if generated_config|length %}
+data:
+{% for k, v in generated_config.items() %}
+  {{ k }}: "{{ v }}"
+{% endfor %}
+{% else %}
+data: {}
+{% endif %}

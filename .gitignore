@@ -1,0 +1,51 @@
+## Remove the next 4 lines in order to version secrets (for private forks of this repo):
+backend/*/secrets
+backend/*/secrets/*
+frontend/*/secrets
+frontend/*/secrets/*
+##############################################################################
+
+._kubify_work
+**/._kubify_work
+._*
+kubify_config.sh
+# mac
+.DS_Store
+**/.DS_Store
+Thumbs.db
+**/Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# terraform
+*.tgz
+.terraform/
+**/.terraform
+terraform.state.d/
+**/terraform.state.d
+*.backup
+terraform.tfstate
+remote_backend.tf
+*.terraform
+*.terragrunt-cache
+*.auto.tfvars
+*.rdb
+**/__pycache__
+tests/*.tif
+.pytest_cache/
+**/.pytest_cache
+
+# Compiled Python files
+*.pyc
+
+# Compiled C++ files
+*.out
+
+# Application specific files
+venv
+node_modules
+.sass-cache
+
+#binaries forsure
+tools/kubify/atlantis/bootstrap/terraform
+tools/kubify/atlantis/atlantis-terragrunt-image/terragrunt

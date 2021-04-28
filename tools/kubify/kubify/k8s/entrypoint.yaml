@@ -1,0 +1,99 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: entrypoint-adminz
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: entrypoint
+  namespace: kubify
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: entrypoint
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: entrypoint-config
+data:
+  .npmrc: |
+    //registry.npmjs.org/:_authToken=${NPM_TOKEN}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: entrypoint
+  labels:
+    role: entrypoint
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: entrypoint
+  template:
+    metadata:
+      labels:
+        role: entrypoint
+    spec:
+      serviceAccountName: entrypoint
+      volumes:
+        - name: src-mount
+          hostPath:
+            path: {{SRC_MOUNT}}
+        - name: home-mount-aws
+          hostPath:
+            path: {{HOME_MOUNT}}/.aws
+        - name: home-mount-ssh
+          hostPath:
+            path: {{HOME_MOUNT}}/.ssh
+        - name: home-mount-gitconfig
+          hostPath:
+            path: {{HOME_MOUNT}}/.gitconfig
+        - name: docker-sock 
+          hostPath:
+            path: /var/run
+        - name: config
+          configMap:
+            name: entrypoint-config
+      containers:
+        - name: entrypoint
+          image: kubify/entrypoint:latest
+          imagePullPolicy: Never
+          command:
+            - /bin/bash
+            - -c
+            - "trap : TERM INT; sleep infinity & wait"
+          workingDir: /src/kubify
+          volumeMounts:
+            - mountPath: /src/kubify
+              name: src-mount
+            - mountPath: /data/home/.aws
+              name: home-mount-aws
+            - mountPath: /data/home/.ssh
+              name: home-mount-ssh
+            - mountPath: /data/home/.gitconfig
+              name: home-mount-gitconfig
+            - mountPath: /var/run 
+              name: docker-sock
+            - mountPath: /root/.npmrc
+              subPath: .npmrc
+              name: config
+          envFrom:
+          - secretRef:
+              name: kubify
+          - secretRef:
+              name: npm-credentials
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"

@@ -1,0 +1,13 @@
+---
+apiVersion: kubify.kubify.local/v1
+kind: Environment
+metadata:
+  name: prod
+target:
+  cluster: internal_prod
+kubify_version: '0.0.2'
+services:
+  zalenium-svc:
+    config: 0.0.2
+    image: 0.0.2
+    profile: prod

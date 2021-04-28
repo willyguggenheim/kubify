@@ -1,0 +1,15 @@
+- name: Configure service
+  hosts: localhost
+  become: false
+  gather_facts: no
+  vars:
+    env: ''
+    env_domain: ''
+    profile: ''
+    app_name: ''
+    app_dir: ''
+    kubify_dir: ''
+    app_kubify_dir: "{{ kubify_dir }}/{{ env }}/{{ app_name }}"
+  roles:
+    - role: clean_workdir_and_validate_folders
+      tags: generate_k8s

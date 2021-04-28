@@ -1,0 +1,54 @@
+---
+apiVersion: k8.kubify.local/v1
+kind: Config
+metadata:
+  name: example-django-simple-svc
+init: |
+  echo "run migrations for example-django-simple-svc/app"
+  cd /app/app
+  python manage.py makemigrations
+  python manage.py migrate
+dev:
+  # TODO: have an option for alternate reloaders in start (such as hot reloading)
+  # TODO: this should also have an option to run unit tests each time it reloads
+  # "sync" = if you want Kubify to listen for code changes (other option is 
+  # using some cli listener for code changes in release.scripts.start)
+  sync:
+    'app/***': 'app/'
+  scripts:
+    start: |
+      echo 'listening for code changes in example-django-simple-svc folder'
+      cd /app/app
+      python manage.py runserver  0.0.0.0:8000
+release:
+  scripts:
+    start: |
+      echo 'starting example-django-simple-svc release service's pod'  
+      cd /app/app
+      python manage.py runserver  0.0.0.0:8000
+config:
+  PORT: "8000"
+  APP_NAME: example-django-simple-svc
+  DEBUG: "example-django-simple-svc:*"
+  ENV: "{{ env }}"
+  KUBIFY_ENV: "{{ env }}"
+profiles:
+  dev:
+    scaler:
+      minReplicas: 2
+      maxReplicas: 4
+      metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 40
+    resources:
+      requests:
+        cpu: 64m
+        memory: 64Mi
+      limits:
+        cpu: 128m
+        memory: 128Mi
+    

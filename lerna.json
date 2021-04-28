@@ -1,0 +1,14 @@
+{
+  "npmClient": "yarn",
+  "packages": [
+    "backend/*",
+    "frontend/*",
+    "tools/*"
+  ],
+  "command": {
+    "version": {
+      "allowBranch": "master"
+    }
+  },
+  "version": "independent"
+}

@@ -1,0 +1,8 @@
+kind: ConfigMap 
+apiVersion: v1 
+metadata:
+  name: "{{ app_name }}"
+  labels:
+    app: "{{ app_name }}"
+    kubify_version: "{{ kubify_version }}"
+data: {}

@@ -1,0 +1,3 @@
+gitpython
+boto3
+pytest

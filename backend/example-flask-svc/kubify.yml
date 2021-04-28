@@ -1,0 +1,53 @@
+---
+apiVersion: k8.kubify.local/v1
+kind: Config
+metadata:
+  name: example-flask-svc
+init: |
+  echo "run migrations for example-flask-svc/app"
+dev:
+  sync:
+    'app/***': 'app/'
+  scripts:
+    start: |
+      echo 'listening for code changes in example-flask-svc folder'
+      cd /app/app
+      export FLASK_APP=flask_hello_kubify.py
+      export FLASK_RUN_HOST=0.0.0.0
+      export FLASK_ENV=development 
+      flask run
+release:
+  scripts:
+    start: |
+      echo 'starting example-flask-svc release service's pod'  
+      cd /app/app
+      export FLASK_APP=flask_hello_kubify.py
+      export FLASK_RUN_HOST=0.0.0.0
+      export FLASK_ENV=release
+      flask run
+config:
+  PORT: "8000"
+  APP_NAME: example-flask-svc
+  DEBUG: "example-flask-svc:*"
+  ENV: "{{ env }}"
+  KUBIFY_ENV: "{{ env }}"
+profiles:
+  dev:
+    scaler:
+      minReplicas: 2
+      maxReplicas: 4
+      metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 40
+    resources:
+      requests:
+        cpu: 64m
+        memory: 64Mi
+      limits:
+        cpu: 128m
+        memory: 128Mi
+    

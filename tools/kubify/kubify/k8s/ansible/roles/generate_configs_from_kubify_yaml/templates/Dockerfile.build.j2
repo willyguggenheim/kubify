@@ -1,0 +1,87 @@
+# Build
+
+{% if requirements_txt_file.stat.exists %}
+FROM python:3.9-alpine as builder
+{% elif package_json_file.stat.exists %}
+FROM node:{{ package_json_node_version }}-alpine as builder
+{% endif %}
+
+RUN apk update
+RUN apk --no-cache add postgresql-dev jq curl bash g++ ca-certificates lz4-dev musl-dev cyrus-sasl-dev make python3
+RUN apk add --no-cache --virtual .build-deps gcc zlib-dev libc-dev bsd-compat-headers py-setuptools bash
+RUN apk add --update findutils
+WORKDIR /app
+COPY . .
+{% set build_script = kubify_config | json_query('release.scripts.build') | default(none, true) %}
+
+{% if requirements_txt_file.stat.exists %}
+  {% if build_script is not none %}
+RUN {{ build_script.split('\n') | join('; ') }}
+  {% else %}
+RUN pip3 install -r requirements.txt
+  {% endif %}
+{% elif package_json_file.stat.exists %}
+ARG NPM_TOKEN
+RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > /app/.npmrc
+    {% set builder_cmd = 'yarn' if yarn_lock_file.stat.exists else 'npm' %}
+  {% if build_script is not none %}
+RUN {{ build_script.split('\n') | join('; ') }}
+  {% else %}
+RUN {{ builder_cmd }} run build || true
+  {% endif %}
+{% endif %}
+
+RUN rm -f /app/.npmrc
+
+
+
+{% if (kubify_config | json_query('release.type')) == 'static_assets' %}
+# Production
+FROM nginx:1.15.5-alpine
+ENV NGINX_PORT {{ app_port }}
+ENV ESC '$'
+{% set build_dir = kubify_config | json_query('release.build_dir') | default('build', true) %}
+COPY --from=builder /app/{{ build_dir }}/ /usr/share/nginx/html
+RUN echo $'\n\
+server {\n\
+  listen       ${NGINX_PORT};\n\
+  server_name  localhost;\n\
+\n\
+  location / {\n\
+      root   /usr/share/nginx/html;\n\
+      index  index.html index.htm;\n\
+      try_files ${ESC}uri /index.html;\n\
+  }\n\
+\n\
+  error_page   500 502 503 504  /50x.html;\n\
+  location = /50x.html {\n\
+      root   /usr/share/nginx/html;\n\
+  }\n\
+}\n'\
+>> /etc/nginx/conf.d/default.template
+
+RUN echo "/bin/sh -c \"envsubst < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'\"" > /run.sh
+CMD ["sh", "/run.sh"]
+{% else %}
+
+{% if requirements_txt_file.stat.exists %}
+FROM python:3.9-alpine as builder
+{% elif package_json_file.stat.exists %}
+FROM node:{{ package_json_node_version }}-alpine as builder
+{% endif %}
+
+RUN apk update && apk add jq curl
+{% set install_script = kubify_config | json_query('release.scripts.install') | default('echo', true)  %}
+RUN {{ install_script.split('\n') | join(';') }}
+WORKDIR /app
+COPY --from=builder /app /app
+RUN echo '\
+{% set start_script = kubify_config | json_query('release.scripts.start') %}
+{% if start_script is not none %}
+{{ start_script.split('\n') | join('; ') | replace('\'', '\'\"\'\"\'') | indent(width=4, indentfirst=true) }} \
+{% else %}
+    PATH=$PATH:/app/node_modules/.bin {{ builder_cmd }} start \
+{% endif %}' > /app/run.sh
+ENV PORT {{ app_port }}
+CMD ["sh", "run.sh"]
+{% endif %}

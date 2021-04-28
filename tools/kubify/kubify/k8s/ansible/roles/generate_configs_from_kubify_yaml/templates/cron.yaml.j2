@@ -1,0 +1,53 @@
+{% if is_local is not defined %}
+{% set crons = kubify_config | json_query("crons") | default(dict(), true) %}
+{% for name,cron in crons.items() %}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: "{{ app_name }}-{{ name }}-cron"
+spec:
+  schedule: "{{ cron.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: "{{ app_name }}-{{ name }}-cron"
+            image: "{{ app_image }}"
+            imagePullPolicy: IfNotPresent
+            args:
+            - /bin/sh
+            - -c 
+            - export DB_USERNAME=${DB_USERNAME:-test} && export DB_PASSWORD=${DB_PASSWORD:-test} && {{ cron.command }}
+            env:
+            - name: DD_TRACE_AGENT_HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_SERVICE_NAME
+              value: "{{ app_name }}"
+            - name: DD_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ app_name }}-init"
+                  key: environment
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ app_name }}-init"
+                  key: environment
+            envFrom:
+            - configMapRef:
+                name: "{{ app_name }}-generated"
+            - configMapRef:
+                name: "{{ app_name }}"
+            - secretRef:
+                name: "{{ app_name }}"
+{% endfor %}
+{% endif %}

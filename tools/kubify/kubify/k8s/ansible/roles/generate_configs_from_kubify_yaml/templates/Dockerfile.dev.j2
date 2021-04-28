@@ -1,0 +1,62 @@
+# Build
+
+{% if requirements_txt_file.stat.exists %}
+FROM python:3.9-alpine as builder
+{% elif csproj_file.stat.exists %}
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine3.13 as builder
+{% elif pom_xml_file.stat.exists %}
+FROM openjdk:8-jdk-alpine as builder
+{% elif package_json_file.stat.exists %}
+FROM node:{{ package_json_node_version }}-alpine as builder
+{% endif %}
+
+RUN apk update
+RUN apk --no-cache add postgresql-dev jq curl bash g++ ca-certificates lz4-dev musl-dev cyrus-sasl-dev make python3
+RUN apk add --no-cache --virtual .build-deps gcc zlib-dev libc-dev bsd-compat-headers py-setuptools bash
+RUN apk add --update findutils
+{% set install_script = kubify_config | json_query('dev.scripts.install') | default('echo', true)  %}
+RUN {{ install_script.split('\n') | join(';') }}
+WORKDIR /app
+COPY . .
+
+{% set build_script = kubify_config | json_query('dev.scripts.build') | default(none, true) %}
+
+{% if requirements_txt_file.stat.exists %}
+    {% if build_script is not none %}
+RUN {{ build_script.split('\n') | join('; ') }}
+    {% else %}
+RUN pip3 install -r requirements.txt
+    {% endif %}
+{% elif csproj_file.stat.exists %}
+WORKDIR /app
+# Copy csproj and restore as distinct layers
+COPY app.csproj ./
+RUN dotnet restore
+# Copy everything else 
+COPY app/. ./
+{% elif pom_xml_file.stat.exists %}
+WORKDIR /app
+COPY app/ .
+RUN ./mvnw install -DskipTests
+{% elif package_json_file.stat.exists %}
+ARG NPM_TOKEN
+RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > /app/.npmrc
+    {% set builder_cmd = 'yarn' if yarn_lock_file.stat.exists else 'npm' %}
+    {% if build_script is not none %}
+RUN {{ build_script.split('\n') | join('; ') }}
+    {% else %}
+RUN {{ builder_cmd }} install --network-timeout 1000000 
+    {% endif %}
+{% endif %}
+
+RUN mkdir -p /ops
+RUN echo '\
+{% set start_script = kubify_config | json_query('dev.scripts.start') %}
+{% if start_script is not none %}
+{{ start_script.split('\n') | join('; ') | replace('\'', '\'\"\'\"\'') | indent(width=4, indentfirst=true) }} \
+{% else %}
+{{ builder_cmd }} run dev \
+{% endif %}' > /app/dev.sh
+RUN rm -f /app/.npmrc
+ENV PORT {{ app_port }}
+CMD ["sh", "dev.sh"]
