@@ -1256,10 +1256,12 @@ $KUBECTL apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/mas
 $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=90s || $KUBECTL wait --namespace ingress-nginx \
+  --timeout=90s || sleep 20
+      $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=90s || $KUBECTL wait --namespace ingress-nginx \
+  --timeout=90s || sleep 20
+      $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
   --timeout=90s
