@@ -43,19 +43,22 @@ spec:
       volumes:
         - name: src-mount
           hostPath:
-            path: {{SRC_MOUNT}}
+            path: /src/kubify
+        # - name: home-mount
+        #   hostPath:
+        #     path: "{{HOME_MOUNT}}"
         - name: home-mount-aws
           hostPath:
-            path: {{HOME_MOUNT}}/.aws
+            path: /root/.aws
         - name: home-mount-ssh
           hostPath:
-            path: {{HOME_MOUNT}}/.ssh
+            path: /root/.ssh
         - name: home-mount-gitconfig
           hostPath:
-            path: {{HOME_MOUNT}}/.gitconfig
-        - name: docker-sock 
+            path: /root/.gitconfig
+        - name: docker-sock
           hostPath:
-            path: /var/run
+            path: "{{DOCKER_SOCKET_FILE_LOCATION}}"
         - name: config
           configMap:
             name: entrypoint-config
@@ -71,13 +74,15 @@ spec:
           volumeMounts:
             - mountPath: /src/kubify
               name: src-mount
-            - mountPath: /data/home/.aws
+            # - mountPath: /root
+            #   name: home-mount
+            - mountPath: /root/.aws
               name: home-mount-aws
-            - mountPath: /data/home/.ssh
+            - mountPath: /root/.ssh
               name: home-mount-ssh
-            - mountPath: /data/home/.gitconfig
+            - mountPath: /root/.gitconfig
               name: home-mount-gitconfig
-            - mountPath: /var/run 
+            - mountPath: "{{DOCKER_SOCKET_FILE_LOCATION}}"
               name: docker-sock
           envFrom:
           - secretRef:

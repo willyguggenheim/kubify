@@ -51,10 +51,16 @@ kubify up
 kubify start-all 
 
 #cd into a specific service
-cd backend/backend-svc
+cd backend/example-django-simple-svc
 
-#listens for code changes, shows logs, runs unit tests (on each code save), opens and auto-configures IDE
+# Option A (use the wrapper shortcut)
+../../kubify start
+
+# Option B (use the script folder in path)
 kubify start
+
+# kubify now listens for any code changes on your service 
+# and automatically immediatly tails the logs of all services in the cluster ..
 
 ```
 When you fork this into your private repo: I recommend removing these lines from .gitignore file:

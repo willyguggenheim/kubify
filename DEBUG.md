@@ -1,10 +1,16 @@
 # Debug Things
 
 
-________________START WINDOWS INSTALL (until we automate these steps)____________________
+```
++ kubectl --context kind-kind --namespace kubify apply -f -
+Error from server (InternalError): error when creating "STDIN": Internal error occurred: failed calling webhook "webhook.cert-manager.io": Post "https://cert-manager-webhook.cert-manager.svc:443/mutate?timeout=10s": EOF
+```
+solution coming soon in new version: https://github.com/jetstack/cert-manager/issues/2640
+TODO (urgent): https://github.com/jetstack/cert-manager/releases we are going to use the 2 day old version of cert-manager, so upgrade this soon
+   Another option: v1.3.1 (stable), actually lemme try that first...
 
 
-# Please note (for Windows support, you need to do this first):
+# WINDOWS INSTALL (until we automate these steps):
 
 - install WSL2 (Ubuntu for Windows, the one created by Microsoft): #TODO: automate this flow using ansible
   - # if windows is on a VM, enable vXT (virtualization nesting)
@@ -198,4 +204,11 @@ still?
 ```
 brew uninstall ansible
 brew install ansible
+```
+
+# troubleshoot entrypoint container mount point things
+```
+kubectl get pods -n kubify
+kubectl -n kubify exec entrypoint-54d6c57bbd-np75d sh -- ls -al /data/home/.aws
+kubectl --context kind-kind --namespace kubify exec -it entrypoint-54d6c57bbd-np75d -- bash -l -i -c kubify
 ```

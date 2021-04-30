@@ -1,5 +1,21 @@
 #!/usr/bin/env bash
 
+if ! [ -x "$(command -v sudo)" ]; then
+  if [[ "$OSTYPE" == *"linux"* ]]; then
+    apt-get update
+    apt-get install -y sudo
+  fi
+fi
+
+if ! [ -x "$(command -v wget)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    brew install wget
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+    sudo apt-get update
+    sudo apt-get install -y wget
+  fi
+fi
+
 # TODO: implement this progress bar when debug is turned off:
 # phases=( 
 #     'Phase A...'
@@ -23,6 +39,7 @@
 # `kubify hard_reset_docker_mac`
 # alternative 1) docker system prune -a
 # alternative 2) open docker desktop, resize disk maximum disk size, apply, `kubify up`
+
 hard_reset_docker_mac() {
 
   IMAGES=$@
@@ -152,15 +169,6 @@ if [[ "$OSTYPE" == *"darwin"* ]]; then
   if ! [ -x "$(command -v brew)" ]; then
     # https://brew.sh
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  fi
-fi
-
-if ! [ -x "$(command -v wget)" ]; then
-  if [[ "$OSTYPE" == *"darwin"* ]]; then
-    brew install wget
-  elif [[ "$OSTYPE" == *"linux"* ]]; then
-    sudo apt-get update
-    sudo apt-get install -y wget
   fi
 fi
 
@@ -514,15 +522,15 @@ function mount_dir {
 }
 
 function mount_source {
-  mount_dir $SRC_DIR $SRC_MOUNT
+  mount_dir "$SRC_DIR" "$SRC_MOUNT"
 }
 
 function mount_home {
-  mount_dir $HOME $HOME_MOUNT
+  mount_dir "$HOME" "$HOME_MOUNT"
 }
 
 function mount_aws {
-  mount_dir $HOME/.aws /config/aws
+  mount_dir "$HOME/.aws" /config/aws
 }
 
 function start_mount {
@@ -783,11 +791,15 @@ function configure_cluster {
       kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
---timeout=180s || sleep 10
+--timeout=100s || sleep 10
       kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
---timeout=180s
+--timeout=100s || sleep 10
+      kubectl wait --namespace ingress-nginx \
+--for=condition=ready pod \
+--selector=app.kubernetes.io/component=controller \
+--timeout=100s
 
     else
       # Install nginx-ingress (except on minikube)
@@ -894,7 +906,9 @@ function configure_cluster {
 
     # 4/9/2021: this 1.3.0 version is a 2 day old release (but certmanager should be updated regularly), but it looks to fix the some of the recent certmanager issues nicely, according to my latest rapid testing \
     #  efforts (refactor was necessary along with it) https://github.com/jetstack/cert-manager/releases
-    CERT_MANAGER_VERSION="v1.3.1"
+    # CERT_MANAGER_VERSION="v1.3.1"
+    # niiiiiice very naiiiiceee https://github.com/jetstack/cert-manager/releases/tag/v1.4.0-alpha.0 !!!!!!!!!
+    CERT_MANAGER_VERSION=v1.4.0-alpha.0
     # CERT_MANAGER_CRD_VERSION="0.8" # Both these need to have the same minor version !!! IMPORTANT !!!
     #$KUBECTL apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-${CERT_MANAGER_CRD_VERSION}/deploy/manifests/00-crds.yaml
     $KUBECTL create ns cert-manager || echo 'cert-manager ns exists'
@@ -1096,10 +1110,10 @@ function configure {
     SRC_MOUNT_PATTERN=`echo "$SRC_MOUNT" | sed 's/\\//\\\\\//g'`
     HOME_MOUNT_PATTERN=`echo "$HOME_MOUNT" | sed 's/\\//\\\\\//g'`
     if [[ "$KUBIFY_CONTAINER_REGISTRY" == *"dockerhub"* ]]; then
-        ENTRYPOINT_TEMPLATE=`cat "$MANIFESTS/entrypoint.yaml" | sed "s/{{SRC_MOUNT}}/$SRC_MOUNT_PATTERN/g" | sed "s/{{HOME_MOUNT}}/$HOME_MOUNT_PATTERN/g"`
+        ENTRYPOINT_TEMPLATE=`cat "$MANIFESTS/entrypoint.yaml" | sed "s/{{SRC_MOUNT}}/$SRC_MOUNT_PATTERN/g" | sed "s/{{HOME_MOUNT}}/$HOME_MOUNT_PATTERN/g" | sed "s/{{DOCKER_SOCKET_FILE_LOCATION}}/\/var\/run\/docker.sock/g"`
         exit 1
     elif [[ "$KUBIFY_CONTAINER_REGISTRY" == *"ecr"* ]]; then
-        ENTRYPOINT_TEMPLATE=`cat "$MANIFESTS/entrypoint_s3.yaml" | sed "s/{{SRC_MOUNT}}/$SRC_MOUNT_PATTERN/g" | sed "s/{{HOME_MOUNT}}/$HOME_MOUNT_PATTERN/g"`
+        ENTRYPOINT_TEMPLATE=`cat "$MANIFESTS/entrypoint_s3.yaml" | sed "s/{{SRC_MOUNT}}/$SRC_MOUNT_PATTERN/g" | sed "s/{{HOME_MOUNT}}/$HOME_MOUNT_PATTERN/g" | sed "s/{{DOCKER_SOCKET_FILE_LOCATION}}/\/var\/run\/docker.sock/g"`
     else
       echo "please set env KUBIFY_CONTAINER_REGISTRY"
       exit 1
@@ -1199,11 +1213,23 @@ function install {
 
   echo "Installing Kind"
 
+# https://kind.sigs.k8s.io/docs/user/configuration/
 kind get clusters | grep kind || cat <<EOF | kind create cluster --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
+  extraMounts:
+  - hostPath: "${SRC_DIR}"
+    containerPath: /src/kubify
+  - hostPath: "${HOME}/.aws"
+    containerPath: /root/.aws
+  - hostPath: "${HOME}/.ssh"
+    containerPath: /root/.ssh
+  - hostPath: "${HOME}/.gitconfig"
+    containerPath: /root/.gitconfig
+  - hostPath: /var/run/docker.sock
+    containerPath: /var/run/docker.sock
   kubeadmConfigPatches:
   - |
     kind: InitConfiguration
@@ -1220,16 +1246,18 @@ nodes:
 EOF
 # kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
 # kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
-# kubectl wait --timeout=180s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
+# kubectl wait --timeout=100s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
 $KUBECTL apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
 $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=180s || sleep 10
-$KUBECTL wait --namespace ingress-nginx \
+  --timeout=100s || $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=180s
+  --timeout=100s || $KUBECTL wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=100s
 
 
 }
@@ -1301,20 +1329,16 @@ function down {
           $MINIKUBE stop --profile $PROFILE
         } &> "$KUBIFY_OUT"
       else
-
-        # if [[ "$OSTYPE" == *"darwin"* ]]; then
-        #    ${KUBECTL} delete ns kubify
-        # elif [[ "$OSTYPE" == *"linux"* ]]; then
-        #   if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-           kind delete cluster --name kind-kind
-           rm -rf "${WORK_DIR}"
-        #   fi
-        # fi
-
-
+           kind delete cluster --name docker-desktop
+           kind delete cluster --name kind
+           kind get clusters
       fi
     fi
   fi
+}
+
+function clear_cache {
+  rm -rf "${WORK_DIR}"
 }
 
 function check_local_env {
@@ -1880,19 +1904,18 @@ function run_in_entrypoint {
   fi
 }
 
-function __setup_symlinks {
-  ln -sf /data/home/.aws /root/
-  ln -sf /data/home/.ssh /root/
-  ln -sf /data/home/.gitconfig /root/
-}
+# function __setup_symlinks {
+#   ln -sf /data/home/.aws /root/
+#   ln -sf /data/home/.ssh /root/
+#   ln -sf /data/home/.gitconfig /root/
+# }
 
-function setup_symlinks {
-  echo "Setting up symlinks in entrypoint container" &> "$KUBIFY_OUT"
-  # workaroud for race condition during ECR compatibility feature development (will clean this redundant code up later)
-  run_in_entrypoint 'ln -sf /data/home/.aws /root/ && ln -sf /data/home/.ssh /root/ && ln -sf /data/home/.gitconfig /root/'
-  # TODO: add the rest of the env vars (already added KUBIFY_CONTAINER_REGISTRY)
-  run_in_entrypoint KUBIFY_DEBUG=${KUBIFY_DEBUG} KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY} UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM} kubify __setup_symlinks || true
-}
+# function setup_symlinks {
+#   echo "Setting up symlinks in entrypoint container" &> "$KUBIFY_OUT"
+#   run_in_entrypoint 'ln -sf /data/home/.aws /root/ && ln -sf /data/home/.ssh /root/ && ln -sf /data/home/.gitconfig /root/'
+#   # TODO: add the rest of the env vars (already added KUBIFY_CONTAINER_REGISTRY)
+#   run_in_entrypoint KUBIFY_DEBUG=${KUBIFY_DEBUG} KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY} UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM} kubify __setup_symlinks || true
+# }
 
 function wait_for_deployment {
   check_arg $1 "No deployment name specified!"
@@ -1926,7 +1949,8 @@ function check_containers {
 
 function configure_containers {
   check_containers
-  setup_symlinks
+  #TODO (urgent): fix kind mounts and then uncomment this !!!!!
+  # setup_symlinks
 }
 
 function run_in_app_entrypoint {

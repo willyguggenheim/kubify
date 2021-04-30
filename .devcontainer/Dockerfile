@@ -5,7 +5,8 @@ FROM mcr.microsoft.com/vscode/devcontainers/base:0-buster
 ARG INSTALL_ZSH="true"
 ARG UPGRADE_PACKAGES="false"
 ARG ENABLE_NONROOT_DOCKER="true"
-ARG SOURCE_SOCKET=/var/run/docker-host.sock
+# ARG SOURCE_SOCKET=/var/run/docker-host.sock
+ARG SOURCE_SOCKET=/var/run/docker.sock
 ARG TARGET_SOCKET=/var/run/docker.sock
 ARG USERNAME=vscode
 ARG USER_UID=1000

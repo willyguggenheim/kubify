@@ -1,19 +1,29 @@
 #feature #1: APM with ISTIO
 #feature #2: Auto-Configure IDE Debugger on "kubify debug"  
 #more features that come to mind:
-- (similar to Ubuntu/Debian Kind implementation): change Mac to also use Kind (instead of the docker desktop K8s)
+- CICD !!!
+	- create kubify/entrypoint:latest and kubify/entrypoint:v2.0.X everytime master has code merged into it
+	- deploy stages
+	- terraform automations
+	- example file
+	- artifacts that can speed up local `kubify up` to be pushed to artifacts on master merge
+	- kubify pushes as a pypi package
+	- kubify pushes as a npmjs package
+	- kubify pushes as a maven package
+	- extra credit: kubify pushes as a NuGet package
+	- add build passing image to README.md
+- DONE: (similar to Ubuntu/Debian Kind implementation): change Mac to also use Kind (instead of the docker desktop K8s)
   - after much performance testing I found that docker desktop is a lot slower than Kind (and uses more CPU than Kind, so important)
-- M1 compatibility
+- DONE: M1 compatibility
 - permissions between services automated in kubify.yaml
 - automate kafka
 - automate localstack
 - native windows option (other than wsl2) with install_windows.yaml
 - migrate to using docker cmd for all cli commands (so it runs anywhere smoothly, less porting)
 	- use kind, start with linux migration
-- fix WSL2 windows
+- DONE: fix WSL2 windows
   - also automate this current pre-req flow: 
       - on WSL2: you must first (before running kubify up for the first time on Windows): enable WSL1, install WSL2, upgrade to WSL2, Install Ubuntu for Windows from Microsoft, open Ubuntu for Windows, make sure it's upgraded to WSL2, make sure install Docker Desktop (and that will install docker into that WSL2 Debian distro mapped to host Docker Desktop and host Kubernetes on the Windows side).. 
-- add kubemq automation (backed by interface to sqs or kubemq container, based on deployed and local env automation)
 - build various example 'hello kubify world' services in various languages, since this is turn key
   - add those to tooling as well
 - add istio apm (FREE APM!!!!) feature to example services
