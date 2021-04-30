@@ -791,15 +791,15 @@ function configure_cluster {
       kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
---timeout=100s || sleep 10
+--timeout=90s || sleep 10
       kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
---timeout=100s || sleep 10
+--timeout=90s || sleep 10
       kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
---timeout=100s
+--timeout=90s
 
     else
       # Install nginx-ingress (except on minikube)
@@ -1251,18 +1251,18 @@ nodes:
 EOF
 # kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
 # kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
-# kubectl wait --timeout=100s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
+# kubectl wait --timeout=90s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
 $KUBECTL apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
 $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=100s || $KUBECTL wait --namespace ingress-nginx \
+  --timeout=90s || $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=100s || $KUBECTL wait --namespace ingress-nginx \
+  --timeout=90s || $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=100s
+  --timeout=90s
 
 
 }
