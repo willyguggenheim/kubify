@@ -3,6 +3,7 @@
   hosts: localhost
   vars:
     local_bin: /usr/local/bin
+    kind_version: 0.10.0
     skaffold_version: 1.21.0
     skaffold_url: https://storage.googleapis.com/skaffold/releases/v{{ skaffold_version }}/skaffold-darwin-amd64
     brew_taps:
@@ -13,6 +14,7 @@
       - visual-studio-code
     brew_remove_packages:
       - skaffold
+    kind_url: https://github.com/kubernetes-sigs/kind/releases/download/v{{ kind_version }}/kind-darwin-amd64
     helm_url: https://raw.githubusercontent.com/Homebrew/homebrew-core/1e8e12c73c465f15ae25ed8bc5f321018b9107b1/Formula/kubernetes-helm.rb # Helm 2.13
     brew_packages:
       - minikube
@@ -35,6 +37,7 @@
     upgrade_homebrew_packages: true
     get_url_downloads:
       - {'bin': 'skaffold', 'url': '{{ skaffold_url }}'}
+      - {'bin': 'kind', 'url': '{{ kind_url }}' }
     pip_packages:
       - jmespath
       - pyjwt
@@ -177,46 +180,67 @@
       lineinfile:
         path: "~/Library/Group Containers/group.com.docker/settings.json"
         regexp: memoryMiB
-        line: '  "memoryMiB" : 8192,'
+        line: '  "memoryMiB" : 5120,'
       tags: ['docker']
       when: file_docker_settings.stat.exists
+      register: docker_config_changed
 
     - name: configure docker cpu limit
       lineinfile:
         path: "~/Library/Group Containers/group.com.docker/settings.json"
         regexp: cpus
-        line: '  "cpus" : 4,'
+        line: '  "cpus" : 3,'
       tags: ['docker']
       when: file_docker_settings.stat.exists
+      register: docker_config_changed
 
-    - name: enable docker-desktop flavor of kubernetes, part 1
+    # TODO: change this all to use Kind intead of Docker Desktop
+    # this is for M1 compatibility mostly, but also performance testing
+    # known bug: https://github.com/docker/for-mac/issues/5410
+    - name: docker desktop to use it's new framework
+      lineinfile:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: useVirtualizationFramework
+        # set to true for M1?
+        line: '  "useVirtualizationFramework" : true,'
+      tags: ['docker']
+      when: file_docker_settings.stat.exists
+      register: docker_config_changed
+
+    - name: disable docker-desktop flavor of kubernetes, part 1 (migrated to Kind)
       lineinfile:
         path: "~/Library/Group Containers/group.com.docker/settings.json"
         regexp: kubernetesEnabled
-        line: '  "kubernetesEnabled" : true,'
+        line: '  "kubernetesEnabled" : false,'
       tags: ['docker']
       when: file_docker_settings.stat.exists
+      register: docker_config_changed
 
-    - name: enable docker-desktop flavor of kubernetes, part 2
-      lineinfile:
-        path: "~/Library/Group Containers/group.com.docker/settings.json"
-        regexp: showKubernetesSystemContainers
-        line: '  "showKubernetesSystemContainers" : true,'
-      tags: ['docker']
-      when: file_docker_settings.stat.exists
+
+    # - name: enable docker-desktop flavor of kubernetes, part 2
+    #   lineinfile:
+    #     path: "~/Library/Group Containers/group.com.docker/settings.json"
+    #     regexp: showKubernetesSystemContainers
+    #     line: '  "showKubernetesSystemContainers" : false,'
+    #   tags: ['docker']
+    #   when: file_docker_settings.stat.exists
   
     - name: Stop Docker Desktop
-      shell: osascript -e 'quit app "Docker"' || test -z "$(docker ps -q 2>/dev/null)" && osascript -e 'quit app "Docker"'
-      when: file_docker_settings.stat.exists
+      # shell: osascript -e 'quit app "Docker"' || test -z "$(docker ps -q 2>/dev/null)" && osascript -e 'quit app "Docker"'
+      shell: osascript -e 'quit app "Docker"'
+      when: docker_config_changed.changed
 
-    - name: Reset PKI Certs (Workaround 002)
-      shell: rm -f "~/Library/Group Containers/group.com.docker/pki"
-      when: file_docker_settings.stat.exists
+    # - name: Reset PKI Certs (Workaround 002)
+    #   shell: rm -f "~/Library/Group Containers/group.com.docker/pki"
+    #   when: file_docker_settings.stat.exists
 
     - name: Start Docker Desktop
       shell: open --background -a Docker
-      when: file_docker_settings.stat.exists
+      when: docker_config_changed.changed
 
-    - name: Waiting for Kubernetes (on Docker Desktop) to configure
-      shell: while ! /usr/local/bin/kubectl get namespaces 2>&1;   do     echo "Waiting for Kubernetes for Docker Desktop to Install and Configure" && sleep 2;   done
-      when: file_docker_settings.stat.exists
+    - name: Waiting for docker ps command to succeed
+      shell: while ! /usr/local/bin/docker ps 2>&1;   do     echo "Waiting for Kubernetes for Docker Desktop to Install and Configure" && sleep 2;   done
+
+    # - name: Waiting for Kubernetes (on Docker Desktop) to configure
+    #   shell: while ! /usr/local/bin/kubectl get namespaces 2>&1;   do     echo "Waiting for Kubernetes for Docker Desktop to Install and Configure" && sleep 2;   done
+    #   when: file_docker_settings.stat.exists

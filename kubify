@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
-export PATH=$PATH:$(pwd)/tools/kubify/cli
+# this way you can run this shortcut from any folder :) 
+MY_PATH="`dirname \"$0\"`"
+# echo "$MY_PATH"
+
+
+export PATH=$PATH:$MY_PATH/tools/kubify/cli
 
 kubify $@

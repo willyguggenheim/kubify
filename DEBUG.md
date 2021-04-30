@@ -41,6 +41,10 @@ kubify up
 
 ____________________________________________________________________________________________
 
+# Ansible on Mac stuck at "Add local.kubify.local resolver port"
+remove your dnsmasq kubify file and then `kubify up`
+why: some Ansible issue, will fix it with a check
+
 # Ansible script fails on brew install during Kubify Up
 
 Manually install the offending packages (this seems to work):

@@ -1,5 +1,91 @@
 #!/usr/bin/env bash
 
+# TODO: implement this progress bar when debug is turned off:
+# phases=( 
+#     'Phase A...'
+#     'Phase B...'
+#     'Phase C...'
+#     'ALMOST THERE...'
+# )   
+# for i in $(seq 1 100); do  
+#     sleep 0.1
+#     if [ $i -eq 100 ]; then
+#         echo -e "XXX\n100\nDone!\nXXX"
+#     elif [ $(($i % 25)) -eq 0 ]; then
+#         let "phase = $i / 25"
+#         echo -e "XXX\n$i\n${phases[phase]}\nXXX"
+#     else
+#         echo $i
+#     fi 
+# done | whiptail --title 'Kerbal Space Program' --gauge "${phases[0]}" 6 60 0
+
+
+# `kubify hard_reset_docker_mac`
+# alternative 1) docker system prune -a
+# alternative 2) open docker desktop, resize disk maximum disk size, apply, `kubify up`
+hard_reset_docker_mac() {
+
+  IMAGES=$@
+
+  echo "This will remove all your current containers and images except for:"
+  echo ${IMAGES}
+  read -p "Are you sure? [yes/NO] " -n 1 -r
+  echo    # (optional) move to a new line
+  if [[ ! $REPLY =~ ^[Yy]$ ]]
+  then
+      exit 1
+  fi
+
+
+  TMP_DIR=$(mktemp -d)
+
+  pushd $TMP_DIR >/dev/null
+
+  open -a Docker
+  echo "=> Saving the specified images"
+  for image in ${IMAGES}; do
+    echo "==> Saving ${image}"
+    tar=$(echo -n ${image} | base64)
+    docker save -o ${tar}.tar ${image}
+    echo "==> Done."
+  done
+
+  echo "=> Cleaning up"
+  echo -n "==> Quiting Docker"
+  osascript -e 'quit app "Docker"'
+  while docker info >/dev/null 2>&1; do
+    echo -n "."
+    sleep 1
+  done;
+  echo ""
+
+  echo "==> Removing Docker.qcow2 file"
+  rm ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2
+
+  echo "==> Launching Docker"
+  open -a Docker
+  echo -n "==> Waiting for Docker to start"
+  until docker info >/dev/null 2>&1; do
+    echo -n "."
+    sleep 1
+  done;
+  echo ""
+
+  echo "=> Done."
+
+  echo "=> Loading saved images"
+  for image in ${IMAGES}; do
+    echo "==> Loading ${image}"
+    tar=$(echo -n ${image} | base64)
+    docker load -q -i ${tar}.tar || exit 1
+    echo "==> Done."
+  done
+
+  popd >/dev/null
+  rm -r ${TMP_DIR}
+
+}
+
 ACTUAL_OS_TYPE=mac
 cat /proc/version | grep -i microsoft &> /dev/null && ACTUAL_OS_TYPE=wsl2
 cat /proc/version | grep -i ubuntu &> /dev/null && ACTUAL_OS_TYPE=ubuntu
@@ -102,12 +188,13 @@ if [[ $KUBIFY_CI != '1' ]]; then
   # echo "$KUBIFY_CI"
   # echo "$ACTUAL_OS_TYPE"
   # exit 1
-  PROFILE=${KUBIFY_PROFILE:-docker-desktop}
-  if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-   # echo "yo"
-   # exit 1
-   PROFILE=kind-kind
-  fi
+  PROFILE=${KUBIFY_PROFILE:-kind-kind}
+  # PROFILE=${KUBIFY_PROFILE:-docker-desktop}
+  # if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+  #  # echo "yo"
+  #  # exit 1
+  #  PROFILE=kind-kind
+  # fi
 else
   PROFILE=${KUBIFY_PROFILE:-default}
 fi
@@ -455,7 +542,8 @@ function _build_image {
 
   set_context
   docker build -t ${IMAGE}:latest "$SRC_PATH"
-  if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+  # if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+  if [[ $KUBIFY_CI != '1' ]]; then
     kind load docker-image ${IMAGE}:latest
   fi
 }
@@ -656,6 +744,8 @@ function configure_cluster {
     # so we will use the last version before that (they used to use a version naming convention that didn't match the version name):
     # also we had to do a find/replace from kubedb-operator to kubedb-community (previous helm chart name, before the march breaking changes of kubedb)
     KUBEDB_VERSION=v0.16.2
+    # UPDATE ^^: new version of KubeDB might be fixed:
+    # KUBEDB_VERSION=v2021.04.16
 
     # workaround, since --install was not ignoring errors (and \
     # the KubeDB public repo latest release version is using the depreciated api resulting in error: 
@@ -687,12 +777,14 @@ function configure_cluster {
     if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
       # kind nginx ingress pattern: https://kind.sigs.k8s.io/docs/user/ingress/
       # TODO: since this is needed maybe we should also support microkubes or k3s, as an alternative (since docker desktop is not on linux)
-      $KUBECTL apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
-      $KUBECTL wait --namespace ingress-nginx \
+      
+      kubectl create ns ingress-nginx
+      kubectl apply --namespace ingress-nginx -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+      kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
 --timeout=180s || sleep 10
-      $KUBECTL wait --namespace ingress-nginx \
+      kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
 --timeout=180s
@@ -700,9 +792,15 @@ function configure_cluster {
     else
       # Install nginx-ingress (except on minikube)
       if [[ "$KUBIFY_ENGINE" != "minikube" ]]; then
+        helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
+          --install \
+          --namespace ingress-nginx \
+          --set rbac.create=true \
+          --set controller.publishService.enabled=true \
+          --wait && \
         $HELM ${TILLER} upgrade ingress-nginx ingress-nginx/ingress-nginx \
           --install \
-          --namespace kube-system \
+          --namespace ingress-nginx \
           --set rbac.create=true \
           --set controller.publishService.enabled=true \
           --wait
@@ -735,7 +833,7 @@ function configure_cluster {
     #     # Create a self signed Certificate, valid for 10yrs with the 'signing' option set
     #     # https://stackoverflow.com/questions/43665243/invalid-self-signed-ssl-cert-subject-alternative-name-missing/43665244#43665244
     #     docker run -it -v"${WORK_DIR}/certs":/certs alpine/openssl req -x509 -new -nodes -key "/certs/ca.key" -subj "/CN=local.kubify.local/subjectAltName=DNS.1=*.local.kubify.local/" -days 3650 -reqexts v3_req -extensions v3_ca -out "/certs/ca.crt"
-    #     openssl x509 -req -extensions v3_req -days 3650 -in "${WORK_DIR}/certs/ca.csr" -signkey "${WORK_DIR}/certs/ca.key.rsa" -out "${WORK_DIR}/certs/ca.crt" -extfile "${K8S_DIR}/certs/kubify-cli-gen-certs.conf"
+    #     openssl x509 -req -extensions v3_req -days 3650 -in "${WORK_DIR}/certs/ca.csr" -signkey "${WORK_DIR}/certs/ca.key.rsa" -out "${WORK_DIR}/certs/ca.crt" -extfile "${K8S_DIR}/k8s/certs/kubify-cli-gen-certs.conf"
     #     sudo /usr/bin/security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "/certs/ca.crt"
     #     # openssl req -x509 -new -nodes -key "${WORK_DIR}/certs/ca.key" -subj "/CN=local.kubify.local/subjectAltName=DNS.1=*.local.kubify.local/" -days 3650 -reqexts v3_req -extensions v3_ca -out "${WORK_DIR}/certs/ca.crt"
     #     # sudo /usr/bin/security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "${WORK_DIR}/certs/ca.crt"
@@ -747,9 +845,21 @@ function configure_cluster {
         echo "generating ca.key"
         openssl genrsa -out "${WORK_DIR}/certs/ca.key" 2048
         openssl rsa -in "${WORK_DIR}/certs/ca.key" -out "${WORK_DIR}/certs/ca.key.rsa"
-        openssl req -new -key "${WORK_DIR}/certs/ca.key.rsa" -subj /CN=local.kubify.local -out "${WORK_DIR}/certs/ca.csr" -config "${K8S_DIR}/certs/kubify-cli-gen-certs.conf"
-        openssl x509 -req -extensions v3_req -days 3650 -in "${WORK_DIR}/certs/ca.csr" -signkey "${WORK_DIR}/certs/ca.key.rsa" -out "${WORK_DIR}/certs/ca.crt" -extfile "${K8S_DIR}/certs/kubify-cli-gen-certs.conf"
-        sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "${WORK_DIR}/certs/ca.crt"
+        openssl req -new -key "${WORK_DIR}/certs/ca.key.rsa" -subj /CN=local.kubify.local -out "${WORK_DIR}/certs/ca.csr" -config "${K8S_DIR}/k8s/certs/kubify-cli-gen-certs.conf"
+        openssl x509 -req -extensions v3_req -days 3650 -in "${WORK_DIR}/certs/ca.csr" -signkey "${WORK_DIR}/certs/ca.key.rsa" -out "${WORK_DIR}/certs/ca.crt" -extfile "${K8S_DIR}/k8s/certs/kubify-cli-gen-certs.conf"
+
+        if [[ "$OSTYPE" == *"darwin"* ]]; then
+           sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "${WORK_DIR}/certs/ca.crt"
+        elif [[ "$OSTYPE" == *"linux"* ]]; then
+          if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+           # NOTE: TODO?: Might also have to also add to the browsers (linux/windows): https://unix.stackexchange.com/questions/90450/adding-a-self-signed-certificate-to-the-trusted-list
+           apt-get install -y ca-certificates
+           # normally cacert.pem
+           cp "${WORK_DIR}/certs/ca.crt" /usr/share/ca-certificates
+           dpkg-reconfigure ca-certificates
+          fi
+        fi
+        
     fi
 
     # Install cert-manager for TLS
@@ -817,11 +927,17 @@ rbac:
   create: true
 EOF
 
+      kubectl create ns external-dns
+      helm upgrade external-dns stable/external-dns \
+        --install \
+        --wait \
+        --values ${WORK_DIR}/external-dns-values.yaml \
+        --namespace external-dns || \
       ${HELM} ${TILLER} upgrade external-dns stable/external-dns \
         --install \
         --wait \
         --values ${WORK_DIR}/external-dns-values.yaml \
-        --namespace kube-system
+        --namespace external-dns
     fi
   } &> "$KUBIFY_OUT"
 
@@ -1022,8 +1138,13 @@ function configure {
 function install {
   set -e
   echo "Ensuring system dependencies"
-  if [[ "$OSTYPE" == "darwin"* ]]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
     {
+      # https://github.com/dennisausbremen/macOStrap/blob/a7665473faf87677a5c01e8a66d26508379f950f/functions/installer.sh
+      if ! [ -x "$(command -v whiptail)" ]; then
+        # TODO do this dependency file
+        brew install newt
+      fi
       if ! [ -x "$(command -v ansible)" ]; then
         # TODO do this dependency file
         brew install ansible || brew install ansible
@@ -1044,7 +1165,13 @@ function install {
         fi
       fi
     fi
-  elif [[ "$OSTYPE" == "linux"* ]]; then
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+       if ! [ -x "$(command -v whiptail)" ]; then
+        # TODO do this dependency file
+        # https://askubuntu.com/questions/747143/create-a-progress-bar-in-bash
+        sudo apt-get update
+        sudo apt-get install -y whiptail
+      fi
     {
       if ! [ -x "$(command -v ansible)" ]; then
         if ! [ -x "$(command -v pip)" ]; then
@@ -1061,8 +1188,18 @@ function install {
       ansible-playbook --connection=local \
         "${K8S_DIR}/k8s/ansible/install_linux.yaml" \
         --ask-become-pass -e ansible_python_interpreter=`which python3`
-      if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-        kind get clusters | grep kind || cat <<EOF | kind create cluster --config=-
+    } &> "$KUBIFY_OUT"
+  else
+    echo "'kubify install' not supported on $OSTYPE ... yet"
+    exit 1
+  fi
+  echo "Remember to add ${SRC_DIR}/kubify/tools/bin to your \$PATH in your .bashrc, .zshrc, etc"
+  echo "Alternatively create a symlink to ${SRC_DIR}/kubify/tools/bin/kubify to your existing \$PATH"
+
+
+  echo "Installing Kind"
+
+kind get clusters | grep kind || cat <<EOF | kind create cluster --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -1081,26 +1218,20 @@ nodes:
     hostPort: 443
     protocol: TCP
 EOF
-        # kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
-        # kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
-        # kubectl wait --timeout=180s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
-        $KUBECTL apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
-        $KUBECTL wait --namespace ingress-nginx \
+# kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
+# kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
+# kubectl wait --timeout=180s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
+$KUBECTL apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+$KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
   --timeout=180s || sleep 10
-        $KUBECTL wait --namespace ingress-nginx \
+$KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
   --timeout=180s
-      fi
-    } &> "$KUBIFY_OUT"
-  else
-    echo "'kubify install' not supported on $OSTYPE ... yet"
-    exit 1
-  fi
-  echo "Remember to add ${SRC_DIR}/kubify/tools/bin to your \$PATH in your .bashrc, .zshrc, etc"
-  echo "Alternatively create a symlink to ${SRC_DIR}/kubify/tools/bin/kubify to your existing \$PATH"
+
+
 }
 
 function db {
@@ -1119,6 +1250,13 @@ function up {
   if [[ "$@" == "--skip-install" ]]; then
     echo "Skipping installation"
   else
+
+    # ensure sudo password is correct first #TODO: do this better in the python3 migration of this file and allow for non-sudo usage patterns, but for V2 let's do this:
+    until sudo whoami
+    do
+      echo "enter your computer password (since dnsmsq needs sudo)"
+    done
+
     install
   fi
 
@@ -1164,13 +1302,14 @@ function down {
         } &> "$KUBIFY_OUT"
       else
 
-        if [[ "$OSTYPE" == *"darwin"* ]]; then
-           ${KUBECTL} delete ns kubify
-        elif [[ "$OSTYPE" == *"linux"* ]]; then
-          if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+        # if [[ "$OSTYPE" == *"darwin"* ]]; then
+        #    ${KUBECTL} delete ns kubify
+        # elif [[ "$OSTYPE" == *"linux"* ]]; then
+        #   if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
            kind delete cluster --name kind-kind
-          fi
-        fi
+           rm -rf "${WORK_DIR}"
+        #   fi
+        # fi
 
 
       fi
@@ -1229,16 +1368,17 @@ function delete {
       echo "Deleting kubify namespace ${NAMESPACE}"
       #TODO: add checks, for better OS compat
       #if namespace takes longer than 30 seconds to delete (provider hanging), then re-install kubernetes
-        if [[ "$OSTYPE" == *"darwin"* ]]; then
-          echo "TODO: have it turn of k8s and restart docker (similar to the end of the install_osx ansible file.."
-          timeout 60 ${KUBECTL} delete ns ${NAMESPACE} || osascript -e 'quit app "Docker"' && rm -f "~/Library/Group Containers/group.com.docker/pki" && open --background -a Docker && while ! $KUBECTL get namespaces 2>&1;   do     echo "Waiting for Kubernetes for Docker Desktop to Install and Configure" && sleep 2;   done &> "$KUBIFY_OUT"
-        elif [[ "$OSTYPE" == *"linux"* ]]; then
-          # if not WSL2 (if real linux), then since there is no "Docker Desktop" for linux, use "kind" instead
-          timeout 60 ${KUBECTL} delete ns ${NAMESPACE} &> "$KUBIFY_OUT"
-          if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-           kind delete cluster --name docker-desktop
-          fi
-        fi
+        # if [[ "$OSTYPE" == *"darwin"* ]]; then
+        #   echo "TODO: have it turn of k8s and restart docker (similar to the end of the install_osx ansible file.."
+        #   timeout 60 ${KUBECTL} delete ns ${NAMESPACE} || osascript -e 'quit app "Docker"' && rm -f "~/Library/Group Containers/group.com.docker/pki" && open --background -a Docker && while ! $KUBECTL get namespaces 2>&1;   do     echo "Waiting for Kubernetes for Docker Desktop to Install and Configure" && sleep 2;   done &> "$KUBIFY_OUT"
+        # elif [[ "$OSTYPE" == *"linux"* ]]; then
+        #   # if not WSL2 (if real linux), then since there is no "Docker Desktop" for linux, use "kind" instead
+        #   timeout 60 ${KUBECTL} delete ns ${NAMESPACE} &> "$KUBIFY_OUT"
+        #   if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+        #    kind delete cluster --name docker-desktop
+        #   fi
+        # fi
+        kind delete cluster --name docker-desktop || echo "run: docker system prune -a"
     fi
   fi
 }

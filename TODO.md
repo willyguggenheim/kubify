@@ -1,6 +1,9 @@
 #feature #1: APM with ISTIO
 #feature #2: Auto-Configure IDE Debugger on "kubify debug"  
 #more features that come to mind:
+- (similar to Ubuntu/Debian Kind implementation): change Mac to also use Kind (instead of the docker desktop K8s)
+  - after much performance testing I found that docker desktop is a lot slower than Kind (and uses more CPU than Kind, so important)
+- M1 compatibility
 - permissions between services automated in kubify.yaml
 - automate kafka
 - automate localstack
