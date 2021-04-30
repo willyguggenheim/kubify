@@ -12,6 +12,7 @@
 	- kubify pushes as a maven package
 	- extra credit: kubify pushes as a NuGet package
 	- add build passing image to README.md
+- DOCS!!! ALL OF THE DOCS!! <-------------------------------LOOOK THIS WAY!!!!!!
 - DONE: (similar to Ubuntu/Debian Kind implementation): change Mac to also use Kind (instead of the docker desktop K8s)
   - after much performance testing I found that docker desktop is a lot slower than Kind (and uses more CPU than Kind, so important)
 - DONE: M1 compatibility
