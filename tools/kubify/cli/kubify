@@ -1163,7 +1163,12 @@ function install {
         # TODO do this dependency file
         brew install ansible || brew install ansible
       fi
-      ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/k8s/ansible/install_osx.yaml"
+      if [[ `uname -m` == "arm64" ]]; then
+        echo "M1/M2 detected (Arm)"
+        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/k8s/ansible/install_osx_m1.yaml"
+      else
+        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/k8s/ansible/install_osx.yaml"
+      fi
     } &> "$KUBIFY_OUT"
 
     if [[ "$KUBIFY_ENGINE" == "minikube" ]]; then
