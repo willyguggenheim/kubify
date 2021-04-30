@@ -61,6 +61,7 @@ kubify start
 
 # if there is no secrets folder, a vim windows 
 	# or for sublime-text: `EDITOR="subl -w ." kubify start` 
+		# or `EDITOR="subl -w " ../../kubify start`
 		# or `EDITOR="subl -w " ../../kubify secrets edit dev`
 
 ```

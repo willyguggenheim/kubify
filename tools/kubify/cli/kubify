@@ -1562,7 +1562,7 @@ function clean {
 
 function check_skaffold {
   check_kubify
-  APP_DIR=$PWD
+  APP_DIR="$PWD"
   KUBIFY_FILE=${APP_DIR}/kubify.yml
 
   if [ ! -f $KUBIFY_FILE ]; then
@@ -1584,8 +1584,8 @@ function publish {
   EXTRA_VERSIONS=$1
 
   check_skaffold
-  APP_DIR=$PWD
-  APP_NAME=`basename $APP_DIR`
+  APP_DIR="$PWD"
+  APP_NAME=`basename "$APP_DIR"`
   echo "Publishing application '$APP_NAME'"
   _init "$APP_DIR" "common,generate_k8s,build_image" "app_cicd_build_image_extra_versions=latest,${EXTRA_VERSIONS}"
 }
@@ -1779,7 +1779,8 @@ function start {
   echo "function start {"
   kubify_config
 
-  SECRETS_FILE=${APP_DIR}/secrets/secrets.${ENV}.enc.yaml
+  APP_DIR="$PWD"
+  SECRETS_FILE="${APP_DIR}/secrets/secrets.${ENV}.enc.yaml"
   # if SECRETS_FILE not exist, let's create the intial secret
   if [ ! -f "${SECRETS_FILE}" ]; then
       kubify secrets edit ${ENV}
@@ -1790,7 +1791,7 @@ function start {
   echo "function start check_skaffold"
   APP_NAME=`basename $PWD`
   echo "function start APP_NAME $APP_NAME"
-  APP_DIR=$PWD
+  APP_DIR="$PWD"
   echo "function start APP_DIR $APP_DIR"
 
   echo "Starting application '$APP_NAME' for local development. Changes will be watched."
@@ -1999,7 +2000,7 @@ function init {
 
 function _init {
   APP_DIR=$1
-  APP_NAME=`basename $APP_DIR`
+  APP_NAME=`basename "$APP_DIR"`
   TAGS=$2
   VARS=$3
   IMAGE=`image_name $APP_NAME`
@@ -2056,8 +2057,8 @@ function secrets {
   ENV=$2
 
   check_kubify
-  APP_DIR=$PWD
-  APP_NAME=`basename $APP_DIR`
+  APP_DIR="$PWD"
+  APP_NAME=`basename "$APP_DIR"`
 
   SECRETS_FILE=${APP_DIR}/secrets/secrets.${ENV}.enc.yaml
 
@@ -2101,6 +2102,20 @@ function secrets {
               # rm -f "${SECRETS_FILE}"
               # mv "${SECRETS_FILE}"_SED "${SECRETS_FILE}"
           fi
+
+          echo "
+# Please make sure you set the values in data like so (so kubesec can encrypt the key/values properly):
+apiVersion: v1
+data:
+  example_key: 'example_value'
+kind: Secret
+metadata:
+  name: common
+type: Opaque
+          "
+          read -p "Press enter to continue (your EDITOR will open for secrets editing, default EDITOR is vi)........."
+
+
           kubesec edit -if "${SECRETS_FILE}" --key="${!KEY_VAR}"
           echo "Reloading secrets in-cluster"
           _generate_manifests "$APP_DIR"
@@ -2118,6 +2133,19 @@ function secrets {
               # rm -f "${SECRETS_FILE}"
               # mv "${SECRETS_FILE}"_SED "${SECRETS_FILE}"
           fi
+
+          echo "
+# Please make sure you set the values in data like so (so kubesec can encrypt the key/values properly):
+apiVersion: v1
+data:
+  example_key: 'example_value'
+kind: Secret
+metadata:
+  name: common
+type: Opaque
+          "
+          read -p "Press enter to continue (your EDITOR will open for secrets editing, default EDITOR is vi)........."
+
           kubesec edit -if "${SECRETS_FILE}" --key="${!KEY_VAR}"
           echo "Reloading secrets in-cluster"
           _generate_manifests "$APP_DIR"
@@ -2135,7 +2163,7 @@ function export_secret {
   ENV=${1}
   APP_NAME=${2}
   APP_DIR=${3}
-  # APP_NAME=`basename $APP_DIR`
+  # APP_NAME=`basename "$APP_DIR"`
   SECRET_NAME=kubify_secrets_${APP_NAME}_${ENV}
   SECRETS_FILE=${APP_DIR}/secrets/secrets.${ENV}.enc.yaml
 
@@ -2150,7 +2178,7 @@ function export_secret {
 function import_secret {
   ENV=${1}
   APP_DIR=${2}
-  APP_NAME=`basename $APP_DIR`
+  APP_NAME=`basename "$APP_DIR"`
 
   DEST=${APP_DIR}/secrets
   SECRET_FILE_PATH=${DEST}/secrets.${ENV}.enc.yaml
@@ -2258,7 +2286,7 @@ function deploy {
 
   check_skaffold
 
-  APP_DIR=$PWD
+  APP_DIR="$PWD"
   CI_BUILD_IMAGE=`cicd_build_image_name $APP_NAME`
   echo "Deploying application $APP_NAME (version: $APP_VERSION) to cluster $CLUSTER using environment profile $PROFILE in namespace $NAMESPACE"
   SERVICE_PROFILE=${SERVICE_PROFILE} UPSTREAM=1 _init "$APP_DIR" "common,generate_k8s,deploy_service" "kubify_domain_env=${NAMESPACE} app_config_sha=${CONFIG_VERSION} deploy_namespace=$NAMESPACE aws_profile=$AWS_ADMIN_PROFILE app_dir=$APP_DIR deploy_cluster_name=$CLUSTER deploy_image=${CI_BUILD_IMAGE}:${APP_VERSION} skaffold_config=${WORK_DIR}/${ENV}/${APP_NAME}/skaffold.yaml skaffold_profile=$BUILD_PROFILE undeploy=no"
@@ -2450,7 +2478,7 @@ function undeploy {
 
   check_skaffold
 
-  APP_DIR=$PWD
+  APP_DIR="$PWD"
   CI_BUILD_IMAGE=`cicd_build_image_name $APP_NAME`
   echo "Undeploying application $APP_NAME from cluster $CLUSTER using environment profile $ENV in namespace $NAMESPACE"
   _init "$APP_DIR" "common,generate_k8s,deploy_service" "deploy_namespace=$NAMESPACE aws_profile=$AWS_ADMIN_PROFILE app_dir=$APP_DIR deploy_cluster_name=$CLUSTER deploy_image=${CI_BUILD_IMAGE}:${APP_VERSION} skaffold_config=${WORK_DIR}/${ENV}/${APP_NAME}/skaffold.yaml skaffold_profile=$BUILD_PROFILE undeploy=yes"
