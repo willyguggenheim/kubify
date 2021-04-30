@@ -59,10 +59,25 @@ cd backend/example-django-simple-svc
 # Option B (use the script folder in path)
 kubify start
 
-# kubify now listens for any code changes on your service 
-# and automatically immediatly tails the logs of all services in the cluster ..
+# if there is no secrets folder, a vim windows 
+	# or for sublime-text: `EDITOR="subl -w ." kubify start` 
+		# or `EDITOR="subl -w ." kubify secrets edit dev`
 
 ```
+fill out `data` with `key: value` pairs, example:
+```
+data:
+	EPIC_ENV_VARIABLE_9000: AWESOME_VERSIONED_SECRET_9000
+metadata:
+  name: example-django-simple-svc
+type: Opaque
+```
+
+your gonna want to save and close that vim window (wq!) ..
+
+kubify now listens for any code changes on your service, as well as has THE REST OF THE INFRA RUNNING ON YOUR MACHINE!!
+.....and it automatically (immediatly) tails the logs of all services in the cluster .. VERY NICE!!!
+
 When you fork this into your private repo: I recommend removing these lines from .gitignore file:
 ```
 backend/*/secrets
