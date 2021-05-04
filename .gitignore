@@ -49,3 +49,4 @@ node_modules
 #binaries forsure
 tools/kubify/atlantis/bootstrap/terraform
 tools/kubify/atlantis/atlantis-terragrunt-image/terragrunt
+backend/*/package-lock.json

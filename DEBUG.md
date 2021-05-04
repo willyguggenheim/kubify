@@ -36,7 +36,7 @@ wsl -d Ubuntu-20.04
 KUBIFY_DEBUG=1
 KUBIFY_CONTAINER_REGISTRY=ecr
 # example commands to start
-cd /mnt/c/Users/w/git/kubify
+cd ~/git/kubify
 # in case we are on WSL2 or container and so therefore are not using NetworkManager
 sudo sh -c "echo 'nameserver 127.0.0.1' >> /etc/resolv. conf"
 export PATH=$PATH:$(pwd)/tools/kubify/cli
@@ -211,4 +211,10 @@ brew install ansible
 kubectl get pods -n kubify
 kubectl -n kubify exec entrypoint-54d6c57bbd-np75d sh -- ls -al /data/home/.aws
 kubectl --context kind-kind --namespace kubify exec -it entrypoint-54d6c57bbd-np75d -- bash -l -i -c kubify
+```
+
+# to shell into the running container
+```
+kubectl get pods -n kubify
+kubectl -n kubify exec --stdin --tty example-node-svc-64856984b-7d72b -- /bin/bash
 ```
