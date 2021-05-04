@@ -9,6 +9,8 @@ metadata:
     kubify_version: "{{ kubify_version }}"
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
 {% if cert_issuer == 'ca-issuer' %}
     certmanager.k8s.io/issuer: "{{ cert_issuer }}"
 {% else %}

@@ -782,11 +782,19 @@ function configure_cluster {
     $KUBECTL rollout status -w deployment/kubedb-community -n kube-system
     while ! $HELM ${TILLER} upgrade kubedb-catalog appscode/kubedb-catalog --install --version $KUBEDB_VERSION --namespace kube-system 2>&1;   do     echo "Waiting for KubeDB to Install in K8s cluster" && sleep 2;   done
 
-    if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+    if [[ "$KUBIFY_ENGINE" == "local" ]]; then
       # kind nginx ingress pattern: https://kind.sigs.k8s.io/docs/user/ingress/
       # TODO: since this is needed maybe we should also support microkubes or k3s, as an alternative (since docker desktop is not on linux)
       
-      kubectl create ns ingress-nginx
+
+
+      sudo mkdir -p /usr/local/certificates
+      sudo cp ${WORK_DIR}/certs/ca.crt /usr/local/certificates/cert
+      sudo cp ${WORK_DIR}/certs/ca.key /usr/local/certificates/key
+
+      # echo "MADE IT" && exit 0
+
+      kubectl create ns ingress-nginx || echo 'cert-manager ns exists'
       kubectl apply --namespace ingress-nginx -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
       kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
@@ -941,7 +949,7 @@ rbac:
   create: true
 EOF
 
-      kubectl create ns external-dns
+      kubectl create ns external-dns || echo 'external-dns ns exists'
       helm upgrade external-dns stable/external-dns \
         --install \
         --wait \
