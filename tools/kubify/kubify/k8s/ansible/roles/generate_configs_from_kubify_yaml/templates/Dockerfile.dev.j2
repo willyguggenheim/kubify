@@ -5,7 +5,7 @@ FROM python:3.9-alpine as builder
 {% elif csproj_file.stat.exists %}
 FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine3.13 as builder
 {% elif pom_xml_file.stat.exists %}
-FROM openjdk:8-jdk-alpine as builder
+FROM openjdk:16-jdk-alpine as builder
 {% elif package_json_file.stat.exists %}
 FROM node:{{ package_json_node_version }}-alpine as builder
 {% endif %}
@@ -36,6 +36,7 @@ RUN dotnet restore
 COPY app/. ./
 {% elif pom_xml_file.stat.exists %}
 WORKDIR /app
+COPY pom.xml .
 COPY app/ .
 RUN ./mvnw install -DskipTests
 {% elif package_json_file.stat.exists %}
@@ -45,10 +46,8 @@ RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > /app/.npmrc
     {% if build_script is not none %}
 RUN {{ build_script.split('\n') | join('; ') }}
     {% else %}
-WORKDIR /app
-COPY app/ .
-COPY package.json ./
-RUN {{ builder_cmd }} install
+WORKDIR /
+RUN {{ builder_cmd }} install 
 #RUN {{ builder_cmd }} install --network-timeout 1000000 
 WORKDIR /app
     {% endif %}
