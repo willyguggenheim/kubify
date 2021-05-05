@@ -6,8 +6,6 @@ metadata:
 init: |
   echo "run migrations for example-csharp-svc/app"
 dev:
-  # "sync" is if you want Kubify to listen for code changes (other option is 
-  # using some cli listener for code changes in release.scripts.start)
   sync:
     'app/***': 'app/'
   scripts:
