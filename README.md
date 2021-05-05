@@ -34,35 +34,21 @@ Think dev team efficiency and happiness. Think on-boarding reduced from weeks to
 export KUBIFY_DEBUG=1
 export KUBIFY_CONTAINER_REGISTRY=ecr
 export UNIQUE_COMPANY_ACRONYM=os
+export EDITOR="subl -w "
 
 
 ## Local Testing ##
 
-#install/configure/re-configure your workstation dependancies & local k8s cluster
-
-# Option A (use the wrapper shortcut)
 ./kubify up
 
-# Option B (use the script folder in path)
-export PATH=$PATH:$(pwd)/tools/kubify/cli
-kubify up
-
-#start all services locally (entire infra running locally)
-kubify start-all 
+#start entire infra locally !!
+kubify start-all
 
 #cd into a specific service
-cd backend/example-django-simple-svc
+cd backend/example-node-svc
 
-# Option A (use the wrapper shortcut)
+# start listening for code changes !!
 ../../kubify start
-
-# Option B (use the script folder in path)
-kubify start
-
-# if there is no secrets folder, a vim windows 
-	# or for sublime-text: `EDITOR="subl -w ." kubify start` 
-		# or `EDITOR="subl -w " ../../kubify start`
-		# or `EDITOR="subl -w " ../../kubify secrets edit dev`
 
 ```
 fill out `data` with `key: value` pairs, example:
@@ -73,8 +59,12 @@ metadata:
   name: example-django-simple-svc
 type: Opaque
 ```
-
 your gonna want to save and close that vim window (wq!) ..
+in your browser or postman GET/POST to your running service https://example-node-svc.local.kubify.local
+or to any of your other running services https://[service folder name].local.kubify.local
+```
+../../kubify secrets edit dev
+```
 
 kubify now listens for any code changes on your service, as well as has THE REST OF THE INFRA RUNNING ON YOUR MACHINE!!
 .....and it automatically (immediatly) tails the logs of all services in the cluster .. VERY NICE!!!

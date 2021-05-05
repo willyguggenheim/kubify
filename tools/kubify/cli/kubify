@@ -282,14 +282,14 @@ export AWS_PROFILE=${KUBIFY_AWS_PROFILE:-default}
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 SRC_DIR=`echo "$(cd "$(dirname "$DIR/../../../..")"; pwd)"`
 # echo $SRC_DIR
-KUBIFY_CURRENT_VERSION=`git --git-dir=${SRC_DIR}/.git rev-parse --verify HEAD --short`
+KUBIFY_CURRENT_VERSION=`git --git-dir="${SRC_DIR}/.git" rev-parse --verify HEAD --short`
 # NOTE (where to put generated files & cache): 
 # command > ${WORK_DIR}/file.extension (in the ${WORK_DIR}/file.extension location)
-WORK_DIR=${SRC_DIR}/._kubify_work
-K8S_DIR=${SRC_DIR}/tools/kubify/kubify
+WORK_DIR="${SRC_DIR}/._kubify_work"
+K8S_DIR="${SRC_DIR}/tools/kubify/kubify"
 # rm -rf $WORK_DIR
-mkdir -p $WORK_DIR
-alias kubify=${DIR}/kubify
+mkdir -p "$WORK_DIR"
+alias kubify="${DIR}/kubify"
 
 # Check AWS configured (ask to configure if not), use cache if already ran
 cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID | grep -Eo '[0-9]{1,12}' || aws sts get-caller-identity || aws configure # login aws if not already logged in
@@ -362,6 +362,28 @@ DEV_KMS="arn:aws:kms:${AWS_REGION}:${AWS_ACCOUNT_NUMBER}:alias/${KMS_KEY_NAME}"
 TEST_KMS="arn:aws:kms:${AWS_REGION}:${AWS_ACCOUNT_NUMBER}:alias/${KMS_KEY_NAME}"
 STAGE_KMS="arn:aws:kms:${AWS_REGION}:${AWS_ACCOUNT_NUMBER}:alias/${KMS_KEY_NAME}"
 PROD_KMS="arn:aws:kms:u${AWS_REGION}:${AWS_ACCOUNT_NUMBER}:alias/${KMS_KEY_NAME}"
+
+# https://gist.github.com/ethicka/27c36c975a5c2cbbd1874bc78bab61c4
+if [ ! -f "${WORK_DIR}/certs/ca.key" ]; then
+    echo "generating ca.key"
+    openssl genrsa -out "${WORK_DIR}/certs/ca.key" 2048
+    openssl rsa -in "${WORK_DIR}/certs/ca.key" -out "${WORK_DIR}/certs/ca.key.rsa"
+    openssl req -new -key "${WORK_DIR}/certs/ca.key.rsa" -subj /CN=local.kubify.local -out "${WORK_DIR}/certs/ca.csr" -config "${K8S_DIR}/k8s/certs/kubify-cli-gen-certs.conf"
+    openssl x509 -req -extensions v3_req -days 3650 -in "${WORK_DIR}/certs/ca.csr" -signkey "${WORK_DIR}/certs/ca.key.rsa" -out "${WORK_DIR}/certs/ca.crt" -extfile "${K8S_DIR}/k8s/certs/kubify-cli-gen-certs.conf"
+
+    if [[ "$OSTYPE" == *"darwin"* ]]; then
+       sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "${WORK_DIR}/certs/ca.crt"
+    elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+       # NOTE: TODO?: Might also have to also add to the browsers (linux/windows): https://unix.stackexchange.com/questions/90450/adding-a-self-signed-certificate-to-the-trusted-list
+       apt-get install -y ca-certificates || sudo apt-get install -y ca-certificates
+       # normally cacert.pem
+       cp "${WORK_DIR}/certs/ca.crt" /usr/share/ca-certificates || sudo cp "${WORK_DIR}/certs/ca.crt" /usr/share/ca-certificates
+       dpkg-reconfigure ca-certificates || sudo dpkg-reconfigure ca-certificates
+      fi
+    fi
+    
+fi
 
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
@@ -785,17 +807,20 @@ function configure_cluster {
     if [[ "$KUBIFY_ENGINE" == "local" ]]; then
       # kind nginx ingress pattern: https://kind.sigs.k8s.io/docs/user/ingress/
       # TODO: since this is needed maybe we should also support microkubes or k3s, as an alternative (since docker desktop is not on linux)
-      
-
 
       sudo mkdir -p /usr/local/certificates
-      sudo cp ${WORK_DIR}/certs/ca.crt /usr/local/certificates/cert
-      sudo cp ${WORK_DIR}/certs/ca.key /usr/local/certificates/key
+      cp "${WORK_DIR}/certs/ca.crt" "${WORK_DIR}/certs/cert"
+      cp "${WORK_DIR}/certs/ca.crt" "${WORK_DIR}/certs/ca"
+      cp "${WORK_DIR}/certs/ca.key" "${WORK_DIR}/certs/key"
+      sudo cp "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/cert
+      sudo cp "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/ca
+      sudo cp "${WORK_DIR}/certs/ca.key" /usr/local/certificates/key
 
       # echo "MADE IT" && exit 0
 
       kubectl create ns ingress-nginx || echo 'cert-manager ns exists'
-      kubectl apply --namespace ingress-nginx -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+      # kubectl apply --namespace ingress-nginx -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+      $KUBECTL apply -f "${SRC_DIR}/tools/kubify/cli/manifests/ingress-nginx-kind.yaml"
       kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
@@ -858,29 +883,6 @@ function configure_cluster {
     #     # openssl req -x509 -new -nodes -key "${WORK_DIR}/certs/ca.key" -subj "/CN=local.kubify.local/subjectAltName=DNS.1=*.local.kubify.local/" -days 3650 -reqexts v3_req -extensions v3_ca -out "${WORK_DIR}/certs/ca.crt"
     #     # sudo /usr/bin/security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "${WORK_DIR}/certs/ca.crt"
     # fi
-
-
-    # https://gist.github.com/ethicka/27c36c975a5c2cbbd1874bc78bab61c4
-    if [ ! -f "${WORK_DIR}/certs/ca.key" ]; then
-        echo "generating ca.key"
-        openssl genrsa -out "${WORK_DIR}/certs/ca.key" 2048
-        openssl rsa -in "${WORK_DIR}/certs/ca.key" -out "${WORK_DIR}/certs/ca.key.rsa"
-        openssl req -new -key "${WORK_DIR}/certs/ca.key.rsa" -subj /CN=local.kubify.local -out "${WORK_DIR}/certs/ca.csr" -config "${K8S_DIR}/k8s/certs/kubify-cli-gen-certs.conf"
-        openssl x509 -req -extensions v3_req -days 3650 -in "${WORK_DIR}/certs/ca.csr" -signkey "${WORK_DIR}/certs/ca.key.rsa" -out "${WORK_DIR}/certs/ca.crt" -extfile "${K8S_DIR}/k8s/certs/kubify-cli-gen-certs.conf"
-
-        if [[ "$OSTYPE" == *"darwin"* ]]; then
-           sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "${WORK_DIR}/certs/ca.crt"
-        elif [[ "$OSTYPE" == *"linux"* ]]; then
-          if [[ "$ACTUAL_OS_TYPE" == "ubuntu" ]] || [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-           # NOTE: TODO?: Might also have to also add to the browsers (linux/windows): https://unix.stackexchange.com/questions/90450/adding-a-self-signed-certificate-to-the-trusted-list
-           apt-get install -y ca-certificates
-           # normally cacert.pem
-           cp "${WORK_DIR}/certs/ca.crt" /usr/share/ca-certificates
-           dpkg-reconfigure ca-certificates
-          fi
-        fi
-        
-    fi
 
     # Install cert-manager for TLS
     CA_SECRET=`${KUBECTL_NS} create secret tls ca-key-pair \
@@ -1226,6 +1228,14 @@ function install {
 
   echo "Installing Kind"
 
+sudo mkdir -p /usr/local/certificates | true
+cp "${WORK_DIR}/certs/ca.crt" "${WORK_DIR}/certs/cert" | true
+cp "${WORK_DIR}/certs/ca.crt" "${WORK_DIR}/certs/ca" | true
+cp "${WORK_DIR}/certs/ca.key" "${WORK_DIR}/certs/key" | true
+sudo cp "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/cert | true
+sudo cp "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/ca | true
+sudo cp "${WORK_DIR}/certs/ca.key" /usr/local/certificates/key | true
+
 # https://kind.sigs.k8s.io/docs/user/configuration/
 kind get clusters | grep kind || cat <<EOF | kind create cluster --config=-
 kind: Cluster
@@ -1243,6 +1253,8 @@ nodes:
     containerPath: /root/.gitconfig
   - hostPath: /var/run/docker.sock
     containerPath: /var/run/docker.sock
+  - hostPath: "${WORK_DIR}/certs"
+    containerPath: /usr/local/certificates
   kubeadmConfigPatches:
   - |
     kind: InitConfiguration
@@ -1260,7 +1272,9 @@ EOF
 # kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
 # kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
 # kubectl wait --timeout=90s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
-$KUBECTL apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+# $KUBECTL apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+$KUBECTL apply -f "${SRC_DIR}/tools/kubify/cli/manifests/ingress-nginx-kind.yaml"
+
 $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
@@ -1328,6 +1342,7 @@ function up {
   fi
 
   configure
+  kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
 }
 
 function down {
@@ -2306,7 +2321,7 @@ function environments {
   check_arg $1 "No action (list/view/status/logs/diff/get-context) specified!"
 
   ENV=$2
-  ENV_FILE=${SRC_DIR}/environments/${ENV}.yaml
+  ENV_FILE="${SRC_DIR}/environments/${ENV}.yaml"
 
   case "$1" in
       list)
@@ -2504,7 +2519,7 @@ function new {
 function _new {
   APP_TYPE=$1
   APP_NAME=$2
-  APP_DIR=${SRC_DIR}/${APP_TYPE}/${APP_NAME}
+  APP_DIR="${SRC_DIR}/${APP_TYPE}/${APP_NAME}"
 
   if [ -d "${APP_DIR}" ]; then
     echo "Error: The app '$APP_NAME' already exists!"
@@ -2528,7 +2543,7 @@ EOF
     fi
   done
 
-  TEMPLATES_DIR=${SRC_DIR}/tools/kubify/templates
+  TEMPLATES_DIR="${SRC_DIR}/tools/kubify/templates"
 
   case "$choice" in
     1)
@@ -2561,7 +2576,7 @@ function tf_atlantis {
     exit 1
   fi
 
-  SCRIPT=${SRC_DIR}/tools/kubify/atlantis/bootstrap/terraform
+  SCRIPT="${SRC_DIR}/tools/kubify/atlantis/bootstrap/terraform"
   env $(echo "${TF_BACKEND_CREDENTIALS}" | xargs) ${SCRIPT} init && \
   env $(echo "${TF_BACKEND_CREDENTIALS}" | xargs) ${SCRIPT} apply -auto-approve
 }
@@ -2569,7 +2584,7 @@ function tf_atlantis {
 function publish_atlantis_image {
   check_ci_mode publish_atlantis_image
 
-  SCRIPT=${SRC_DIR}/tools/kubify/atlantis/atlantis-terragrunt-image/build.sh
+  SCRIPT="${SRC_DIR}/tools/kubify/atlantis/atlantis-terragrunt-image/build.sh"
   chmod +x ${SCRIPT}
   ${SCRIPT}
 }

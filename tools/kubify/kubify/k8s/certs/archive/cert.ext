@@ -5,4 +5,5 @@ commonName = local.kubify.local
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1 = *.local.kubify.local
+DNS.1 = ingress-nginx-controller-admission.ingress-nginx.svc
+DNS.2 = *.local.kubify.local
