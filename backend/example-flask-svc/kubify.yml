@@ -15,6 +15,7 @@ dev:
       export FLASK_APP=flask_hello_kubify.py
       export FLASK_RUN_HOST=0.0.0.0
       export FLASK_ENV=development 
+      export FLASK_RUN_PORT=8003
       flask run
 release:
   scripts:
@@ -24,9 +25,12 @@ release:
       export FLASK_APP=flask_hello_kubify.py
       export FLASK_RUN_HOST=0.0.0.0
       export FLASK_ENV=release
+      export FLASK_RUN_PORT=8003
       flask run
+service:
+  port: "8003"
 config:
-  PORT: "8000"
+  PORT: "8003"
   APP_NAME: example-flask-svc
   DEBUG: "example-flask-svc:*"
   ENV: "{{ env }}"

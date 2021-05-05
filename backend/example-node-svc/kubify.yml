@@ -2,12 +2,9 @@
 apiVersion: k8.kubify.local/v1
 kind: Config
 metadata:
-  name: example-django-simple-svc
+  name: example-node-svc
 init: |
-  echo "run migrations for example-django-simple-svc/app"
-  cd /app/app
-  python manage.py makemigrations
-  python manage.py migrate
+  echo "run init for example-node-svc/app"
 dev:
   # TODO: have an option for alternate reloaders in start (such as hot reloading)
   # TODO: this should also have an option to run unit tests each time it reloads
@@ -17,21 +14,21 @@ dev:
     'app/***': 'app/'
   scripts:
     start: |
-      echo 'listening for code changes in example-django-simple-svc folder'
+      echo 'listening for code changes in example-node-svc folder'
       cd /app/app
-      python manage.py runserver  0.0.0.0:8000
+      node app.js
 release:
   scripts:
     start: |
-      echo 'starting example-django-simple-svc release service's pod'  
+      echo 'starting example-node-svc release service's pod'  
       cd /app/app
-      python manage.py runserver  0.0.0.0:8000
+      node app.js
 service:
-  port: "8000"
+  port: "3000"
 config:
-  PORT: "8000"
-  APP_NAME: example-django-simple-svc
-  DEBUG: "example-django-simple-svc:*"
+  PORT: "3000"
+  APP_NAME: example-node-svc
+  DEBUG: "example-node-svc:*"
   ENV: "{{ env }}"
   KUBIFY_ENV: "{{ env }}"
 profiles:
