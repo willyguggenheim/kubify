@@ -8,7 +8,7 @@ Kubify is a DevEx (Developer-First) Kubernetes Turn Key full SDLC Framework (Dev
 Make Kubernetes easy to use by adopting the 1 Yaml per Service, 1 Yaml per Env, 1 Folder for FE and 1 Folder for BE full DevEx clear automation strategy of Kubify and make our hardworking Devs/DevOps/DevSecOps engineers happy.
 Think dev team efficiency and happiness. Think on-boarding reduced from weeks to only 5 minutes. That should say a lot.
 
-This is FREE turn key DevOps revolutionary software, so please consider donating to this project: [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MSRFJHSGCKGCG)
+This is FREE turn key DevOps revolutionary software. If you use Kubify, please make sure to donate: [![](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?business=MSRFJHSGCKGCG&item_name=Kubify&currency_code=USD)
 
 
 # Setup
