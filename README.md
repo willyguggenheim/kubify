@@ -2,13 +2,13 @@
 
 # Description
 
-
-
 Kubify is a CLI tool to manage the development and deployment lifecycle of microservices.
 
 Kubify is a DevEx (Developer-First) Kubernetes Turn Key full SDLC Framework (DevOps Solution) that allows you to easily rapid test entire infra locally (the same way as it's deployed), driving amazing quality in services' code commits. 
 Make Kubernetes easy to use by adopting the 1 Yaml per Service, 1 Yaml per Env, 1 Folder for FE and 1 Folder for BE full DevEx clear automation strategy of Kubify and make our hardworking Devs/DevOps/DevSecOps engineers happy.
 Think dev team efficiency and happiness. Think on-boarding reduced from weeks to only 5 minutes. That should say a lot.
+
+This is FREE turn key DevOps revolutionary software, so please consider donating to this project: [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MSRFJHSGCKGCG)
 
 
 # Setup
