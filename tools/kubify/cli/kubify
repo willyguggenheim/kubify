@@ -1826,9 +1826,9 @@ function start {
   echo "function start init"
 
   FALLBACK=0
-  if [ ! -f ${WORK_DIR}/${ENV}/${APP_NAME}/Dockerfile.dev ]; then
+  if [ ! -f "${WORK_DIR}/${ENV}/${APP_NAME}/Dockerfile.dev" ]; then
     echo "WARNING: No 'Dockerfile.dev' defined for '$APP_NAME', using 'Dockerfile' instead. Run 'kubify help' for more details"
-    if [ ! -f ${APP_DIR}/Dockerfile ]; then
+    if [ ! -f "${APP_DIR}/Dockerfile" ]; then
       echo "ERROR: No 'Dockerfile' defined for '$APP_NAME'. "
       exit 1
     else
@@ -1838,9 +1838,9 @@ function start {
 
   echo "function start FALLBACK $FALLBACK"
   if [[ $FALLBACK == '1' ]]; then
-    SKAFFOLD_PROFILE=$LOCAL_RUN_PROFILE
+    SKAFFOLD_PROFILE=${LOCAL_RUN_PROFILE}
   else
-    SKAFFOLD_PROFILE=$LOCAL_START_PROFILE
+    SKAFFOLD_PROFILE=${LOCAL_START_PROFILE}
   fi
 
   echo "function start SKAFFOLD_PROFILE $SKAFFOLD_PROFILE"
@@ -2000,10 +2000,10 @@ function init {
   fi
 
   APP_NAME=`basename $PWD`
-  APP_DIR=${PWD}
-  KUBIFY_CONFIG=${APP_DIR}/kubify.yml
-  DOCKERFILE=${APP_DIR}/Dockerfile
-  TAGS='common'
+  APP_DIR="${PWD}"
+  KUBIFY_CONFIG="${APP_DIR}/kubify.yml"
+  DOCKERFILE="${APP_DIR}/Dockerfile"
+  TAGS="common"
 
   if [ ! -d "$APP_DIR/secrets" ]; then
     echo "It looks like you haven't imported secrets from AWS. Checking..."
@@ -2011,7 +2011,7 @@ function init {
   fi
 
   # Check for config.yml or Dockerfile and migrate only if kubify.yml doesn't exist
-  if [[ "$RERUN" == "1" ]] || ( [[ ! -f $KUBIFY_CONFIG ]] ) || ( [[ -f $DOCKERFILE ]] && [[ ! -f $KUBIFY_CONFIG ]] ); then
+  if [[ "$RERUN" == "1" ]] || ( [[ ! -f "$KUBIFY_CONFIG" ]] ) || ( [[ -f "$DOCKERFILE" ]] && [[ ! -f "$KUBIFY_CONFIG" ]] ); then
     TAGS="${TAGS}"
   fi
 

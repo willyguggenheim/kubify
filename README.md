@@ -235,11 +235,25 @@ yup, you heard that right, it's finally here, 1 yaml file total, with minimal sy
 
 dev.yaml = "local" and actual deployed "dev" environment, as they are share a file, by careful DevEx design .. yes, you heard me right, run all of dev on your laptop also and rapid test on it locally in 2 a total of 1 commands from scratch, even on day 1, 10x easier!!!!!
 
+dev.yaml = for local and dev env (both)
+
 1 folder for backend services
 
 1 folder for frontend services
 
+Ingress controller encrypts traffic between services
+
+Ingress controller automation encrypts traffic between host and services
+
+Ingress controller generates a certificate on the fly and added to your trusted certificates on host
+
+Services autmatically listen for code changes when running `kubify start`
+
 Kubify will AUTOMATICALLY generate a Dockerfiles for you, by auto-sensing the language you have written the service in (if there is no Dockerfile.dev or/and Dockerfile.build)!!!!!
+
+options for Dockerfile placement:
+	A) {{ app_dir }}/Dockerfile.dev and {{ app_dir }}/Dockerfile.build (need both to use a custom dockerfile)..
+	B) no Dockerfile* in the app_dir (because it will automatically create one for you based on the langauge)!!
 
 ..so you don't get those DevSecOps access patterns mixed up ever in a yaml
 
@@ -325,7 +339,9 @@ So let's build awesome stuff together!!!
 ![AUTOMATION9000](./docs/img/README_md_imgs/iron-person.gif)
 
 
-Special thank you to the fully automated open source interfaces (local and deployed indentical automation), such as KubeDB and KubeMQ!!!
+Special thank you to the fully automated open source interfaces (local and deployed indentical automation), such as KubeDB and Kafka!!!
+
+https://github.com/operator-framework/awesome-operators
 
 
 In the Kubernetes world, this is truly revolutionary, one of a kind (due to local testing automations matching deployed environment automations turn key and hybrid k8s portable interfaces) and was *super* fun to build!!!

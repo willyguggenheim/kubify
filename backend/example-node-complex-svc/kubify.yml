@@ -36,19 +36,19 @@ config:
   REDIS_PORT: "6379"
   REDIS_DATABASE: "0"
   KUBIFY_ENV: "{{ env }}"
-  UNIQUE_COMPANY_ACRONYM: {{ UNIQUE_COMPANY_ACRONYM }}
+  # UNIQUE_COMPANY_ACRONYM: {{ UNIQUE_COMPANY_ACRONYM }}
 profiles:
   dev:
-    aws:
+    # aws:
       # local behavior: simulate these services with localstack, also points ~/.aws/config endpoints to localstack
       # deployed behavior: deploys these resources, if not already deployed (can also use the terraform ${SRC_DIR}/infra folder to create custom)
-      services:
-        - s3:
-          - {{ UNIQUE_COMPANY_ACRONYM }}-example-node-complex-svc-incoming
-          - {{ UNIQUE_COMPANY_ACRONYM }}-example-node-complex-svc-outgoing
-        - sqs: 
-          - {{ UNIQUE_COMPANY_ACRONYM }}-example-node-complex-svc-normal
-          - {{ UNIQUE_COMPANY_ACRONYM }}-example-node-complex-svc.fifo
+      # services:
+      #   - s3:
+      #     - {{ UNIQUE_COMPANY_ACRONYM }}-example-node-complex-svc-incoming
+      #     - {{ UNIQUE_COMPANY_ACRONYM }}-example-node-complex-svc-outgoing
+      #   - sqs: 
+      #     - {{ UNIQUE_COMPANY_ACRONYM }}-example-node-complex-svc-normal
+      #     - {{ UNIQUE_COMPANY_ACRONYM }}-example-node-complex-svc.fifo
     # Autoscaling Service
     scaler:
       minReplicas: 2
