@@ -1,0 +1,27 @@
+---
+apiVersion: k8.kubify.local/v1
+kind: Config
+metadata:
+  name: example-lambda-python-simple-svc
+dev:
+  sync:
+    'app/***': 'app/'
+service:
+  port: "4566"
+config:
+  SERVICES: "lambda"
+  APP_NAME: example-lambda-python-simple-svc
+  DEBUG: "example-lambda-python-simple-svc:*"
+  ENV: "{{ env }}"
+  KUBIFY_ENV: "{{ env }}"
+  LAMBDA_EXECUTOR: "local"
+profiles:
+  dev:
+    resources:
+      requests:
+        cpu: 64m
+        memory: 64Mi
+      limits:
+        cpu: 128m
+        memory: 128Mi
+

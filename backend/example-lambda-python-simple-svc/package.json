@@ -1,0 +1,8 @@
+{
+    "name": "example-lambda-python-simple-svc",
+    "version": "0.0.1",
+    "description": "Simulate AWS Services Locally",
+    "dependencies": {
+        "express": "^4.17.1"
+    }
+}

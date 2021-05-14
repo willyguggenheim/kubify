@@ -4,6 +4,7 @@ kind: Config
 metadata:
   name: example-lambda-python-svc
 dev:
+  # live code listening
   sync:
     'app/***': 'app/'
 service:
@@ -24,4 +25,19 @@ profiles:
       limits:
         cpu: 128m
         memory: 128Mi
-
+    # KubeDB Databases https://kubedb.com/docs/v2021.04.16/guides/
+    databases:
+      # db cache layer
+      redis:
+        type: redis
+        # versions https://kubedb.com/docs/v2021.04.16/guides/redis/quickstart/quickstart/
+        # note: no version specified, so using latest
+        version: 5.0.3-v1
+      postgres:
+        type: postgres
+        # versions: https://kubedb.com/docs/v2021.04.16/guides/postgres/quickstart/quickstart/
+        # note: asked to use v10, so I chose the latest v10
+        version: 10.6-v3
+        init:
+          script: |
+            CREATE DATABASE "example-lambda-python-svc"    
