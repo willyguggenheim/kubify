@@ -53,7 +53,7 @@ metadata:
     kubify_version: "{{ kubify_version }}"
 data:
   data.sql: |
-{{ db.init.script | indent(width=4, indentfirst=true) }}
+{{ db.init.script | indent(width=4, first=true) }}
 {% endif %}
 {% elif db.type == 'mongo' %}
 ---

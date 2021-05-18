@@ -57,7 +57,7 @@ RUN mkdir -p /ops
 RUN echo '\
 {% set start_script = kubify_config | json_query('dev.scripts.start') %}
 {% if start_script is not none %}
-{{ start_script.split('\n') | join('; ') | replace('\'', '\'\"\'\"\'') | indent(width=4, indentfirst=true) }} \
+{{ start_script.split('\n') | join('; ') | replace('\'', '\'\"\'\"\'') | indent(width=4, first=true) }} \
 {% else %}
 {{ builder_cmd }} run dev \
 {% endif %}' > /app/dev.sh

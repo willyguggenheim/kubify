@@ -1,7 +1,7 @@
 {% set builder_cmd = 'yarn' if yarn_lock_file.stat.exists else 'npm' %}
 {% set start_script = kubify_config | json_query('release.scripts.start') %}
 {% if start_script is not none %}
-echo '{{ start_script.split('\n') | join('; ') | replace('\'', '\'\"\'\"\'') | indent(width=4, indentfirst=true) }}' > /app/run.sh
+echo '{{ start_script.split('\n') | join('; ') | replace('\'', '\'\"\'\"\'') | indent(width=4, first=true) }}' > /app/run.sh
 {% else %}
     echo "PATH=$PATH:/app/node_modules/.bin {{ builder_cmd }} start" > /app/run.sh
 {% endif %}

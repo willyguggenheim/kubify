@@ -78,7 +78,7 @@ COPY --from=builder /app /app
 RUN echo '\
 {% set start_script = kubify_config | json_query('release.scripts.start') %}
 {% if start_script is not none %}
-{{ start_script.split('\n') | join('; ') | replace('\'', '\'\"\'\"\'') | indent(width=4, indentfirst=true) }} \
+{{ start_script.split('\n') | join('; ') | replace('\'', '\'\"\'\"\'') | indent(width=4, first=true) }} \
 {% else %}
     PATH=$PATH:/app/node_modules/.bin {{ builder_cmd }} start \
 {% endif %}' > /app/run.sh
