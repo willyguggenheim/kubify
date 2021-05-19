@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 
+ACTUAL_OS_TYPE=mac
+cat /proc/version | grep -i microsoft &> /dev/null && ACTUAL_OS_TYPE=wsl2
+cat /proc/version | grep -i ubuntu &> /dev/null && ACTUAL_OS_TYPE=ubuntu
+cat /proc/version | grep -i debian &> /dev/null && ACTUAL_OS_TYPE=debian
+
 if ! [ -x "$(command -v sudo)" ]; then
   if [[ "$OSTYPE" == *"linux"* ]]; then
-    apt-get update
-    apt-get install -y sudo
+    apt-get update &> /dev/null
+    apt-get install -y sudo &> /dev/null
   fi
 fi
 
 if ! [ -x "$(command -v wget)" ]; then
   if [[ "$OSTYPE" == *"darwin"* ]]; then
-    brew install wget
+    brew install wget &> /dev/null
   elif [[ "$OSTYPE" == *"linux"* ]]; then
-    sudo apt-get update
-    sudo apt-get install -y wget
+    sudo apt-get update &> /dev/null
+    sudo apt-get install -y wget &> /dev/null
   fi
 fi
 
@@ -103,11 +108,6 @@ hard_reset_docker_mac() {
 
 }
 
-ACTUAL_OS_TYPE=mac
-cat /proc/version | grep -i microsoft &> /dev/null && ACTUAL_OS_TYPE=wsl2
-cat /proc/version | grep -i ubuntu &> /dev/null && ACTUAL_OS_TYPE=ubuntu
-cat /proc/version | grep -i debian &> /dev/null && ACTUAL_OS_TYPE=debian
-
 read_flag_verbose() {
   if [ "$KUBIFY_DEBUG" != "0" ]; then
     set -v
@@ -173,20 +173,20 @@ if [[ "$OSTYPE" == *"darwin"* ]]; then
 fi
 
 MUST_INSTALL_YQ=0
-~/kubify/yq --version || MUST_INSTALL_YQ=1
-~/kubify/yq --version | grep 4.7.0 || MUST_INSTALL_YQ=1
+~/kubify/yq --version &> /dev/null || MUST_INSTALL_YQ=1
+~/kubify/yq --version | grep 4.7.0 &> /dev/null || MUST_INSTALL_YQ=1
 if [[ "$OSTYPE" == *"darwin"* && "$MUST_INSTALL_YQ" == 1 ]]; then
   wget https://github.com/mikefarah/yq/releases/download/v4.7.0/yq_darwin_amd64.tar.gz -O - |\
-    tar xz && sudo mv ./yq_darwin_amd64 ~/kubify/yq | true
+    tar xz && sudo mv ./yq_darwin_amd64 ~/kubify/yq &> /dev/null | true
   rm -f ./yq_darwin_amd64*
   sudo chmod +x ~/kubify/yq
-  ~/kubify/yq --version | grep 4.7.0 || exit 1
+  ~/kubify/yq --version | grep 4.7.0 &> /dev/null || exit 1
 elif [[ "$OSTYPE" == *"linux"* && "$MUST_INSTALL_YQ" == 1 ]]; then
   wget https://github.com/mikefarah/yq/releases/download/v4.7.0/yq_linux_amd64.tar.gz -O - |\
-    tar xz && sudo mv ./yq_linux_amd64 ~/kubify/yq
+    tar xz && sudo mv ./yq_linux_amd64 ~/kubify/yq &> /dev/null
   rm -f ./yq_linux_amd64*
   sudo chmod +x ~/kubify/yq
-  ~/kubify/yq --version | grep 4.7.0 || exit 1
+  ~/kubify/yq --version | grep 4.7.0 &> /dev/null || exit 1
 fi
 
 
@@ -217,21 +217,21 @@ if ! [ -x "$(command -v git)" ]; then
   if [[ "$OSTYPE" == *"darwin"* ]]; then
     xcode-select --install
   elif [[ "$OSTYPE" == *"linux"* ]]; then
-    sudo apt-get update
-    sudo apt-get install -y git
+    sudo apt-get update &> /dev/null
+    sudo apt-get install -y git &> /dev/null
   fi
 fi
 
-git config --get user.name
+git config --get user.name &> /dev/null
 if [ $? -eq 1 ]; then
     read FIRST_LAST
-    git config --set user.name "${FIRST_LAST}"
+    git config --set user.name "${FIRST_LAST}" &> /dev/null
 fi
 
-git config --get user.email
+git config --get user.email &> /dev/null
 if [ $? -eq 1 ]; then
     read EMAIL
-    git config --set user.email "${EMAIL}"
+    git config --set user.email "${EMAIL}" &> /dev/null
 fi
 
 if ! [ -x "$(command -v git config --get user.email)" ]; then
@@ -246,15 +246,15 @@ if ! [ -x "$(command -v git config --get user.email)" ]; then
   exit 1
 fi
 
-echo "Welcome back $(git config --get user.name)!"
+# echo "Welcome back $(git config --get user.name)!"
 
 if ! [ -x "$(command -v aws)" ]; then
   if [[ "$OSTYPE" == *"darwin"* ]]; then
-    brew install awscli
-    brew link awscli
+    brew install awscli &> /dev/null
+    brew link awscli &> /dev/null
   elif [[ "$OSTYPE" == *"linux"* ]]; then
-    sudo apt-get update
-    sudo apt-get install -y awscli
+    sudo apt-get update &> /dev/null
+    sudo apt-get install -y awscli &> /dev/null
   fi
 fi
 
@@ -286,15 +286,16 @@ KUBIFY_CURRENT_VERSION=`git --git-dir="${SRC_DIR}/.git" rev-parse --verify HEAD 
 # NOTE (where to put generated files & cache): 
 # command > ${WORK_DIR}/file.extension (in the ${WORK_DIR}/file.extension location)
 WORK_DIR="${SRC_DIR}/._kubify_work"
+mkdir -p "${WORK_DIR}/certs"
 K8S_DIR="${SRC_DIR}/tools/kubify/kubify"
 # rm -rf $WORK_DIR
 mkdir -p "$WORK_DIR"
 alias kubify="${DIR}/kubify"
 
 # Check AWS configured (ask to configure if not), use cache if already ran
-cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID | grep -Eo '[0-9]{1,12}' || aws sts get-caller-identity || aws configure # login aws if not already logged in
+cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID | grep -Eo '[0-9]{1,12}'  &> /dev/null || aws sts get-caller-identity || aws configure # login aws if not already logged in
 # NOTE: to clear AWS Account ID value cache file: rm -rf ./._kubify_work/env_var__cache__AWS_ACCOUNT_ID
-cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID | grep -Eo '[0-9]{1,12}' || aws sts get-caller-identity --query Account --output text > ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID
+cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID | grep -Eo '[0-9]{1,12}'  &> /dev/null || aws sts get-caller-identity --query Account --output text > ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID
 AWS_ACCOUNT_ID=`cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID`
 
 # Flags
@@ -309,11 +310,16 @@ KUBIFY_ENTRYPOINT_IMAGE=kubify/entrypoint   # The entrypoint image for ad-hoc co
 KUBIFY_LOCAL_DOMAIN_SUFFIX="kubify.local"                # Local domain suffix
 KUBIFY_LOCAL_DOMAIN="local.${KUBIFY_LOCAL_DOMAIN_SUFFIX}"  # The local domain (for development)
 KUBIFY_UPSTREAM_DOMAIN_SUFFIX="${KUBIFY_UPSTREAM_DOMAIN_SUFFIX:-kubify.com}"   # The domain suffix for upstream environments (Example: <env>.kubify.local)
-KUBIFY_UPSTREAM_ENV_ACCOUNT="arn:aws:eks:${AWS_REGION}:${AWS_ACCOUNT_NUMBER}"
+KUBIFY_UPSTREAM_ENV_ACCOUNT="arn:aws:eks:${AWS_REGION}:${AWS_ACCOUNT_ID}"
 KUBIFY_NPM_CREDENTIALS_SECRET="npm-credentials"
 
 # CI Parameters
-PUBLISH_IMAGE_REPO_PREFIX=$NAMING_PREFIX
+if [[ "$KUBIFY_CONTAINER_REGISTRY" == "dockerhub" ]]; then
+  PUBLISH_IMAGE_REPO_PREFIX=$NAMING_PREFIX
+elif [[ "$KUBIFY_CONTAINER_REGISTRY" == "ecr" ]]; then
+  PUBLISH_IMAGE_REPO_PREFIX=${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/$NAMING_PREFIX
+fi
+
 
 if [[ "$KUBIFY_ENGINE" == "minikube" ]]; then
   PROFILE=kubify-kubify
@@ -353,15 +359,15 @@ ALL_ENV=( dev test stage prod )
 
 
 AWS_ADMIN_PROFILE=${AWS_ADMIN_PROFILE:-kubify-admin}
-AWS_ACCOUNT_NUMBER=$(aws sts get-caller-identity --query Account --output text --profile ${AWS_PROFILE})
+AWS_ACCOUNT_NUMBER=${AWS_ACCOUNT_ID}
 # The key used to encrypt the secrets
 # TODO: Move this somewhere outside this file
 # TODO: Store this in AWS SSM ?
 KMS_KEY_NAME=kubify_secrets_${ENV}
-DEV_KMS="arn:aws:kms:${AWS_REGION}:${AWS_ACCOUNT_NUMBER}:alias/${KMS_KEY_NAME}"
-TEST_KMS="arn:aws:kms:${AWS_REGION}:${AWS_ACCOUNT_NUMBER}:alias/${KMS_KEY_NAME}"
-STAGE_KMS="arn:aws:kms:${AWS_REGION}:${AWS_ACCOUNT_NUMBER}:alias/${KMS_KEY_NAME}"
-PROD_KMS="arn:aws:kms:u${AWS_REGION}:${AWS_ACCOUNT_NUMBER}:alias/${KMS_KEY_NAME}"
+DEV_KMS="arn:aws:kms:${AWS_REGION}:${AWS_ACCOUNT_ID}:alias/${KMS_KEY_NAME}"
+TEST_KMS="arn:aws:kms:${AWS_REGION}:${AWS_ACCOUNT_ID}:alias/${KMS_KEY_NAME}"
+STAGE_KMS="arn:aws:kms:${AWS_REGION}:${AWS_ACCOUNT_ID}:alias/${KMS_KEY_NAME}"
+PROD_KMS="arn:aws:kms:u${AWS_REGION}:${AWS_ACCOUNT_ID}:alias/${KMS_KEY_NAME}"
 
 # https://gist.github.com/ethicka/27c36c975a5c2cbbd1874bc78bab61c4
 if [ ! -f "${WORK_DIR}/certs/ca.key" ]; then
@@ -752,12 +758,12 @@ function configure_cluster {
   fi
 
   echo "Configuring cluster"
-  {
-    echo "skipping tiller init, since helm3 removed it"
-    # https://github.com/helm/helm/issues/6996
-    # $HELM init --force-upgrade --upgrade
-    # $KUBECTL rollout status -w deployment/tiller-deploy -n kube-system
-  } &> "$KUBIFY_OUT"
+  # {
+  #   echo "skipping tiller init, since helm3 removed it"
+  #   # https://github.com/helm/helm/issues/6996
+  #   # $HELM init --force-upgrade --upgrade
+  #   # $KUBECTL rollout status -w deployment/tiller-deploy -n kube-system
+  # } &> "$KUBIFY_OUT"
 
   {
     $HELM repo add stakater https://stakater.github.io/stakater-charts
@@ -2672,6 +2678,8 @@ Available Commands:
 
   start             Start the app locally for local development (Watch changes)
                       kubify start
+
+  start-all         Start all services in debug mode
 
   run               Run the app locally
                       kubify run [<app_version>]

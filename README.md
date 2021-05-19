@@ -78,6 +78,27 @@ frontend/*/secrets/*
 ```
 If you have forked this repo into your org: You should remove those 4 lines at the top of the .gitignore file (to enable encrypted git versioning of secrets, as designed).
 
+Make sure you have disk encryption on!!!!!!!!!!!! #TODO: Automate this enforcement!!!!!!
+
+![DISKENC](./docs/img/README_md_imgs/MAKE_SURE_YOU_HAVE_DISK_ENCRYPTION_ENABLED.png)
+
+!!THIS IS SUPER IMPORTANT!!
+
+Make sure you are blocking all incoming connections to your workstation!!!!!!!! #TODO: Automate this enforcement!!!!!!
+
+![BLOCKINCOMING](./docs/img/README_md_imgs/MAKE_SURE_YOU_ARE_BLOCKING_INCOMING_CONNECTIONS.png)
+
+
+!!IMPORTANT:
+To hard reset your local docker environment (includes kubify cluster):
+
+- To reset your docker (troubleshooting or fast cleaning):
+	- 1) (Optional) Reset your workdir `rm -f ./._kubify_work/kubify_config.sh`
+	- 2) (Optional) Hard reset your Docker Desktop (fixes a lot)!!
+	- 3) `./kubify up`
+
+![Reset Local K8s](./docs/img/DEBUG_md_imgs/000001/reset_docker_desktop_k8s_stack.png)
+
 
 # Awesome
 

@@ -1,0 +1,23 @@
+version: 0.2
+
+env:
+  variables:
+    KUBIFY_CI: 1
+    KUBIFY_CONTAINER_REGISTRY: ecr
+    UNIQUE_COMPANY_ACRONYM: os
+    KUBIFY_DEBUG: 0
+
+phases:
+  deploy_environments:
+    commands:
+      - pwd
+      - env | grep KUBIFY
+      - ls -a
+      - ci/scripts/deploy_environments.sh
+  new_build_container:
+    commands:
+      - pwd
+      - env | grep KUBIFY
+      - ls -a
+      - ci/scripts/new_build_container.sh
+

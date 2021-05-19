@@ -46,10 +46,10 @@ RUN echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > /app/.npmrc
     {% if build_script is not none %}
 RUN {{ build_script.split('\n') | join('; ') }}
     {% else %}
-WORKDIR /
+WORKDIR /app
 RUN {{ builder_cmd }} install 
 #RUN {{ builder_cmd }} install --network-timeout 1000000 
-WORKDIR /app
+#WORKDIR /app
     {% endif %}
 {% endif %}
 
