@@ -1,0 +1,83 @@
+apiVersion: skaffold/v2beta13
+kind: Config
+build:
+  artifacts:
+    - image: "{{ app_image }}"
+      context: .
+  local:
+    useDockerCLI: true
+    push: false
+deploy:
+  kubectl:
+    manifests:
+{% for m in manifests_glob %}
+    - "{{ m }}"
+{% endfor %}
+profiles:
+  - name: local-start
+    build:
+      tagPolicy:
+        envTemplate:
+          template: dev
+      local:
+        useDockerCLI: true
+        push: false
+      artifacts:
+      - image: "{{ app_image }}"
+        context: .
+        sync:
+          manual:
+          - src: "/src/kubify/src/kubify/templates/aws/***"
+            dest: "/root/.aws/"
+          - src: "/src/kubify/._kubify_work/certs/***"
+            dest: "/usr/local/certificates/"
+{% set kubify_config_sync = kubify_config | json_query("dev.sync") | default(dict(), true) %}
+{% if kubify_config_sync|length %}
+{% for k, v in kubify_config_sync.items() %}
+          - src: "{{ k }}"
+            dest: "{{ v }}"
+{% endfor %}
+{% endif %}
+        docker:
+          dockerfile: "../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.dev"
+          # TODO: should we keep squash (disk space saver)?
+          # squash: true
+          buildArgs:
+            NPM_TOKEN: "{% raw %}{{ .NPM_TOKEN }}{% endraw %}"
+
+  - name: local-run
+    build:
+      tagPolicy:
+        sha256: {}
+      artifacts:
+      - image: "{{ app_image }}"
+        context: .
+        sync:
+          manual:
+          - src: "/src/kubify/src/kubify/templates/aws/***"
+            dest: "/root/.aws/"
+          - src: "/src/kubify/._kubify_work/certs/***"
+            dest: "/usr/local/certificates/"
+        docker:
+          dockerfile: "../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.release"
+          buildArgs:
+            NPM_TOKEN: "{% raw %}{{ .NPM_TOKEN }}{% endraw %}"
+
+      local:
+        useDockerCLI: true
+        push: false
+  - name: ci-build
+    build:
+      tagPolicy:
+        sha256: {}
+      artifacts:
+      - image: "{{ app_cicd_build_image }}"
+        context: .
+        docker:
+          dockerfile: "../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.release"
+          buildArgs:
+            NPM_TOKEN: "{% raw %}{{ .NPM_TOKEN }}{% endraw %}"
+
+      local:
+        useDockerCLI: true
+        push: false

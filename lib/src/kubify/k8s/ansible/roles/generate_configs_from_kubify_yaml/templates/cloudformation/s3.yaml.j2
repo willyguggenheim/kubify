@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: S3 Cloudfromation bucket
+Parameters:
+  Name:
+    Type: String
+    Description: Name of the bucket
+  ServiceName:
+    Type: String
+    Default: NO-SERVICE-NAME-FOUND
+    Description: (AUTOMATICALLY SET!!) Name of the Service
+  Stage:
+    Type: String
+    Description: (AUTOMATICALLY SET!!) Name of the environment
+  RoleUserList:
+    Type: List<String>
+    Description: (AUTOMATICALLY SET!!) IAM Role List Allowed to access this SQS Queue
+
+Resources:
+  DevOpsBucket:
+    Type: AWS::S3::Bucket
+    Properties: 
+      AccessControl: Private
+      BucketEncryption: 
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault:
+            #TODO: once kms is moved convert this tousing kms keys
+              SSEAlgorithm: AES256
+      BucketName: !Ref Name
+      LifecycleConfiguration: 
+        Rules:
+          - Id: DeleteObjectsAfter30Days
+            AbortIncompleteMultipartUpload: 
+               DaysAfterInitiation: 2
+            ExpirationInDays: 30
+            Prefix: 'cloudformation/'
+            Status: Enabled
+      PublicAccessBlockConfiguration: 
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration: 
+        Status: Suspended
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref DevOpsBucket
+      PolicyDocument:
+        Id: !Sub ${Name}-policy
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AccountEditPolicy
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - s3:PutBucketAcl
+              - s3:PutBucketPolicy
+            Resource: !GetAtt DevOpsBucket.Arn
+          - Sid: DeployAccessJoe
+            Effect: Allow
+            Principal:
+              AWS:
+                !Ref RoleUserList
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: !Sub ${DevOpsBucket.Arn}/*"
+          
+
+

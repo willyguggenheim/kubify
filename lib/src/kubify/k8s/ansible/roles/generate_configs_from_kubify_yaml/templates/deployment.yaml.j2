@@ -1,0 +1,229 @@
+{% set probe_liveness  = kubify_config | json_query('probes.liveness') | default(dict(), true) %}
+{% set probe_readiness = kubify_config | json_query('probes.readiness') | default(dict(), true) %}
+{% set resources = kubify_config | json_query("profiles." + profile + ".resources") | default(dict(), true) %}
+{% set scaler_spec = kubify_config | json_query("profiles." + profile + ".scaler") | default(dict(), true) %}
+{% set scaler_base = {"scaleTargetRef": {"apiVersion": "networking.k8s.io/v1", "kind": "Deployment", "name": app_name}} %}
+
+{% if scaler_spec|length %}
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "{{ app_name }}"
+spec: {{ scaler_spec | combine(scaler_base) | to_json }}
+{% endif %}
+
+{% if (kubify_config | json_query('release.type')) == 'static_assets' or (kubify_config | json_query('configPath')) %}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ app_name }}-config"
+  labels:
+    kubify_version: "{{ kubify_version }}"
+spec:
+  selector:
+    matchLabels:
+      app: "{{ app_name }}-config"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "{{ app_name }}-config"
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: config-volume
+        configMap:
+          name: "{{ app_name }}-static"
+---
+kind: ConfigMap
+apiVersion: v1 
+metadata:
+  name: "{{ app_name }}-static"
+  labels:
+    kubify_version: "{{ kubify_version }}"
+data:
+  kubify-config.js: |
+    window.KUBIFY_CONFIG = {{ kubify_config | json_query('config') | default({}, true) | combine(profile_config.data) | combine({'ENVIRONMENT': env}) | to_json }}
+{% endif %}
+{% set init_script = kubify_config | json_query('init') | default('', true) %}
+---
+kind: ConfigMap
+apiVersion: v1 
+metadata:
+  name: "{{ app_name }}-init"
+  labels:
+    kubify_version: "{{ kubify_version }}"
+data:
+  environment: "{{ kubify_domain_env }}"
+{% if init_script|length %}
+  init.sh: |
+    #!/usr/bin/env bash
+    {{ init_script.split('\n') | join('; ') }}
+{% endif %}
+---
+{% if init_script|length %}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ app_name }}-init"
+spec:
+  template:
+    spec:
+      volumes:
+{% if is_local is defined %}
+      - name: npm-credentials
+        secret:
+          secretName: npm-credentials
+{% endif %}
+      - name: init-volume
+        configMap:
+          name: "{{ app_name }}-init"
+      - name: init-aws-volume
+        hostPath:
+          path: "/src/kubify/src/kubify/templates/aws"
+      - name: init-certs
+        hostPath:
+          path: "/src/kubify/._kubify_work/certs"
+      containers:
+        - name: "{{ app_name }}-init"
+          image: "{{ app_image }}"
+{% if env == 'local' %}
+          imagePullPolicy: Never
+{% else %}
+          imagePullPolicy: IfNotPresent
+{% endif %}
+          command: ["sh", "/init.sh"]
+          volumeMounts:
+          - name: init-volume
+            mountPath: /init.sh
+            subPath: init.sh
+          - name: init-aws-volume
+            mountPath: "/root/.aws"
+          - name: init-certs
+            mountPath: "/usr/local/certificates"
+          envFrom:
+          - configMapRef:
+              name: "{{ app_name }}-generated"
+          - configMapRef:
+              name: "{{ app_name }}"
+          - secretRef:
+              name: "{{ app_name }}"
+{% set databases = kubify_config | json_query("profiles." + profile + ".databases") | default(dict(), true) %}
+{% for name, db in databases.items() %}
+{% if db.type in ['postgres', 'mysql'] %}
+          - secretRef:
+              name: "{{ app_name }}-{{ name }}-auth"
+{% endif %}
+{% endfor %}
+      restartPolicy: Never
+  backoffLimit: 5
+  activeDeadlineSeconds: 120
+{% endif %}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ app_name }}"
+  labels:
+    app: "{{ app_name }}"
+    kubify_version: "{{ kubify_version }}"
+    context: kubify
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ app_name }}"
+      context: kubify
+  template:
+    metadata:
+      name: "{{ app_name }}"
+      labels:
+        app: "{{ app_name }}"
+        context: kubify
+    spec:
+{% if app_name == 'localstack-aws-svc' %}
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run
+{% endif %}
+      containers:
+        - name: "{{ app_name }}"
+          image: "{{ app_image }}"
+          imagePullPolicy: IfNotPresent
+{% if app_name == 'localstack-aws-svc' %}
+          #securityContext:
+          #  privileged: true
+          volumeMounts:
+              - mountPath: /var/run
+                name: docker-sock
+{% endif %}
+          ports:
+            - containerPort: {{ app_port }}
+{% if probe_liveness|length %}
+          livenessProbe: {{ probe_liveness | to_json }}
+{% endif %}
+{% if probe_readiness|length %}
+          readinessProbe: {{ probe_readiness | to_json }}
+{% endif %}
+{% if resources|length %}
+          resources: {{ resources | to_json }}
+{% endif %}
+          env:
+{% if env == 'local' %}
+          - name: STAGE
+            value: local
+          - name: localstack_endpoint
+            value: "http://localstack-aws-svc.demo.svc:4566"
+          - name: AWS_ACCESS_KEY
+            value: test
+          - name: AWS_SECRET_ACCESS_KEY
+            value: test
+          - name: AWS_DEFAULT_REGION
+            value: us-east-1
+{% endif %}
+          - name: DD_TRACE_AGENT_HOSTNAME
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: DD_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: DD_SERVICE_NAME
+            value: "{{ app_name }}"
+          - name: DD_ENV
+            valueFrom:
+              configMapKeyRef:
+                name: "{{ app_name }}-init"
+                key: environment
+          - name: ENVIRONMENT
+            valueFrom:
+              configMapKeyRef:
+                name: "{{ app_name }}-init"
+                key: environment
+          envFrom:
+          - configMapRef:
+              name: "{{ app_name }}-generated"
+          - configMapRef:
+              name: "{{ app_name }}"
+          - secretRef:
+              name: "{{ app_name }}"
+{% set databases = kubify_config | json_query("profiles." + profile + ".databases") | default(dict(), true) %}
+{% for name, db in databases.items() %}
+{% if db.type in ['postgres', 'mysql'] %}
+          - secretRef:
+              name: "{{ app_name }}-{{ name }}-auth"
+{% endif %}
+{% endfor %}

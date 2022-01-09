@@ -1,0 +1,13 @@
+- name: Build image
+  shell: |
+    docker build --build-arg NPM_TOKEN -t {{ app_cicd_build_image }}:{{ app_cicd_build_image_version }} -f {{ app_kubify_dir }}/Dockerfile.release {{ app_dir }} && \
+    docker tag {{ app_cicd_build_image }}:{{ app_cicd_build_image_version }} {{ app_cicd_build_image }}:latest
+
+- name: Tag images
+  shell: |
+    docker tag {{ app_cicd_build_image }}:{{ app_cicd_build_image_version }} {{ app_cicd_build_image }}:{{ item }} 
+  with_items: "{{ app_cicd_build_image_extra_versions.split(',') | list }}"
+
+- name: Push image
+  shell: |
+    docker push {{ app_cicd_build_image }}

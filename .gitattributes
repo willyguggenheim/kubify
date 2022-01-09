@@ -1,1 +1,13 @@
+
+########################
+#### Questions Answered:
+########################
+# Kubify offers a seamless experience on Windows, Linux and Mac OSx.
+#   However, Docker for Windows is slow (Windows Docker = Fake Docker). Avoid Windows, just get a Mac. 
+#   Windows is old school (still runs on a non-linux kernel), get yourself a Mac.
+########################
+########################
+
+# Case in point:
+# This is to fix line endings when coding on Windows (example 1 of 9999999999999999999 ^^^^^):
 * text=auto

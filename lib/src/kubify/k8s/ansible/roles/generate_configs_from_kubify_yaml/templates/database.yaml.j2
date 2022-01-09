@@ -1,0 +1,164 @@
+{% set databases = kubify_config | json_query("profiles." + profile + ".databases") | default(dict(), true) %}
+{% for name, db in databases.items() %}
+{% if db.type == 'postgres' %}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "{{ app_name }}-{{ name }}-auth"
+  labels:
+    app: "{{ app_name }}"
+    kubify_version: "{{ kubify_version }}"
+type: Opaque
+data:
+  POSTGRES_USER: "{{ 'test' | b64encode }}"
+  POSTGRES_PASSWORD: "{{ 'test' | b64encode }}"
+---
+apiVersion: kubedb.com/v1alpha2
+kind: Postgres
+metadata:
+  name: "{{ app_name }}-{{ name }}"
+  labels:
+    kubify_version: "{{ kubify_version }}"
+spec:
+  version: "{{ db.version }}"
+{% if env == 'local' %}
+  storageType: Ephemeral
+{% else %}
+  storageType: Durable
+{% endif %}
+  authSecret:
+    name: "{{ app_name }}-{{ name }}-auth"
+  storage:
+{% if env == 'local' %}
+    storageClassName: "standard"
+{% else %}
+    storageClassName: "gp2"
+{% endif %}
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+{% if db.size is defined %}
+        storage: "{{ db.size }}"
+{% else %}
+        storage: 1Gi
+{% endif %}
+{% if env != 'local' %}
+  terminationPolicy: DoNotTerminate
+{% endif %}
+{% if (db | json_query('init.script')) %}
+  init:
+    script:
+      configMap:
+        name: "{{ app_name }}-{{ name }}-init"
+{% endif %}
+---
+{% if (db | json_query('init.script')) %}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ app_name }}-{{ name }}-init"
+  labels:
+    kubify_version: "{{ kubify_version }}"
+data:
+  data.sql: |
+{{ db.init.script | indent(width=4, first=true) }}
+{% endif %}
+{% elif db.type == 'mongo' %}
+---
+apiVersion: kubedb.com/v1alpha2
+kind: MongoDB
+metadata:
+  name: "{{ app_name }}-{{ name }}"
+  labels:
+    kubify_version: "{{ kubify_version }}"
+spec:
+  version: "{{ db.version }}"
+{% if env == 'local' %}
+  storageType: Ephemeral
+{% else %}
+  storageType: Durable
+{% endif %}
+{% elif db.type == 'redis' %}
+---
+apiVersion: kubedb.com/v1alpha2
+kind: Redis
+metadata:
+  name: "{{ app_name }}-{{ name }}"
+  labels:
+    kubify_version: "{{ kubify_version }}"
+spec:
+  version: "{{ db.version }}"
+{% if env == 'local' %}
+  storageType: Ephemeral
+{% else %}
+  storageType: Durable
+{% endif %}
+{% elif db.type == 'mysql' %}
+{# ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "{{ app_name }}-{{ name }}-auth"
+  labels:
+    app: "{{ app_name }}"
+    kubify_version: "{{ kubify_version }}"
+type: Opaque
+data:
+  username: "{{ 'test' | b64encode }}"
+  password: "{{ 'test' | b64encode }}" #}
+---
+apiVersion: kubedb.com/v1alpha2
+kind: MySQL
+metadata:
+  name: "{{ app_name }}-{{ name }}"
+  labels:
+    kubify_version: "{{ kubify_version }}"
+spec:
+  version: "{{ db.version }}"
+{% if env == 'local' %}
+  storageType: Ephemeral
+{% else %}
+  storageType: Durable
+{% endif %}
+  #authSecret:
+  #  name: "{{ app_name }}-{{ name }}-auth"
+  storage:
+{% if env == 'local' %}
+    storageClassName: "standard"
+{% else %}
+    storageClassName: "gp2"
+{% endif %}
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+{% if db.size is defined %}
+        storage: "{{ db.size }}"
+{% else %}
+        storage: 1Gi
+{% endif %}
+{% if env != 'local' %}
+  terminationPolicy: DoNotTerminate
+{% endif %}
+{% if (db | json_query('init.script')) %}
+  init:
+    script:
+      configMap:
+        name: "{{ app_name }}-{{ name }}-init"
+{% endif %}
+---
+{% if (db | json_query('init.script')) %}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ app_name }}-{{ name }}-init"
+  labels:
+    kubify_version: "{{ kubify_version }}"
+data:
+  data.sql: |
+{{ db.init.script | indent(width=4, first=true) }}
+{% endif %}
+{% endif %}
+{% endfor %}

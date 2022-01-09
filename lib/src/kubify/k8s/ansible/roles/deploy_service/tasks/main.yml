@@ -1,0 +1,71 @@
+- name: Update EKS config
+  shell: |
+    AWS_PROFILE={{ aws_profile }} aws eks update-kubeconfig --name {{ deploy_cluster_name }}
+
+- name: Set facts
+  set_fact:
+    skaffold_deploy_cmd: |
+      skaffold config set --global local-cluster false
+      skaffold deploy \
+        --namespace {{ deploy_namespace }} \
+        --images {{ deploy_image }} \
+        --filename {{ skaffold_config }} \
+        --profile {{ skaffold_profile }}
+    skaffold_delete_cmd: |
+      skaffold config set --global local-cluster false
+      skaffold delete \
+        --namespace {{ deploy_namespace }} \
+        --filename {{ skaffold_config }} \
+        --profile {{ skaffold_profile }}
+
+- name: Deploy service
+  shell: "{{ skaffold_deploy_cmd }}"
+  args:
+    chdir: "{{ app_dir }}"
+  register: skaffold_deploy_result
+  when: undeploy == "no"
+
+- name: Undeploy service
+  shell: "{{ skaffold_delete_cmd }}"
+  args:
+    chdir: "{{ app_dir }}"
+  register: skaffold_delete_result
+  when: undeploy == "yes"
+
+- name: Skaffold deploy command
+  debug:
+    var: skaffold_deploy_cmd
+  when: undeploy == "no"
+
+- name: Skaffold delete command
+  debug:
+    var: skaffold_delete_cmd
+  when: undeploy == "yes"
+
+- name: Skaffold deploy output
+  debug:
+    var: skaffold_deploy_result.stdout_lines
+  when: undeploy == "no"
+
+- name: Skaffold deploy errors
+  debug:
+    var: skaffold_deploy_result.stderr_lines
+  when: undeploy == "no"
+
+- name: Skaffold delete output
+  debug:
+    var: skaffold_delete_result.stdout_lines
+  when: undeploy == "yes"
+
+- name: Skaffold delete errors
+  debug:
+    var: skaffold_delete_result.stderr_lines
+  when: undeploy == "yes"
+
+# TODO: uncomment this:
+# - name: Restore config
+#   shell: git checkout HEAD {{ item }}
+#   with_items:
+#     - "{{ app_dir }}/config"
+#     - "{{ app_dir }}/secrets"
+#   when: app_config_sha != ""

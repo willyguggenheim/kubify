@@ -1,0 +1,5 @@
+services:
+  s3:
+    command: get-bucket-tagging
+    query: TagSet[?Key=='aws:cloudformation:stack-name'].Value
+    

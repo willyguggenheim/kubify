@@ -1,0 +1,24 @@
+---
+- name: Ensure common secrets work directory exists
+  file:
+    path: "{{ kubify_dir }}/{{ env }}/common/manifests"
+    state: directory
+
+- name: Decrypt common secrets
+  shell: "kubesec decrypt {{ item.src }} > {{ item.dest }}"
+  with_items:
+    - { src: "{{ app_dir }}/../../src/kubify/templates/secrets/secrets.{{ env }}.enc.yaml", dest: "{{ kubify_dir }}/{{ env }}/common/manifests/secrets.yaml"}
+
+- name: Ensure common config directory exists
+  file:
+    path: "{{ app_dir }}/../../src/kubify/templates/config/"
+    state: directory
+
+- name: Generate config
+  template:
+    src: "{{ item[0].src }}"
+    dest: "{{ item[0].dest }}/config.{{ item[1] }}.yaml"
+    force: "no"
+  with_nested:
+    - - { src: "templates/config.yaml.j2",     dest: "{{ app_dir }}/../../src/kubify/templates/config/" }
+    - [ 'dev', 'test', 'stage', 'prod' ]

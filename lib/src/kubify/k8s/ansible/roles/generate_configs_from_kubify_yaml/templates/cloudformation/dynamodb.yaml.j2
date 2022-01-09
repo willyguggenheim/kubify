@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: DynamoDB Cloudfromation DynamoDB Table
+Parameters:
+  Name:
+    Type: String
+    Description: Name of the DynamoDB Table
+  ServiceName:
+    Type: String
+    Default: NO-SERVICE-NAME-FOUND
+    Description: (AUTOMATICALLY SET!!) Name of the Service
+  Stage:
+    Type: String
+    Description: (AUTOMATICALLY SET!!) Name of the environment
+  HashKeyName:
+    Default: type
+    Type: String
+  HashKeyType:
+    Default: S
+    Type: String
+  RangeKeyName: key
+    Type: String
+  RangeKeyType:
+    Default: S
+    Type: String
+
+Resources:
+  myDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref Name
+      AttributeDefinitions:
+      - AttributeName: !Ref 'HashKeyName'
+        AttributeType: !Ref 'HashKeyType'
+      - AttributeName: !Ref 'RangeKeyName'
+        AttributeType: !Ref 'RangeKeyType'
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: !Ref 'HashKeyName'
+        KeyType: HASH
+      - AttributeName: !Ref 'RangeKeyName'
+        KeyType: RANGE
+      LocalSecondaryIndexes:
+          -
+            IndexName: !Sub "${Name}-index"
+            KeySchema:
+              -
+                AttributeName: !Ref 'HashKeyName'
+                KeyType: "HASH"
+              -
+                AttributeName: id
+                KeyType: "RANGE"
+      BillingMode: PAY_PER_REQUEST

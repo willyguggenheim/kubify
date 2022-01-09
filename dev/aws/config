@@ -1,0 +1,15 @@
+[profile default]
+region = us-east-1
+output = json
+ca_bundle = /usr/local/certificates/ca.crt
+s3 =
+    endpoint_url = http://localstack-aws-svc.demo.svc:4566
+    ca_bundle = /usr/local/certificates/ca.crt
+
+[profile local]
+region = us-east-1
+output = json
+ca_bundle = /usr/local/certificates/ca.crt
+s3 =
+    endpoint_url = http://localstack-aws-svc.demo.svc:4566
+    ca_bundle = /usr/local/certificates/ca.crt

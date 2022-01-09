@@ -1,0 +1,41 @@
+[ req ]
+default_bits        = 2048 
+default_keyfile     = ca.pem 
+distinguished_name  = local_kubify_local
+req_extensions          = v3_req
+x509_extensions         = v3_ca
+
+[local_kubify_local]
+C = [Press Enter to Continue]
+C_default = US 
+C_min = 2 
+C_max = 2 
+
+O = [Press Enter to Continue]
+O_default = default 
+
+0.OU=[Press Enter to Continue]
+0.OU_default = default 
+1.OU=[Press Enter to Continue]
+1.OU_default = PKI 
+2.OU=[Press Enter to Continue] 
+2.OU_default = ABCD
+commonName = local.kubify.local 
+commonName_max = 64
+emailAddress = test@kubify.local
+emailAddress_default = test@kubify.local
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment
+
+[ v3_ca ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+subjectAltName 		   = @alt_names
+issuerAltName          = issuer:copy
+
+[alt_names]
+DNS.1 = ingress-nginx-controller-admission.ingress-nginx.svc
+DNS.2 = *.local.kubify.local
+DNS.3 = *.demo.svc

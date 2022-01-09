@@ -1,0 +1,52 @@
+#!/bin/bash
+
+echo "" > {{ app_kubify_dir }}/sls.log
+
+export AWS_DEFAULT_REGION=us-east-1
+export AWS_REGION=us-east-1
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
+export ACCOUNT_ID=$AWS_ACCOUNT_ID
+
+{% if env == 'local' %}
+    export AWS_ACCOUNT_ID=000000000000
+    export ACCOUNT_ID=000000000000
+{% else %}
+export ACCOUNT_ID
+{% endif %}
+
+mkdir -p {{ app_kubify_dir }}/code
+rsync -a --delete {{ app_dir }}/ {{ app_kubify_dir }}/code/
+rm -f {{ app_kubify_dir }}/code/serverless.yml
+cp {{ app_kubify_dir }}/serverless.yml {{ app_kubify_dir }}/serverless-with-add.yml
+
+mkdir -p {{ app_kubify_dir }}/code/lambdaci
+cd {{ app_kubify_dir }}/code/lambdaci
+docker build -t lambci/lambda:build-undefined -f {{ app_kubify_dir }}/../../../src/kubify/tool/scripts/serverless/lambdaci/Dockerfile .
+
+cd {{ app_kubify_dir }}/code
+# delete the add section, as it was already utilized
+~/kubify/yq eval 'del(.add)' {{ app_kubify_dir }}/serverless-with-add.yml > ./serverless.yml
+{# echo "log in {{ app_kubify_dir }}/sls.log" #}
+
+# not needed as run_in_entrypoint is used on local sls invoke
+{# {% if env == 'local' %}
+export NODE_TLS_REJECT_UNAUTHORIZED=0
+{% endif %} #}
+
+    {% if env == 'local' %}
+        mkdir -p ./python
+        rsync -a --delete ../cloudformation/lambda/layer/python/ ./python/
+        mkdir -p ./node_modules
+        rsync -a --delete ../cloudformation/lambda/layer/node_modules/ ./node_modules/
+    {% endif %}
+
+    {% if env == 'local' %}
+        echo "cd /src/kubify/._kubify_work/local/{{ app_name }}/code" > {{ app_kubify_dir }}/sls-reinvoke.sh
+        echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION AWS_REGION=$AWS_REGION AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID ACCOUNT_ID=$ACCOUNT_ID serverless deploy --stage {{ env }}" >> {{ app_kubify_dir }}/sls-reinvoke.sh
+        chmod +x {{ app_kubify_dir }}/sls-reinvoke.sh
+        {{ app_kubify_dir }}/../../../kubify run_in_entrypoint /src/kubify/._kubify_work/local/{{ app_name }}/sls-reinvoke.sh || {{ app_kubify_dir }}/../../../kubify run_in_entrypoint /src/kubify/._kubify_work/local/{{ app_name }}/sls-reinvoke.sh
+    {% else %}
+        serverless deploy --stage {{ env }}
+    {% endif %}
+
+

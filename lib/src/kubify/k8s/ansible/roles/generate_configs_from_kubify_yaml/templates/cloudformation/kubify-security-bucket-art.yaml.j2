@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: S3 Cloudformation bucket
+Parameters:
+  Name:
+    Type: String
+    Description: Name of the bucket
+  ServiceName:
+    Type: String
+    Default: NO-SERVICE-NAME-FOUND
+    Description: (AUTOMATICALLY SET!!) Name of the Service
+  Stage:
+    Type: String
+    Description: (AUTOMATICALLY SET!!) Name of the environment
+  RoleUserList:
+    Type: List<String>
+    Description: (AUTOMATICALLY SET!!) IAM Role List Allowed to access this SQS Queue
+
+Resources:
+  S3SecOpsReportsBucket:
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref Name
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      VersioningConfiguration:
+        Status: Enabled
+  S3SecOpsReportsBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Sid: SecOpsReportsAccessInternalWrite
+            Action:
+              - 's3:PutObject'
+              - 's3:Get*'
+            Effect: Allow
+            Resource: 'arn:aws:s3:::kubify-kubify-security-bucket-art/*'
+            Principal:
+              AWS:
+              - !Sub 'arn:aws:iam::${AWS::AccountId}:user/usr-willy-guggenheim-1'
+              - !Sub 'arn:aws:iam::${AWS::AccountId}:user/usr-philip-t-1'
+      Bucket: !Ref S3SecOpsReportsBucket

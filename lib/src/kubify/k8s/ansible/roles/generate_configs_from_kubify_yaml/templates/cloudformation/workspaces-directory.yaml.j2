@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: WorkSpaces workstations directory
+Parameters:
+  Name:
+    Type: String
+    Description: Name of the Domain
+  ServiceName:
+    Type: String
+    Default: NO-SERVICE-NAME-FOUND
+    Description: (AUTOMATICALLY SET!!) Name of the Service
+  Stage:
+    Type: String
+    Description: (AUTOMATICALLY SET!!) Name of the environment
+  RoleUserList:
+    Type: List<String>
+    Description: (AUTOMATICALLY SET!!) IAM Role List Allowed to access this SQS Queue
+Resources:
+  WorkspaceDirectorySSMParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: "/kubify/env/dev/infra/workspaces/directory_id"
+      Type: String
+      Value: !Ref WorkspaceDirectory
+      Description: SSM Parameter for workspaces directory ID (used from workspaces template).
+  AWSManagedADSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      GenerateSecretString:
+        PasswordLength: 24
+  WorkspaceDirectory: 
+    Type: AWS::DirectoryService::MicrosoftAD
+    Properties: 
+        Name: !Ref Name
+        Edition: 'Standard'
+        Password: !Sub '{{resolve:secretsmanager:${AWSManagedADSecret}}}'
+        VpcSettings: 
+            SubnetIds: 
+                - subnet-abcde012
+                - subnet-abcde012
+            VpcId: vpc-abcde012

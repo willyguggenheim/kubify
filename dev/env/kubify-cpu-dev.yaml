@@ -1,0 +1,21 @@
+# dev aws eks environment AND local "run" environment file (BOTH), not used for "start" commands. I will explain in more detail:
+# this same file is used for eks kubify-cpu-dev cluster
+# this same file is used for local development testing of kubify-cpu-dev cluster (on your workstation using "kubify run", "kubify run [] [] []" or "kubify run-all")
+# let me say that again (just to be clear, because this magic is AWESOME):
+# to clarify the above: `kubify start` commands = rapid test and listen for code changes
+# to clarify the above: `kubify up` commands = use this file and test the built version (so you can rapid test any environment locally with seeds, not with pii data, by copying the file contents here:)
+---
+apiVersion: kubify.kubify.local/v1
+kind: Environment
+metadata:
+  name: dev
+target:
+  cluster: kubify-eks-dev.us-east-1.eksctl.io
+kubify_version: 9000.0.1
+services:
+  example-node-svc:
+    # config = config folder & secrets folder (they are versioned to match the image used, 
+    #  similar to a snapshot of configuration/image/.. of the entire service at that time that you can easily revert to)
+    config: 0.0.2
+    image: 0.0.2
+    profile: dev

@@ -1,0 +1,129 @@
+---
+- hosts: all
+  vars:
+    - TF_VERSION: 0.14.10
+    - AWS_CLI_VERSION: 1.19.49
+    #TODO: check if: docker desktop local will soon upgrade kubernetes from 1.19.7 to 1.2X.X+? If so, we upgrade this line.
+    # but we might be able to just upgrade this, as it should be backwards compatible k8s tooling/libs anyway (double check and then upgrade this next line) .. 
+    - KUBE_VERSION: 1.19.7
+    - KUBESEC_VERSION: 0.9.2
+
+  tasks:
+    - name: Install the gpg key for nodejs
+      become: true
+      apt_key:
+        url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+        state: present
+
+    - name: Install the nodejs repo
+      become: true
+      apt_repository:
+        repo: "deb https://deb.nodesource.com/node_10.x {{ ansible_distribution_release }} main"
+        state: present
+        update_cache: yes
+
+    - name: Install packages
+      become: true
+      apt:
+        name:
+          - vim
+          - emacs
+          - python3-pip
+          - jq
+          - unzip
+          - nodejs
+          - groff
+          - git
+          - gettext-base
+          - curl
+          - aptitude
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+
+    - name: kubesec
+      become: true
+      get_url:
+        url: https://github.com/shyiko/kubesec/releases/download/{{ KUBESEC_VERSION }}/kubesec-{{ KUBESEC_VERSION }}-linux-amd64
+        dest: /usr/local/bin/kubesec
+        mode: u+x
+
+    - name: Install kubectl
+      get_url:
+        url: https://storage.googleapis.com/kubernetes-release/release/v{{ KUBE_VERSION }}/bin/linux/amd64/kubectl
+        dest: /usr/bin/
+        mode: u+x
+
+    - name: AWS CLI
+      become: true
+      pip:
+        name: awscli
+        version: "{{ AWS_CLI_VERSION }}"
+        executable: pip3
+
+    - name: Download terraform
+      get_url:
+        url: "https://releases.hashicorp.com/terraform/{{ TF_VERSION }}/terraform_{{ TF_VERSION }}_linux_amd64.zip"
+        dest: /tmp/terraform.zip
+        mode: 0440
+
+    - name: Install terraform
+      become: true
+      unarchive:
+        src: /tmp/terraform.zip
+        dest: /usr/bin/
+        mode: 744
+
+    - name: Install the gpg key for yarn
+      become: true
+      apt_key:
+        url: "https://dl.yarnpkg.com/debian/pubkey.gpg"
+        state: present
+
+    - name: Install the yarn repo
+      become: true
+      apt_repository:
+        repo: "deb https://dl.yarnpkg.com/debian/ stable main"
+        state: present
+        update_cache: yes
+
+    - name: Install yarn
+      become: true
+      apt:
+        name: yarn
+        state: present
+
+    - name: Install CRA
+      become: true
+      command: npm install -g create-react-app
+
+    - name: Install serverless
+      become: true
+      command: npm install -g serverless serverless-python-requirements serverless-reqvalidator-plugin serverless-localstack serverless-aws-documentation serverless-plugin-aws-alerts
+
+    - name: "APT - Add Docker GPG key"
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: "APT - Add Docker repository"
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+        state: present
+        filename: docker
+
+    - name: "APT - install 'docker-ce'"
+      apt:
+        name: "docker-ce"
+        update_cache: yes
+
+    - name: Configure aws profile
+      lineinfile:
+        path: /root/.bashrc
+        state: present
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^export AWS_PROFILE=',                           line: 'export AWS_PROFILE=default' }
+        - { regexp: '^export PATH=/src/kubify(/tools)?/kubify/tool(2)?.*', line: 'export PATH=/src/kubify/src/kubify/tool:$PATH'}

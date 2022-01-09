@@ -1,0 +1,68 @@
+---
+apiVersion: k8.kubify.local/v1
+kind: Config
+metadata:
+  name: example-node-complex-svc
+init: |
+  echo "run init for example-node-complex-svc/app"
+dev:
+  sync:
+    'app/***': 'app/'
+  scripts:
+    start: |
+      echo 'listening for code changes in example-node-complex-svc folder'
+      cd /app/app
+      DB_USERNAME=$POSTGRES_USER
+      DB_PASSWORD=$POSTGRES_PASSWORD
+      node app.js
+release:
+  scripts:
+    start: |
+      echo 'starting example-node-complex-svc release service's pod'  
+      cd /app/app
+      DB_USERNAME=$POSTGRES_USER
+      DB_PASSWORD=$POSTGRES_PASSWORD
+      node app.js
+service:
+  port: '3000'
+config:
+  PORT: '3000'
+  APP_NAME: example-node-complex-svc
+  DEBUG: 'example-node-complex-svc:*'
+  DB_HOST: example-node-complex-svc-postgres
+  DB_NAME: example-node-complex-svc
+  ENV: '{{ env }}'
+  REDIS_URL: 'example-node-complex-svc-redis'
+  REDIS_PORT: '6379'
+  REDIS_DATABASE: '0'
+  KUBIFY_ENV: '{{ env }}'
+profiles:
+  dev:
+    scaler:
+      minReplicas: 1
+      maxReplicas: 4
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 40
+    resources:
+      requests:
+        cpu: 8m
+        memory: 8Mi
+      limits:
+        cpu: 512m
+        memory: 512Mi
+    # KubeDB Databases
+    databases:
+      redis:
+        type: redis
+        version: '5.0.3-v1'
+      postgres:
+        type: postgres
+        version: '11.11'
+        init:
+          script: |
+            CREATE DATABASE "example-node-complex-svc"

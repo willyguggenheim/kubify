@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SQS Cloudfromation SQS Queue
+Parameters:
+  Name:
+    Type: String
+    Description: Name of the SQS Queue
+  ServiceName:
+    Type: String
+    Default: NO-SERVICE-NAME-FOUND
+    Description: (AUTOMATICALLY SET!!) Name of the Service
+  Stage:
+    Type: String
+    Description: (AUTOMATICALLY SET!!) Name of the environment
+  RoleUserList:
+    Type: List<String>
+    Description: (AUTOMATICALLY SET!!) IAM Role List Allowed to access this SQS Queue
+  # Addtional Property Override Options:
+  # See: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
+
+  EndpointArn:
+    Type: String
+    Description: (Optionally) Attach Endpoint (that is called when SNS invoke)
+  EndpointProtocol:
+    Type: String
+    Description: '(Optionally) Attach Endpoint protocol. Example "sqs"'
+
+Conditions:
+    AttachEndpoint:
+      !Not [!Equals [!Ref EndpointArn, '']]
+
+Resources:
+  MySNSTopicWithEndpoint:
+    Condition: AttachEndpoint
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint: !Ref EndpointArn
+          Protocol: !Ref EndpointProtocol
+      TopicName: !Ref Name
+      
+
+  MySNSTopicWithoutEndpoint:
+    Condition: AttachEndpoint
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Ref Name

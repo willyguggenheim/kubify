@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ app_name }}"
+  labels:
+    app: "{{ app_name }}"
+    kubify_version: "{{ kubify_version }}"
+spec:
+{% if expose_service == 'true' %}
+  type: LoadBalancer
+{% endif %}
+  selector:
+    app: "{{ app_name }}"
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: {{ app_port }}
+    name: "lb-80-{{ app_port }}"
+{% set internal_tcp_ports = kubify_config | json_query("internal.tcp") | default(dict(), true) %}
+{% if internal_tcp_ports|length %}
+{% for tcp_port in internal_tcp_ports %}
+  - protocol: TCP
+    port: {{ tcp_port }}
+    targetPort: {{ tcp_port }}
+    name: "internal-tcp-{{ tcp_port }}"
+{% endfor %}
+{% endif %}
+{% set internal_udp_ports = kubify_config | json_query("internal.udp") | default(dict(), true) %}
+{% if internal_udp_ports|length %}
+{% for udp_port in internal_udp_ports %}
+  - protocol: UDP
+    port: {{ udp_port }}
+    targetPort: {{ udp_port }}
+    name: "internal-udp--{{ udp_port }}"
+{% endfor %}
+{% endif %}
+{% if (kubify_config | json_query('release.type')) == 'static_assets' or (kubify_config | json_query('configPath') is defined) %}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ app_name }}-config"
+  labels:
+    app: "{{ app_name }}-config"
+    kubify_version: "{{ kubify_version }}"
+spec:
+{% if expose_service == 'true' %}
+  type: LoadBalancer
+{% endif %}
+  selector:
+    app: "{{ app_name }}-config"
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+{% endif %}

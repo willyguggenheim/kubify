@@ -1,0 +1,5 @@
+# example:
+# [submodule "dev/svc/example-submodule-service"]
+# 	path = dev/svc/example-submodule-service
+# 	url = git@github.com:willyguggenheim/kubify-example-submodule-service.git
+# 	branch = master

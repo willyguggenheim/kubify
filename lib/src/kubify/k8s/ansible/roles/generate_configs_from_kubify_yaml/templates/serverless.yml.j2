@@ -1,0 +1,54 @@
+#Option A) Read json env. Option B would be https://www.serverless.com/plugins/serverless-dotenv-plugin
+{% set env_vars = lookup('file', "{{ app_kubify_dir }}/gen-env-vars-all.json") | from_json %}
+{% set serverless_custom_code = kubify_config | json_query('serverless.add.custom') | to_nice_yaml( explicit_start=False, explicit_end=False) | indent(4, true) %}
+{% set serverless_iam_code = kubify_config | json_query('serverless.add.iam') | to_nice_yaml( explicit_start=False, explicit_end=False) | indent(4, true) %}
+
+{% set serverless_code = kubify_config | json_query('serverless') | to_nice_yaml( explicit_start=False, explicit_end=False) %}
+
+service: {{ app_name }}
+
+plugins:
+{% if env == 'local' %}
+    - serverless-localstack
+{% else %}
+    - serverless-python-requirements
+{% endif %}
+    - serverless-reqvalidator-plugin
+    - serverless-aws-documentation
+    - serverless-plugin-aws-alerts
+
+provider:
+    name: aws
+{% if env == 'local' %}
+    deploymentBucket:
+        name: kubify-deploy
+    #TODO: endpoint override if needed for local
+{% endif %}
+    stage: '{{ env }}'
+    region: '${env:AWS_REGION}'
+    environment: '{{ env_vars }}'
+{{ serverless_iam_code }}
+
+custom:
+    pythonRequirements:
+        dockerizePip: true
+    bolt_next_line: bolt_next_line
+{{ serverless_custom_code }}
+{% if env == 'local' %}
+    localstack:
+      stages:
+        # list of stages for which the plugin should be enabled
+        - local
+      host: http://localstack-aws-svc.demo.svc:4566 # optional - LocalStack host to connect to when running in run_in_entrypoint
+      edgePort: 4566
+      # it is already started in kubify at this point
+      autostart: false
+      lambda:
+        # Enable this flag to improve performance
+        mountCode: false
+      docker:
+        # Enable this flag to run "docker ..." commands as sudo
+        sudo: false
+{% endif %}
+
+{{ serverless_code }}

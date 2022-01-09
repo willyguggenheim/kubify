@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SQS Cloudfromation Lambda Function
+Parameters:
+  EventSourceMappingArn:
+    Type: String
+    Description: The arn of the trigger (if for example sqs when sqs message dequeued and sent as message payload as single invocation for each message)   
+  Name:
+    Type: String
+    Description: Name of the Lambda Function
+  Stage:
+    Type: String
+    Description: (AUTOMATICALLY SET!!) Name of the environment
+  ServiceName:
+    Type: String
+    Default: NO-SERVICE-NAME-FOUND
+    Description: (AUTOMATICALLY SET!!) Name of the Service
+  RoleUserList:
+    Type: List<String>
+    Description: (AUTOMATICALLY SET!!) IAM Role List Allowed to Invoke this Lambda
+  Runtime:
+    Type: String
+    Description: (AUTOMATICALLY SET!!) Lambda Runtime
+  #TODO: for added security can use ssm securestring and permissions around SECRET_* (prefix pattern match) env vars values showing in lambda
+  EnvVars:
+    Type: String
+    Description: (AUTOMATICALLY SET!!) Enviroment Variables JSON String Array
+    Default: "{'NOT_ENV_VARS_FOUND': 'NOT_ENV_VARS_FOUND'}"
+  Handler:  
+    Type: String
+    Description: Path of a Lambda Handler. 
+    AllowedPattern: ^.*[^0-9]$
+    ConstraintDescription: Must end with non-numeric character.
+Conditions:
+    CreateEventSourceMapping:
+      !Not [!Equals [!Ref EventSourceMappingArn, '']]
+Outputs:
+#  LambdaRoleARN:
+#    Description: Role for Lambda execution.
+#    Value:
+#      Fn::GetAtt:
+#        - LambdaRole
+#        - Arn
+#    Export:
+#      Name:
+#        Fn::Sub: LambdaRole
+  LambdaFunctionName:
+    Value:
+      Ref: LambdaFunction
+  LambdaFunctionARN:
+    Description: Lambda function ARN.
+    Value:
+      Fn::GetAtt:
+        - LambdaFunction
+        - Arn
+    Export:
+      Name:
+        Fn::Sub: ${Name}-LambdaARN-${Stage}
+Resources:
+#  LambdaRole:
+#    Type: AWS::IAM::Role
+#    Properties:
+#      RoleName:
+#        Fn::Sub: lambda-role
+#      AssumeRolePolicyDocument:
+#        Statement:
+#          - Action:
+#            - sts:AssumeRole
+#            Effect: Allow
+#            Principal:
+#              Service:
+#              - lambda.amazonaws.com
+#        Version: 2012-10-17
+#      ManagedPolicyArns:
+#        - arn:aws:iam::aws:policy/AWSLambdaExecute
+#        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+#        - !Ref RoleUserList
+#      Path: /
+
+#  LambdaLayer:
+#    Type: AWS::Lambda::LayerVersion
+#    Properties:
+#      CompatibleRuntimes:
+#      # TODO: if condition here
+#        - !Ref Runtime
+#      Content:
+#        S3Bucket: !sub kubify-deploy-${AWS::AccountId}-${AWS::Region}
+#        S3Key: !sub ${ServiceName}-lambda-layer.zip
+#      Description: !sub s3://kubify-deploy-${AWS::AccountId}-${AWS::Region}/artifacts/lambda/${ServiceName}-lambda-layer.zip
+#      LayerName: ${ServiceName}-lambda-layer
+
+  MyEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Condition: CreateEventSourceMapping
+    Properties:
+      EventSourceArn:
+        Fn::Sub: ${EventSourceMappingArn}
+      FunctionName: !Ref LambdaFunction
+      StartingPosition: "LATEST"
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    #TODO: VPC (same in SLS)
+    Properties:
+      FunctionName: !Ref Name
+      Description:
+        Fn::Sub: ${ServiceName}-${Stage}
+      Runtime: !Ref Runtime
+      Code:
+        S3Bucket: !Sub "kubify-deploy"
+        S3Key: !Sub "artifacts/lambda/${ServiceName}-lambda-code.zip"
+      Handler: !Ref Handler
+      MemorySize: 128
+      Timeout: 10
+#TODO: VPC
+#      Role:
+#        Fn::GetAtt:
+#          - LambdaRole
+#          - Arn
+# TODO: put back layers
+#      Layers:
+#        - !Ref LambdaLayer
+      # Last Line Should be Variables (workaround for sed on env vars):
+      Environment:
+        

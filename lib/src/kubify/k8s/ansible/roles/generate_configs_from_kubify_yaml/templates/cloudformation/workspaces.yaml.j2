@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'WorkSpaces workstations'
+Parameters:
+  Name:
+    Type: String
+    Description: 'Name of the SQS Queue'
+  ServiceName:
+    Type: String
+    Default: NO-SERVICE-NAME-FOUND
+    Description: '(AUTOMATICALLY SET!!) Name of the Service'
+  Stage:
+    Type: String
+    Description: '(AUTOMATICALLY SET!!) Name of the environment'
+  RoleUserList:
+    Type: List<String>
+    Description: '(AUTOMATICALLY SET!!) IAM Role List Allowed to access this SQS Queue'
+  Username:
+    Type: String
+    Description: 'the username based on the email prefix. I.e., user.name@acme.com, becomes simply user.name.'
+  Size:
+    Type: String
+    Description: 'options are small, medium, large, xlarge'
+  OS:
+    Type: String
+    Description: 'options are linux and windows'
+Mappings:
+ BundleId:
+    windows:
+        small: [BUNDLE ID GOES HERE] #TODO: make these a lookup !
+        medium: [SAME BUNDLE ID GOES HERE]
+        large: [SAME BUNDLE ID GOES HERE]
+        xlarge: [SAME BUNDLE ID GOES HERE]
+    linux:
+        small: [BUNDLE ID GOES HERE]
+        medium: [BUNDLE ID GOES HERE]
+        large: [SAME BUNDLE ID GOES HERE]
+        xlarge: [SAME BUNDLE ID GOES HERE]
+
+ ComputeTypeName:
+    windows:
+        small: STANDARD
+        medium: POWER
+        large: POWERPRO
+        xlarge: PERFORMANCE
+    linux:
+        small: STANDARD
+        medium: POWER
+        large: POWERPRO
+        xlarge: PERFORMANCE
+
+
+Resources:
+
+  Workspace:
+    Type: AWS::WorkSpaces::Workspace
+    Properties: 
+        BundleId: !FindInMap
+          - BundleId
+          - !Ref OS
+          - !Ref Size
+        DirectoryId: '{{resolve:ssm:/kubify/env/dev/infra/workspaces/directory_id}}'
+        RootVolumeEncryptionEnabled: True
+        UserName: !Ref Username
+        UserVolumeEncryptionEnabled: True
+        VolumeEncryptionKey: "arn:aws:kms:us-east-1:abcde012:key/GOES_HERE"
+        WorkspaceProperties:
+          RunningMode: AUTO_STOP
+          RunningModeAutoStopTimeoutInMinutes: 120
+          UserVolumeSizeGib: 200
+          ComputeTypeName: !FindInMap
+            - ComputeTypeName
+            - !Ref OS
+            - !Ref Size

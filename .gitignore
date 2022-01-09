@@ -1,52 +1,83 @@
-## Remove the next 4 lines in order to version secrets (for private forks of this repo):
-backend/*/secrets
-backend/*/secrets/*
-frontend/*/secrets
-frontend/*/secrets/*
-##############################################################################
+# Keys
+.aws
+**/.aws
+# NOTE: COMMENT THE NEXT LINE IF YOU ARE IN A PRIVATE FORK (AND MAKE SURE TO UNCOMMENT IF YOU ARE CONTRIBUTING TO OS PUBLIC REPO OR ANY PUBLIC FORK):
+dev/svc/*/secrets
 
+# Kubify
 ._kubify_work
 **/._kubify_work
 ._*
 kubify_config.sh
-# mac
+
+# Mac
 .DS_Store
 **/.DS_Store
 Thumbs.db
 **/Thumbs.db
-.Spotlight-V100
-.Trashes
+.Spotlight*
+**/.Spotlight*
+.Trash*
+**/.Trash*
 
-# terraform
+# Random
+*.zip
+**/*.zip
 *.tgz
-.terraform/
-**/.terraform
-terraform.state.d/
-**/terraform.state.d
+**/*.tgz
+*.tar.gz
+**/*.tar.gz
 *.backup
-terraform.tfstate
-remote_backend.tf
-*.terraform
-*.terragrunt-cache
-*.auto.tfvars
+**/*.backup
+*.log
+**/*.log
+*.out
+**/*.out
+*.yamlbak
+**/*.yamlbak
 *.rdb
+**/*.rdb
+__pycache__
 **/__pycache__
-tests/*.tif
-.pytest_cache/
+.pytest_cache
 **/.pytest_cache
 
-# Compiled Python files
+# Compiled Python
 *.pyc
-
-# Compiled C++ files
-*.out
-
-# Application specific files
+**/*.pyc
 venv
-node_modules
-.sass-cache
+**/venv
+site-packages
+**/site-packages
 
-#binaries forsure
-tools/kubify/atlantis/bootstrap/terraform
-tools/kubify/atlantis/atlantis-terragrunt-image/terragrunt
-backend/*/package-lock.json
+# Compiled C++
+*.out
+**/*.out
+
+# Compiled NodeJS
+node_modules
+**/node_modules
+
+# Compiled CSS
+.sass-cache
+**/.sass-cache
+
+# Compiled CSharp
+obj
+**/obj
+*.exe
+**/*.exe
+*.dll
+**/*.dll
+
+# Random Binaries
+**/bootstrap/terraform
+**/*-image/terragrunt
+
+# Liscense Keys External
+kubedb.txt
+**/kubedb.txt
+
+# Liscense Keys Internal
+kubify-multicloud.txt
+**/kubify-multicloud.txt

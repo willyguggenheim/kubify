@@ -1,0 +1,85 @@
+- name: aws_only kubify.yml check
+  shell: cat {{ app_dir }}/kubify.yml | grep aws_only | grep true
+  register: aws_only
+  ignore_errors: true
+
+- name: Set vars
+  set_fact:
+    app_type: "{{ app_dir | dirname | basename }}"
+
+- name: Read kubify.yml
+  include_vars:
+    file: "{{ kubify_yml }}"
+    name: kubify_config
+
+- name: Read application port
+  set_fact:
+    app_port: "{{ kubify_config | json_query('service.port') | default(8080, true) }}"
+  when: aws_only is failed
+
+- name: Check if requirements.txt exists
+  stat:
+    path: "{{ app_dir}}/requirements.txt"
+  register: requirements_txt_file
+  when: aws_only is failed
+
+
+- name: Check if pom.xml exists
+  stat:
+    path: "{{ app_dir}}/pom.xml"
+  register: pom_xml_file
+  when: aws_only is failed
+
+
+- name: Check if csproj exists
+  stat:
+    path: "{{ app_dir}}/app.csproj"
+  register: csproj_file
+  when: aws_only is failed
+
+
+- name: Check if package.json exists
+  stat:
+    path: "{{ app_dir}}/package.json"
+  register: package_json_file
+  when: aws_only is failed
+
+
+- name: Check if yarn.lock exists
+  stat:
+    path: "{{ app_dir}}/yarn.lock"
+  register: yarn_lock_file
+  when: aws_only is failed
+
+
+- name: Read package.json
+  include_vars:
+    file: "{{ app_dir }}/package.json"
+    name: package_json
+  when: package_json_file.stat.exists and aws_only is failed
+  ignore_errors: true
+
+- name: Read app version
+  set_fact:
+    app_cicd_build_image_version: "{{ package_json | json_query('version') }}"
+  ignore_errors: true
+
+- name: Read node engine version
+  set_fact:
+    package_json_node_version: "{{ package_json | json_query('engines.node') | default('14.17.3', true) }}"
+  ignore_errors: true
+
+- name: Create kubify work directory
+  file:
+    path: "{{ app_kubify_dir }}"
+    state: directory
+
+- name: Create kubify work manifests directory
+  file:
+    path: "{{ app_kubify_dir }}/manifests"
+    state: directory
+
+- name: Read profile config
+  include_vars:
+    file: "{{ app_dir }}/config/config.{{ profile }}.yaml"
+    name: profile_config

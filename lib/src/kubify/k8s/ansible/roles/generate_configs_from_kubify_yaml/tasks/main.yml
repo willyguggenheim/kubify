@@ -1,0 +1,204 @@
+---
+
+########################################
+
+
+
+- name: aws_only kubify.yml check
+  shell: cat {{ app_dir }}/kubify.yml | grep aws_only | grep true
+  register: aws_only
+  ignore_errors: true
+
+# - name: Does this service have a container (or lambdas only)?
+#   set_fact:
+#     aws_only: kubify_config | json_query("aws_only")
+#   ignore_errors: true
+
+# Default Value
+# - set_fact: aws_only=false
+#   when: aws_only is undefined
+
+
+########################################
+
+- name: Update .dockerignore
+  lineinfile:
+    path: "{{ app_dir }}/.dockerignore"
+    state: present
+    create: yes
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^\*.swp', line: '*.swp' }
+    - { regexp: '^/kubify\.yml', line: '/kubify.yml'}
+    - { regexp: '^/secrets', line: '/secrets'}
+    - { regexp: '^/config', line: '/config'}
+  when: aws_only is failed
+
+- name: Check if project has custom dev Dockerfile
+  stat:
+    path: "{{ app_dir }}/Dockerfile.dev"
+  register: custom_dev_docker_stat_result
+  when: aws_only is failed
+  ignore_errors: true
+
+- name: Check if project has custom build Dockerfile
+  stat:
+    path: "{{ app_dir }}/Dockerfile.release"
+  register: custom_build_docker_stat_result
+  when: aws_only is failed
+  ignore_errors: true
+
+- name: Generate Dockerfiles
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: "templates/Dockerfile.dev.j2",  dest: "{{ app_kubify_dir }}/Dockerfile.dev" }
+    - { src: "templates/Dockerfile.release.j2", dest: "{{ app_kubify_dir }}/Dockerfile.release" }
+  when: custom_dev_docker_stat_result.stat.exists == False and custom_build_docker_stat_result.stat.exists == False and aws_only is failed
+  ignore_errors: true
+
+- name: Copy Dockerfiles
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: "{{ app_dir }}/Dockerfile.dev",  dest: "{{ app_kubify_dir }}/Dockerfile.dev" }
+    - { src: "{{ app_dir }}/Dockerfile.release", dest: "{{ app_kubify_dir }}/Dockerfile.release" }
+  when: custom_dev_docker_stat_result.stat.exists == True and custom_build_docker_stat_result.stat.exists == True and aws_only is failed
+  ignore_errors: true
+
+- name: Ensure config directory exists
+  file:
+    path: "{{ app_dir }}/config/"
+    state: directory
+  ignore_errors: true
+
+# TODO: uncomment this:
+# - name: Checkout config
+#   shell: git checkout {{ app_config_sha }} {{ item }}
+#   with_items:
+#     - "{{ app_dir }}/config"
+#     - "{{ app_dir }}/secrets"
+#   when: app_config_sha != ""
+
+- name: Create cloudformation dir (if not exist)
+  shell: "mkdir -p {{ app_kubify_dir }}/cloudformation"
+  ignore_errors: true
+
+- name: Touch {{ app_kubify_dir }}/gen-env-vars-all.json
+  shell: "echo {} > {{ app_kubify_dir }}/gen-env-vars-all.json"
+  ignore_errors: true
+
+- name: Generate manifests multiple
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: "templates/skaffold.yaml.j2",         dest: "{{ app_kubify_dir }}/skaffold.yaml" }
+    - { src: "templates/deployment.yaml.j2",       dest: "{{ app_manifests }}/deployment.yaml" }
+    - { src: "templates/service.yaml.j2",          dest: "{{ app_manifests }}/service.yaml" }
+    - { src: "templates/ingress.yaml.j2",          dest: "{{ app_manifests }}/ingress.yaml" }
+    - { src: "templates/database.yaml.j2",         dest: "{{ app_manifests }}/database.yaml" }
+    - { src: "templates/cron.yaml.j2",             dest: "{{ app_manifests }}/cron.yaml" }
+  when: aws_only is failed
+  vars:
+    app_manifests: "{{ app_kubify_dir }}/manifests"
+    manifests_glob:
+      - "../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/manifests/*" # skaffold needs a relative path to the manifests
+      - "../../{{ app_type }}/{{ app_name }}/config/*.{{ profile }}.yaml"
+      # TODO should we comment this? currently doesnt pass validation with it uncommented (since the upgrade to new kuberenets and skaffold)
+      #- "../../{{ app_type }}/{{ app_name }}/kubify.yml"
+  ignore_errors: true
+
+- name: Generate manifests generated config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: "templates/generated-config.yaml.j2", dest: "{{ app_manifests }}/generated-config.yaml" }
+  vars:
+    app_manifests: "{{ app_kubify_dir }}/manifests"
+    manifests_glob:
+      - "../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/manifests/*" # skaffold needs a relative path to the manifests
+      - "../../{{ app_type }}/{{ app_name }}/config/*.{{ profile }}.yaml"
+      # TODO should we comment this? currently doesnt pass validation with it uncommented (since the upgrade to new kuberenets and skaffold)
+      #- "../../{{ app_type }}/{{ app_name }}/kubify.yml"
+  ignore_errors: true
+
+- name: Create secrets dir (if not exist)
+  shell: "mkdir -p {{ app_dir }}/secrets"
+  ignore_errors: true
+
+# - name: Check if secret exists
+#   stat:
+#     path: "{{ app_dir }}/secrets/secrets.{{ profile }}.enc.yaml"
+#   register: secret_file_exists
+
+# - name: Check secrets file exists (create common secret context if not)
+#   shell: "cp {{ app_dir }}/../../src/kubify/templates/secrets/secrets.{{ profile }}.enc.yaml {{ app_dir }}/secrets/secrets.{{ profile }}.enc.yaml && sed -i bak -e 's|common|'\"{{ app_name }}\"'|g' \"${SECRETS_FILE}\" && "
+#   when: secret_file_exists.stat.exists == false
+
+- name: Decrypt secrets
+  shell: "kubesec decrypt {{ item.src }} > {{ item.dest }}"
+  with_items:
+    - { src: "{{ app_dir }}/secrets/secrets.{{ profile }}.enc.yaml", dest: "{{ app_kubify_dir }}/manifests/secrets.yaml"}
+
+# - name: Generate Cloudformation template
+
+
+- name: Generate manifests cloudformation
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: "templates/deployCloudformation.sh.j2", dest: "{{ app_kubify_dir }}/deployCloudformation.sh" }
+    - { src: "templates/cloudformation/lambda.yaml.j2", dest: "{{ app_kubify_dir }}/cloudformation/lambda.yaml" }
+    - { src: "templates/cloudformation/dynamodb.yaml.j2", dest: "{{ app_kubify_dir }}/cloudformation/dynamodb.yaml" }
+    - { src: "templates/cloudformation/s3.yaml.j2", dest: "{{ app_kubify_dir }}/cloudformation/s3.yaml" }
+    - { src: "templates/cloudformation/kubify-security-bucket-art.yaml.j2", dest: "{{ app_kubify_dir }}/cloudformation/kubify-security-bucket-art.yaml" }
+    - { src: "templates/cloudformation/sns.yaml.j2", dest: "{{ app_kubify_dir }}/cloudformation/sns.yaml" }
+    - { src: "templates/cloudformation/sqs.yaml.j2", dest: "{{ app_kubify_dir }}/cloudformation/sqs.yaml" }
+    # - { src: "templates/cloudformation/workspaces-directory.yaml.j2", dest: "{{ app_kubify_dir }}/cloudformation/workspaces-directory.yaml" }
+    # - { src: "templates/cloudformation/workspaces.yaml.j2", dest: "{{ app_kubify_dir }}/cloudformation/workspaces.yaml" }
+  ignore_errors: true
+
+- name: Enable Cloudformation deployer script deployCloudformation.sh
+  shell: "chmod +x {{ app_kubify_dir }}/deployCloudformation.sh"
+
+#TODO check if localstack-svc is up, start if not
+#use the new depends_on feature..
+
+- name: Deploying Cloudformation templates with deployCloudformation.sh
+  shell: "{{ app_kubify_dir }}/deployCloudformation.sh"
+  when: app_name is not search(".*localstack.*")
+
+
+
+- name: serverless is in kubify.yml check
+  shell: cat {{ app_dir }}/kubify.yml | grep 'serverless:'
+  register: serverless_enabled
+  ignore_errors: true
+
+- name: Generate manifests serverless framework manifest and deployer script
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: "templates/deployServerless.sh.j2", dest: "{{ app_kubify_dir }}/deployServerless.sh" }
+    - { src: "templates/serverless.yml.j2", dest: "{{ app_kubify_dir }}/serverless.yml" }
+  when: serverless_enabled is not failed
+  ignore_errors: true
+
+- name: Enable Serverless Framework deployer script deployServerless.sh
+  shell: "chmod +x {{ app_kubify_dir }}/deployServerless.sh"
+  when: serverless_enabled is not failed
+  ignore_errors: true
+
+- name: Deploying Serverless Framework template with deployServerless.sh
+  shell: "{{ app_kubify_dir }}/deployServerless.sh"
+  when: 
+    - app_name is not search(".*localstack.*")
+    - serverless_enabled is not failed
+  ignore_errors: true

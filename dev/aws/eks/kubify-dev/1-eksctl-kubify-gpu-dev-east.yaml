@@ -1,0 +1,64 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+    region: "us-east-1"
+    name: kubify-gpu-dev-east # cluster name (and prefix of cf stacks)
+
+iam:
+    withOIDC: true
+    serviceAccounts:
+    - metadata:
+        name: cluster-autoscaler
+        namespace: kube-system
+        labels:
+          aws-usage: "cluster-autoscaler"
+      attachPolicyARNs:
+          - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+      wellKnownPolicies:
+          autoScaler: true
+
+managedNodeGroups:
+    -   name: for-cpu-pods-and-autoscaler # cpu pods to not use expensive gpu instance type (for autoscaler pods to scale gpu nodegroup back down to 0 each time fast, aws bill cost savings reasons)
+        spot: true # 80% lower pricing on compute (aws bill stay-calm setter)
+        volumeEncrypted: true # uses the default ebs kms key (scoped to same account)
+        instanceTypes: [ "t3.nano" ]
+        # desiredCapacity: "1"
+        minSize: 1
+        maxSize: 2 # configurable (max size of asg pool being deployed goes here)
+        tags:
+          k8s.io/cluster-autoscaler/enabled: "false" # do not autoscale this cpu-only managedNodeGroup (on purpose, to not break the autoscaler)
+        privateNetworking: true
+        iam:
+            attachPolicyARNs:
+                - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+                - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+            withAddonPolicies:
+                autoScaler: true
+    -   name: kubify-gpu-dev-east
+        spot: true # 80% lower pricing on compute (aws bill stay-calm setter)
+        volumeEncrypted: true # uses the default ebs kms key (scoped to same account)
+        instanceTypes: [ "g4dn.xlarge" ]
+        # desiredCapacity: "1"
+        minSize: 0
+        maxSize: 2 # configurable (max size of asg pool being deployed goes here)
+        tags:
+          kubernetes.io/cluster/kubify-gpu-dev-east: "kubify"
+          k8s.io/cluster-autoscaler/kubify-gpu-dev-east: "kubify"
+          k8s.amazonaws.com/accelerator: "true"
+          k8s.io/cluster-autoscaler/enabled: "true"
+        privateNetworking: true
+        iam:
+            attachPolicyARNs:
+                - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+                - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+                - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly # so it can access your docker layers (can be scoped smaller with inline policy)
+            withAddonPolicies:
+                cloudWatch: true
+                autoScaler: true
+                ebs: true
+                fsx: true # fsx > efs (if you ever need multi-pod+multi-region pv volume mount at scale)
+
+availabilityZones: # us-east-1b and 1d both have gpu (but the other east AZs do not seem to have gpu)
+  - us-east-1b
+  - us-east-1d

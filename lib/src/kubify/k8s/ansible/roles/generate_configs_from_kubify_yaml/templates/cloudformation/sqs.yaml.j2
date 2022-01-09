@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SQS Cloudfromation SQS Queue
+Parameters:
+  Name:
+    Type: String
+    Description: Name of the SQS Queue
+  ServiceName:
+    Type: String
+    Default: NO-SERVICE-NAME-FOUND
+    Description: (AUTOMATICALLY SET!!) Name of the Service
+  Stage:
+    Type: String
+    Description: (AUTOMATICALLY SET!!) Name of the environment
+  RoleUserList:
+    Type: List<String>
+    Description: (AUTOMATICALLY SET!!) IAM Role List Allowed to access this SQS Queue
+  # Addtional Property Override Options:
+  # See: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
+  FifoQueue:
+    Type: String
+    Default: False
+    Description: Is this a Fifo Queue (True or False)?
+  ContentBasedDeduplication:
+    Type: Number
+    Default: 0
+  MaximumMessageSize:
+    Type: Number
+    Default: 262144
+  MaximumMessageSize:
+    Type: Number
+    Default: 345600
+  VisibilityTimeout:
+    Type: Number
+    Default: 30
+
+Resources:
+  DevOpsSQSQueue:
+    Type: AWS::SQS::Queue
+    Properties: 
+      FifoQueue: !Ref FifoQueue
+      QueueName: !Ref Name
+
+  SampleSQSPolicy: 
+    Type: AWS::SQS::QueuePolicy
+    Properties: 
+      Queues: 
+        - !Ref DevOpsSQSQueue
+      PolicyDocument: 
+        Statement: 
+          - 
+            Action: 
+              - "SQS:SendMessage" 
+              - "SQS:ReceiveMessage"
+            Effect: Allow
+            Principal:
+              AWS:
+                !Ref RoleUserList

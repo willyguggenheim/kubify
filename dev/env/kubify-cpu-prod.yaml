@@ -1,0 +1,17 @@
+# dev aws eks environment
+# also local rapid testing environment
+---
+apiVersion: kubify.kubify.local/v1
+kind: Environment
+metadata:
+  name: kubify-cpu-prod
+target:
+  cluster: kubify-eks-dev.us-east-1.eksctl.io
+kubify_version: 9000.0.0
+# trunk branch is based on file name (kubify-cpu-prod.yaml = "kubify-cpu-prod" branch)
+# to roll back a version, you edit the file and commit to trunk branch name that matches this file name 
+services:
+  example-node-svc:
+    config: 0.0.1
+    image: 0.0.1
+    profile: dev

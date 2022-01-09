@@ -1,9 +1,0 @@
-#!/usr/bin/env bash -e
-cd "${0%/*}"
-
-if [[ ! -f DevOps\ in\ Python.tif ]]; then
-    gs -q -dNOPAUSE -r300 -sDEVICE=tiffg4 -sOutputFile=DevOps\ in\ Python.tif DevOps\ in\ Python.pdf -c quit
-fi
-
-docker build --target tests -t s3/tests:latest .
-docker-compose up -d

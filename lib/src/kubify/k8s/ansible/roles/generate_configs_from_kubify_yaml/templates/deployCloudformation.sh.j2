@@ -1,0 +1,310 @@
+#!/bin/bash
+
+export AWS_DEFAULT_REGION=us-east-1
+export AWS_REGION=us-east-1
+
+echo "" > {{ app_kubify_dir }}/s3.log
+
+#function getTagging {
+#}
+
+#/usr/local/opt/python@3.7/bin/python3.7 -m pip install --upgrade pip || true
+
+{% if env == 'local' %}
+    simulated_env='dev'
+{% else %}
+    simulated_env={{ env }}
+{% endif %}
+
+workdir=`pwd`
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
+
+#TODO: have this use saved ssm variable or uniq company name var:
+s3DeployBucket="kubify-deploy"
+
+{% if env == 'local' %}
+    AWS_ACCOUNT_ID=000000000000
+    aws s3 mb s3://$s3DeployBucket --region us-east-1 --endpoint-url "https://localstack-aws-svc.local.kubify.local" --no-verify-ssl
+{% endif %}
+
+{% if env == 'local' %}
+    {% if app_name != 'localstack-aws-svc' %}
+        aws s3 ls s3://${s3DeployBucket} --endpoint-url "https://localstack-aws-svc.local.kubify.local" --no-verify-ssl || \
+            aws s3 mb s3://${s3DeployBucket} --endpoint-url "https://localstack-aws-svc.local.kubify.local" --no-verify-ssl
+    {% endif %}
+{% else %}
+    aws s3 ls s3://${s3DeployBucket} || aws s3 mb s3://${s3DeployBucket} | true
+    aws s3api put-bucket-encryption \
+        --bucket ${s3DeployBucket} \
+        --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}' | true
+
+    if [[ ! $(cat {{ app_dir }}/kubify.yml | grep ^aws_only | grep true) ]]
+    then
+        stackName={{ app_name }}-ecr-{{ env }}
+        paramOverrides="Name=kubify-{{ env }}/{{ app_name }}"
+            aws cloudformation package \
+            --template-file {{ app_kubify_dir }}/cloudformation/ecr.yaml \
+            --s3-bucket ${s3DeployBucket} \
+            --s3-prefix cloudfromation/{{ app_name }}-aws/${stackName} \
+            --output-template-file {{ app_kubify_dir }}/cloudformation/${stackName}.template && \
+        aws cloudformation deploy \
+            --template-file {{ app_kubify_dir }}/cloudformation/${stackName}.template \
+            --stack-name ${stackName} \
+            --s3-bucket ${s3DeployBucket} \
+            --s3-prefix cloudfromation/{{ app_name }}-aws/${stackName} \
+            --parameter-overrides ${paramOverrides}
+        unset paramOverrides
+    fi
+{% endif %}
+
+{% set kubify_aws_resources = kubify_config | json_query("aws") | default(dict(), true) %}
+{% if kubify_aws_resources|length %}
+{% for service_key, service_list in kubify_aws_resources.items() %}
+echo "service_key: {{ service_key }}"
+echo "service_list: {{ service_list }}"
+
+{% for resource in service_list %}
+
+stackName={{ app_name }}-{{ service_key }}-{{ resource.Name }}-{{ env }}
+echo "${stackName}: ${stackName}"
+#TODO: dynamically get account Id and figure out how to add all depandancies
+#paramOverrides="RoleUserList=arn:aws:iam::${AWS_ACCOUNT_ID}:role/{{ app_name }}-role "
+paramOverrides="RoleUserList=arn:aws:iam::${AWS_ACCOUNT_ID}:role/kubify-build-role "
+paramOverridesPD="RoleUserList=arn:aws:iam::${AWS_ACCOUNT_ID}:role/kubify-build-role "
+
+{% for param_key, param_value in resource.items() %}
+paramOverrideslocal="${paramOverrideslocal}ParameterKey={{ param_key }},ParameterValue={{ param_value }} "
+paramOverrides="${paramOverrides}{{ param_key }}={{ param_value }} "
+if [[ "${param_key}" == "OverrideEnvironment" ]]
+then
+    paramOverridesPDlocal="${paramOverridesPDlocal}\"{{ param_key }}={{ param_value }}\" "
+    paramOverridesPD="${paramOverridesPD}\"{{ param_key }}={{ param_value }}\" "
+else
+    paramOverridesPDlocal="${paramOverridesPDlocal}{{ param_key }}={{ param_value }} "
+    paramOverridesPD="${paramOverridesPD}{{ param_key }}={{ param_value }} "
+fi
+
+echo {{ param_key }} | grep OverrideEnvironment || paramOverrideslocal="${paramOverrideslocal}ParameterKey={{ param_key }},ParameterValue={{ param_value }} "
+echo {{ param_key }} | grep OverrideEnvironment || paramOverrides="${paramOverrides}{{ param_key }}={{ param_value }} "
+echo {{ param_key }} | grep OverrideEnvironment || paramOverridesPDlocal="${paramOverridesPDlocal}ParameterKey={{ param_key }},ParameterValue={{ param_value }} "
+echo {{ param_key }} | grep OverrideEnvironment || paramOverridesPD="${paramOverridesPD}{{ param_key }}={{ param_value }} "
+{% endfor %}
+
+paramOverrideslocal="${paramOverrideslocal}ParameterKey=Stage,ParameterValue={{ env }} "
+paramOverrides="${paramOverrides}ParameterKey=Stage,ParameterValue={{ env }} "
+paramOverridesPDlocal="${paramOverridesPDlocal}Stage={{ env }} "
+paramOverridesPD="${paramOverridesPD}Stage={{ env }} "
+
+
+paramOverrideslocal="${paramOverrideslocal}ParameterKey=ServiceName,ParameterValue={{ app_name }} "
+paramOverrides="${paramOverrides}ParameterKey=ServiceName,ParameterValue={{ app_name }} "
+paramOverridesPDlocal="${paramOverridesPDlocal}ServiceName={{ app_name }} "
+paramOverridesPD="${paramOverridesPD}ServiceName={{ app_name }} "
+
+lambda_env_vars_array_local_ovverrides='{"STAGE":"local","localstack_endpoint":"http://localstack-aws-svc.demo.svc:4566","AWS_ACCESS_KEY":"test","AWS_SECRET_ACCESS_KEY":"test","AWS_DEFAULT_REGION":"us-east-1","AWS_REGION":"us-east-1"}'
+lambda_env_vars_array_ovverrides='{"STAGE":"{{ env }}","AWS_DEFAULT_REGION":"us-east-1","AWS_REGION":"us-east-1"}'
+
+
+{# {{ env }}
+STAGE #}
+
+# Lambda Packaging Automation
+{% if service_key == 'lambda' %}
+
+    # Gather env vars for Lambda Function
+    lambda_env_vars_array_full='{"BLANK": "TRUE"}'
+    lambda_env_vars_array_1=$(cat {{ app_dir }}/config/config.${simulated_env}.yaml | ~/kubify/yq e -j - | ~/kubify/yq e '.data' -)
+    lambda_env_vars_array_2=$(cat {{ app_kubify_dir }}/manifests/generated-config.yaml | ~/kubify/yq e -j - | ~/kubify/yq e '.data' -)
+    lambda_env_vars_array_3=$(cat {{ app_kubify_dir }}/manifests/secrets.yaml | ~/kubify/yq e -j .data - |  jq -r 'map_values(. | @base64d)' | ~/kubify/yq e '.' -)
+    
+
+{% if env == 'local' %}
+
+    {% if resource.OverrideEnvironment is defined %}
+    {% if resource.OverrideEnvironment|length %}
+    lambda_env_vars_array_4='{{ resource.OverrideEnvironment | to_json }}'
+    lambda_env_vars_array_full=$(jq -s -c '.[0] + .[1] + .[2] + .[3] + .[4]' \
+        <(echo "${lambda_env_vars_array_1}") \
+            <(echo "${lambda_env_vars_array_2}") \
+                <(echo "${lambda_env_vars_array_3}") \
+                    <(echo "${lambda_env_vars_array_4}") \
+                        <(echo "${lambda_env_vars_array_local_ovverrides}") | sed "s/\"/'/g")
+    echo         Variables: $(jq -s -c '.[0] + .[1] + .[2] + .[3] + .[4]' <(echo ${lambda_env_vars_array_1}) <(echo ${lambda_env_vars_array_2}) <(echo ${lambda_env_vars_array_3}) <(echo ${lambda_env_vars_array_4}) <(echo ${lambda_env_vars_array_local_ovverrides})) >> {{ app_kubify_dir }}/cloudformation/{{ service_key }}.yaml
+    echo $(jq -s -c '.[0] + .[1] + .[2] + .[3] + .[4]' <(echo ${lambda_env_vars_array_1}) <(echo ${lambda_env_vars_array_2}) <(echo ${lambda_env_vars_array_3}) <(echo ${lambda_env_vars_array_4}) <(echo ${lambda_env_vars_array_local_ovverrides})) > {{ app_kubify_dir }}/gen-env-vars-all.json
+    {% endif %}
+    {% else %}
+    lambda_env_vars_array_full=$(jq -s -c '.[0] + .[1] + .[2] + .[3]' \
+        <(echo "${lambda_env_vars_array_1}") \
+            <(echo "${lambda_env_vars_array_2}") \
+                <(echo "${lambda_env_vars_array_3}") \
+                    <(echo "${lambda_env_vars_array_local_ovverrides}") | sed "s/\"/'/g")
+    echo         Variables: $(jq -s -c '.[0] + .[1] + .[2] + .[3]' <(echo ${lambda_env_vars_array_1}) <(echo ${lambda_env_vars_array_2}) <(echo ${lambda_env_vars_array_3}) <(echo ${lambda_env_vars_array_local_ovverrides})) >> {{ app_kubify_dir }}/cloudformation/{{ service_key }}.yaml
+    echo $(jq -s -c '.[0] + .[1] + .[2] + .[3]' <(echo ${lambda_env_vars_array_1}) <(echo ${lambda_env_vars_array_2}) <(echo ${lambda_env_vars_array_3}) <(echo ${lambda_env_vars_array_local_ovverrides})) > {{ app_kubify_dir }}/gen-env-vars-all.json
+    
+    {% endif %}
+
+{% else %}
+
+    {% if resource.OverrideEnvironment is defined %}
+    {% if resource.OverrideEnvironment|length %}
+    lambda_env_vars_array_4='{{ resource.OverrideEnvironment | to_json }}'
+    lambda_env_vars_array_full=$(jq -s -c '.[0] + .[1] + .[2] + .[3]' \
+        <(echo "${lambda_env_vars_array_1}") \
+            <(echo "${lambda_env_vars_array_2}") \
+                <(echo "${lambda_env_vars_array_3}") \
+                    <(echo "${lambda_env_vars_array_4}") \
+                        <(echo "${lambda_env_vars_array_ovverrides}") | sed "s/\"/'/g")
+    echo         Variables: $(jq -s -c '.[0] + .[1] + .[2] + .[3]' <(echo ${lambda_env_vars_array_1}) <(echo ${lambda_env_vars_array_2}) <(echo ${lambda_env_vars_array_3}) <(echo ${lambda_env_vars_array_4}) <(echo ${lambda_env_vars_array_ovverrides})) >> {{ app_kubify_dir }}/cloudformation/{{ service_key }}.yaml
+    echo $(jq -s -c '.[0] + .[1] + .[2] + .[3]' <(echo ${lambda_env_vars_array_1}) <(echo ${lambda_env_vars_array_2}) <(echo ${lambda_env_vars_array_3}) <(echo ${lambda_env_vars_array_4}) <(echo ${lambda_env_vars_array_ovverrides})) > {{ app_kubify_dir }}/gen-env-vars-all.json
+
+    {% endif %}
+    {% else %}
+    lambda_env_vars_array_full=$(jq -s -c '.[0] + .[1] + .[2]' \
+        <(echo "${lambda_env_vars_array_1}") \
+            <(echo "${lambda_env_vars_array_2}") \
+                <(echo "${lambda_env_vars_array_3}") \
+                    <(echo "${lambda_env_vars_array_ovverrides}") | sed "s/\"/'/g")
+    echo         Variables: $(jq -s -c '.[0] + .[1] + .[2]' <(echo ${lambda_env_vars_array_1}) <(echo ${lambda_env_vars_array_2}) <(echo ${lambda_env_vars_array_3}) <(echo ${lambda_env_vars_array_ovverrides})) >> {{ app_kubify_dir }}/cloudformation/{{ service_key }}.yaml
+    echo $(jq -s -c '.[0] + .[1] + .[2]' <(echo ${lambda_env_vars_array_1}) <(echo ${lambda_env_vars_array_2}) <(echo ${lambda_env_vars_array_3}) <(echo ${lambda_env_vars_array_ovverrides})) > {{ app_kubify_dir }}/gen-env-vars-all.json
+
+    {% endif %}
+
+{% endif %}
+
+    # Create Lambda Layer for (to enable rapid testing Lambda UI) dependencies Artifact Bundle and place it in S3
+    mkdir -p {{ app_kubify_dir }}/cloudformation/lambda
+    file_path=$(echo {{ resource.Handler }} | sed 's/\..*//')
+    file_extension=$(ls {{ app_dir }}/${file_path}* | sed 's/.*\.//')
+    echo $file_extension
+
+    cd {{ app_dir }}
+    if [[ "$file_extension" == "js" ]]; then
+
+        echo "Lambda is Javascript (will use Node12)."
+        mkdir -p {{ app_kubify_dir }}/cloudformation/lambda/layer/nodejs
+        cp {{ app_dir }}/package.json {{ app_kubify_dir }}/cloudformation/lambda/layer/nodejs/package.json
+        cd {{ app_kubify_dir }}/cloudformation/lambda/layer/nodejs
+        npm install > {{ app_kubify_dir }}/log-lambda-package-npm.log
+        cd {{ app_kubify_dir }}/cloudformation/lambda/layer
+        zip -r {{ app_kubify_dir }}/cloudformation/lambda/layer/{{ app_name }}-lambda-layer.zip ./nodejs*  > {{ app_kubify_dir }}/log-lambda-package-node-layer-zip.log
+        
+        paramOverrideslocal="${paramOverrideslocal}ParameterKey=Runtime,ParameterValue=nodejs14.x "
+        paramOverrides="${paramOverrides}ParameterKey=Runtime,ParameterValue=nodejs14.x "
+        paramOverridesPDlocal="${paramOverridesPDlocal}Runtime=nodejs14.x "
+        paramOverridesPD="${paramOverridesPD}Runtime=nodejs14.x "
+
+        {% if env == 'local' %}
+            {{ app_kubify_dir }}/../../../kubify run_in_entrypoint aws s3 cp ./._kubify_work/{{ env }}/{{ app_name }}/cloudformation/lambda/layer/{{ app_name }}-lambda-layer.zip s3://${s3DeployBucket}/artifacts/lambda/{{ app_name }}-lambda-layer.zip --endpoint-url "http://localstack-aws-svc.demo.svc:4566" >> {{ app_kubify_dir }}/s3.log
+        {% else %}
+            aws s3 cp {{ app_kubify_dir }}/cloudformation/lambda/layer/{{ app_name }}-lambda-layer.zip s3://${s3DeployBucket}/artifacts/lambda/{{ app_name }}-lambda-layer.zip >> {{ app_kubify_dir }}/s3.log
+        {% endif %}
+
+    fi
+    cd {{ app_dir }}
+
+    cd {{ app_dir }}
+    if [[ "$file_extension" == "py" ]]; then
+
+    
+
+        #TODO: add venv and include packages in python folder !!
+
+        echo "Lambda is Python (will use Python3.7)."
+        mkdir -p {{ app_kubify_dir }}/cloudformation/lambda/layer/python
+        echo {{ app_kubify_dir }}/cloudformation/lambda/layer/python
+        cp {{ app_dir }}/requirements.txt {{ app_kubify_dir }}/cloudformation/lambda/layer/requirements.txt
+        cd {{ app_kubify_dir }}/cloudformation/lambda/layer
+        # pip3 install -r requirements.txt
+        docker build -t lambda_layer_python:v1 -f {{ app_kubify_dir }}/../../../src/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile {{ app_kubify_dir }}/../../../src/kubify/tool/scripts/lambda/lambda/layer/python/
+        # docker images
+        docker run -i -v `pwd`:/package lambda_layer_python:v1 /package/requirements.txt > {{ app_kubify_dir }}/log-lambda-package-pip3.log
+        #exit 0
+        zip -r {{ app_kubify_dir }}/cloudformation/lambda/layer/{{ app_name }}-lambda-layer.zip ./python* > {{ app_kubify_dir }}/log-lambda-package-python-layer-zip.log
+
+        paramOverrideslocal="${paramOverrideslocal}ParameterKey=Runtime,ParameterValue=python3.7 "
+        paramOverrides="${paramOverrides}ParameterKey=Runtime,ParameterValue=python3.7 "
+        paramOverridesPDlocal="${paramOverridesPDlocal}Runtime=python3.7 "
+        paramOverridesPD="${paramOverridesPD}Runtime=python3.7 "
+        {% if env == 'local' %}
+            #aws s3 cp {{ app_kubify_dir }}/cloudformation/lambda/layer/{{ app_name }}-lambda-layer.zip s3://${s3DeployBucket}/artifacts/lambda/{{ app_name }}-lambda-layer.zip --endpoint-url "https://localstack-aws-svc.local.kubify.local" --no-verify-ssl
+            {{ app_kubify_dir }}/../../../kubify run_in_entrypoint aws s3 cp ./._kubify_work/{{ env }}/{{ app_name }}/cloudformation/lambda/layer/{{ app_name }}-lambda-layer.zip s3://${s3DeployBucket}/artifacts/lambda/{{ app_name }}-lambda-layer.zip --endpoint-url "http://localstack-aws-svc.demo.svc:4566" >> {{ app_kubify_dir }}/s3.log
+        {% else %}
+            aws s3 cp {{ app_kubify_dir }}/cloudformation/lambda/layer/{{ app_name }}-lambda-layer.zip s3://${s3DeployBucket}/artifacts/lambda/{{ app_name }}-lambda-layer.zip >> {{ app_kubify_dir }}/s3.log
+        {% endif %}
+
+    fi
+
+    # Code artifact bundle & place it in S3
+    mkdir -p {{ app_kubify_dir }}/cloudformation/lambda/code
+    rsync -a --delete {{ app_dir }}/ {{ app_kubify_dir }}/cloudformation/lambda/code/
+    cd {{ app_kubify_dir }}/cloudformation/lambda/code
+    #TODO: remove next line and use layers again (buy localstack pro?):
+    {% if env == 'local' %}
+        #ls ../../layer/python && rm -rf ./python
+        #ls ../../layer/nodejs && rm -rf ./nodejs
+        #mv ../../layer/python ./ || echo "not python"
+        #mv ../../layer/nodejs ./ || echo "not nodejs"
+        mkdir -p ./python
+        rsync -a --delete ../layer/python/ ./python/
+        mkdir -p ./node_modules
+        rsync -a --delete ../layer/node_modules/ ./node_modules/
+        #docker run -it -v `pwd`:/package lambda_layer_python:v1 /package/requirements.txt
+        #todo: do the same for node (docker things):
+        #npm install | true
+    {% endif %}
+    zip -r ../../{{ app_name }}-lambda-code.zip ./* > {{ app_kubify_dir }}/log-lambda-package-code-zip.log
+
+    {% if env == 'local' %}
+        #aws s3 cp ../../{{ app_name }}-lambda-code.zip s3://${s3DeployBucket}/artifacts/lambda/{{ app_name }}-lambda-code.zip --endpoint-url "https://localstack-aws-svc.local.kubify.local" --no-verify-ssl
+        {{ app_kubify_dir }}/../../../kubify run_in_entrypoint aws s3 cp ./._kubify_work/{{ env }}/{{ app_name }}/cloudformation/{{ app_name }}-lambda-code.zip s3://${s3DeployBucket}/artifacts/lambda/{{ app_name }}-lambda-code.zip --endpoint-url "http://localstack-aws-svc.demo.svc:4566" >> {{ app_kubify_dir }}/s3.log
+    {% else %}
+        aws s3 cp {{ app_kubify_dir }}/cloudformation/{{ app_name }}-lambda-code.zip s3://${s3DeployBucket}/artifacts/lambda/{{ app_name }}-lambda-code.zip >> {{ app_kubify_dir }}/s3.log
+    {% endif %}
+
+    cd {{ app_dir }}
+
+{% endif %}
+cd {{ app_dir }}
+
+#TODO: only include 'endpoint-url' if env is local:
+echo "stackName: ${stackName}"
+echo "paramOverrides: ${paramOverrides}"
+echo "paramOverrideslocal: ${paramOverrideslocal}"
+
+#TODO: add tagging to cf calls:
+
+
+{% if env == 'local' %}
+    {% if app_name != 'localstack-aws-svc' %}
+        aws cloudformation create-stack \
+            --stack-name ${stackName} \
+            --template-body file://{{ app_kubify_dir }}/cloudformation/{{ service_key }}.yaml --capabilities CAPABILITY_NAMED_IAM \
+            --endpoint-url "https://localstack-aws-svc.local.kubify.local" --no-verify-ssl \
+            --parameters ${paramOverrideslocal} || \
+         aws cloudformation update-stack \
+            --stack-name ${stackName} \
+            --template-body file://{{ app_kubify_dir }}/cloudformation/{{ service_key }}.yaml --capabilities CAPABILITY_NAMED_IAM \
+            --endpoint-url "https://localstack-aws-svc.local.kubify.local" --no-verify-ssl \
+            --parameters ${paramOverrideslocal}
+    {% endif %}
+{% else %}
+echo "paramOverridesPD: ${paramOverridesPD}"
+
+    aws cloudformation package \
+        --template-file {{ app_kubify_dir }}/cloudformation/{{ service_key }}.yaml \
+        --s3-bucket ${s3DeployBucket} \
+        --s3-prefix cloudfromation/{{ app_name }}-aws/${stackName} \
+        --output-template-file {{ app_kubify_dir }}/cloudformation/${stackName}.template && \
+     aws cloudformation deploy \
+        --template-file {{ app_kubify_dir }}/cloudformation/${stackName}.template \
+        --stack-name ${stackName} \
+        --s3-bucket ${s3DeployBucket} \
+        --s3-prefix cloudfromation/{{ app_name }}-aws/${stackName} \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameter-overrides ${paramOverridesPD} || true
+        #TODO: fix above to error when it is an actual error
+{% endif %}
+
+{% endfor %}
+{% endfor %}
+{% endif %}
