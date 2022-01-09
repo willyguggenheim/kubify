@@ -15,6 +15,8 @@ Alright, so what if LocalStackAWS, Docker-Compose, Serverless-Framework, Terrafo
 
 So you can code at lightning speed. So your commits are already tested in full on your machine. So you can feel confident about your code before you push it within the first 5 minutes of working at a company !!
 
+It's impossible right? Terraform and Docker-Compose will always be seperate tools?! NOPE. Clone This Repo if you want to live in the future !!
+
 
 # What do I need?
 
