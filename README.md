@@ -11,7 +11,7 @@ Ready to Simulate AWS Cloud Locally??
 
 Mac, Linux, Windows or any Docker
 
-AWS Account(s) and Access to S#, KMS, EKS and EC2 (or for the CICD to have access)
+AWS Account(s) and Access to AWS KMS, EKS and EC2 (or for the CICD to have access)
 
 
 # Dependencies For Runtime?
