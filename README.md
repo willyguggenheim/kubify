@@ -18,6 +18,11 @@ So you can code at lightning speed. So your commits are already tested in full o
 It's impossible right? Terraform and Docker-Compose will always be seperate tools?! NOPE. Clone This Repo if you want to live in the future !!
 
 
+# Future State?
+
+Fork Terraform and build this into it.
+
+
 # What do I need?
 
 Mac, Linux, Windows or any Docker
