@@ -15,6 +15,12 @@ Think dev team efficiency and happiness. Think on-boarding reduced from weeks to
 This is FREE turn key DevOps revolutionary software. If you use Kubify, please make sure to donate: [![](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?business=MSRFJHSGCKGCG&item_name=Kubify&currency_code=USD)
 
 
+# By Why ?
+
+So you might be using Docker-Compose for local testing, but that's not the entire Terraform infrastructure that is deployed, so as developer you end up spending a fraction of your day (every day) on building test workflows on your machine, but they never match the real full infrastructure, so you accidentaly merge a bug and then find out in the cloud it breaks. Well what if Terraform instead WAS Docker-Compose. What is Terraform+DockerCompose+LocalStack meant that you can turn off your WiFi, go off the grid and STILL know that your commit will not break the cloud when it's pushed?! 
+
+What if you can test the entire cloud on your laptop?! Yes, the entire cloud, EXACTLY how it's deployed into AWS!!
+
 
 # Setup
 
