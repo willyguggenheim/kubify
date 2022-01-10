@@ -9,7 +9,7 @@ export ANSIBLE_PYTHON_INTERPRETER=auto_silent
 
 export KUBIFY_EDITOR="code --wait "
 export EDITOR="code --wait "
-export UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM:-os}
+export UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM:-changethis} # <--- CHANGE THIS TO YOUR COMPANY ACRONYM
 export KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY:-ecr}
 # FOR DEBUG SET THIS TO 1:
 export KUBIFY_VERBOSE=${KUBIFY_VERBOSE:-0}
@@ -3064,8 +3064,11 @@ nodes:
     protocol: TCP
 EOF
 
+  stat ~/kubify/kubedb.txt || touch ~/kubify/kubedb.txt
+
   docker-compose up -d
   docker ps | grep kubify_kubify_1
+  docker exec -it --privileged -w "/src/kubify" "kubify_kubify_1" ./kubify _up_container
   docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify_kubify_1" ../../../kubify run
   # docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify_kubify_1" "../../../kubify run"
 

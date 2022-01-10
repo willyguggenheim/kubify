@@ -187,6 +187,7 @@
   when:
     - ansible_os_family != "Darwin"
     - check_if_running_in_wsl2 is failed
+  ignore_errors: true
 
 # - name: Make sure Dnsmasq is running
 #   service:
@@ -208,6 +209,7 @@
   when: 
     - ansible_os_family != "Darwin"
     - check_if_running_in_wsl2 is failed
+  ignore_errors: true
 
 # # This tries to open an internet connection for up to 30 seconds before failure.
 # - name: wait for network connection to come back up and test dns
