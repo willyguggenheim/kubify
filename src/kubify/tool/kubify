@@ -16,7 +16,7 @@ export KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY:-ecr}
 export KUBIFY_VERBOSE=${KUBIFY_VERBOSE:-0}
 # FOR DEBUG SET THIS TO 1:
 export KUBIFY_DEBUG=${KUBIFY_VERBOSE:-0}
-export DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG="kubify-local:9000"
+export KUBIFY_CONTAINER="willy0912/kubify-local:9000"
 
 
 ACTUAL_OS_TYPE=mac
@@ -265,15 +265,17 @@ fi
 git config --get user.name &> /dev/null
 if [ $? -eq 1 ]; then
     echo "What is your first and last name (for git config)?"
-    read FIRST_LAST
-    git config --set user.name "${FIRST_LAST}" &> /dev/null
+    read GIT_FIRST_LAST
+    FIRST_LAST=${GIT_FIRST_LAST}
+    git config --set user.name "${GIT_FIRST_LAST}" &> /dev/null
 fi
 
 git config --get user.email &> /dev/null
 if [ $? -eq 1 ]; then
     echo "What is your email address (for git config)?"
-    read EMAIL
-    git config --set user.email "${EMAIL}" &> /dev/null
+    read GIT_EMAIL
+    EMAIL=${EMAIL}
+    git config --set user.email "${GIT_EMAIL}" &> /dev/null
 fi
 
 if ! [ -x "$(command -v git config --get user.email)" ]; then
@@ -1555,12 +1557,16 @@ function enable_firewall {
 function up_container {
   mkdir -p ./._kubify_work;
   cp -R ~/.aws ./._kubify_work/;
-  docker build -t ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} -f Dockerfile .;
-  docker exec -it ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} echo "I'm inside the Kubify Rapid Test Engine TM container!"
-  docker exec -it ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} echo "./kubify up"
-  docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} echo "../../../kubify run"
-  docker run --rm -ti -p 80:80 -p 443:443 --name kubify-rapid-test-engine ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} sleep 9999999
-  # EXAMPLE: docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} echo "../../../kubify start"
+  # docker pull ${KUBIFY_CONTAINER} || \
+    docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
+      --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
+      --build-arg GIT_EMAIL="${GIT_EMAIL}" \
+      `pwd`/;
+  # docker exec -it ${KUBIFY_CONTAINER} echo "I'm inside the Kubify Rapid Test Engine TM container!"
+  # docker exec -it ${KUBIFY_CONTAINER} echo "./kubify up"
+  # docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it ${KUBIFY_CONTAINER} echo "../../../kubify run"
+  # docker run --rm -ti -p 80:80 -p 443:443 --name kubify-rapid-test-engine ${KUBIFY_CONTAINER} sleep 9999999
+  # EXAMPLE: docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it ${KUBIFY_CONTAINER} echo "../../../kubify start"
 }
 
 function up {

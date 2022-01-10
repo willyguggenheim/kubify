@@ -1,6 +1,12 @@
 # This is the Latest LTS (still as of January 2022):
 FROM ubuntu:20.04
 
+# Required --build-arg variables:
+ARG GIT_FIRST_LAST_NAME=local
+ENV GIT_FIRST_LAST_NAME ${GIT_FIRST_LAST_NAME}
+ARG GIT_EMAIL=local
+ENV GIT_EMAIL ${GIT_EMAIL}
+
 # Might be important, so just in case:
 USER root
 ENV USER=root
@@ -15,6 +21,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y snapd
 
 # For full install (but CICD env sets KUBIFY_CI=1 at runtime to override this default):
 ENV KUBIFY_CI 0
+ENV KUBIFY_VERBOSE 1
 
 # Add your DevSecOps OS Hardening things here:
 RUN apt update && apt -y upgrade
@@ -23,9 +30,9 @@ RUN apt update && apt -y upgrade
 # Copying the automation magic here (for building a trusted hardened container):
 RUN mkdir -p /etc/ansible
 RUN apt update
-RUN apt install -y git python3 ansible python3-pip curl wget
-RUN git config --global user.name "Willy Guggenheim"
-RUN git config --global user.email "willy@gugcorp.com"
+RUN apt install -y git python3 ansible python3-pip curl
+RUN git config --global user.name "${GIT_FIRST_LAST_NAME}"
+RUN git config --global user.email "${GIT_EMAIL}"
 ADD ./ansible.cfg /etc/ansible/
 
 # PLEASE NOTE: https://snapcraft.io/store
@@ -62,6 +69,8 @@ ADD ./src/kubify /src/kubify/src/kubify
 RUN cd /src/kubify && \
     ./src/kubify/tool/kubify install
 ##
+
+ENV KUBIFY_VERBOSE 0
 
 RUN echo "_______________________________________________________________________________"
 RUN echo "THANK YOU FOR CHOOSING KUBIFY, YOUR AN EPIC CODE MACHINE, HAPPY RAPID TESTING!!"
