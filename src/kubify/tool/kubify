@@ -1558,7 +1558,7 @@ function up_container {
   mkdir -p ./._kubify_work;
   cp -R ~/.aws ./._kubify_work/;
   # docker pull ${KUBIFY_CONTAINER} || \
-    docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
+    DOCKER_BUILDKIT=0  docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
       --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
       --build-arg GIT_EMAIL="${GIT_EMAIL}" \
       `pwd`/;
