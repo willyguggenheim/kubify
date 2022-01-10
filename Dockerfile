@@ -66,6 +66,7 @@ ADD ./src/kubify /src/kubify/src/kubify
 
 # TODO: Make sure "install" is upgraded to work with full local cluster testing (like "up" does) 
 #  in a way that does not break cicd usage (willy created "install" for cicd usage originally)
+COPY ./._kubify_work/certs /src/kubify/._kubify_work/certs
 RUN cd /src/kubify && \
     ./src/kubify/tool/kubify install
 ##
