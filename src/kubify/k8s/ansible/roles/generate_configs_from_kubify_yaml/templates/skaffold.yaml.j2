@@ -39,7 +39,7 @@ profiles:
 {% endfor %}
 {% endif %}
         docker:
-          dockerfile: "../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.dev"
+          dockerfile: "../../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.dev"
           # TODO: should we keep squash (disk space saver)?
           # squash: true
           buildArgs:
@@ -59,7 +59,7 @@ profiles:
           - src: "/src/kubify/._kubify_work/certs/***"
             dest: "/usr/local/certificates/"
         docker:
-          dockerfile: "../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.release"
+          dockerfile: "../../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.release"
           buildArgs:
             NPM_TOKEN: "{% raw %}{{ .NPM_TOKEN }}{% endraw %}"
 
@@ -74,7 +74,7 @@ profiles:
       - image: "{{ app_cicd_build_image }}"
         context: .
         docker:
-          dockerfile: "../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.release"
+          dockerfile: "../../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.release"
           buildArgs:
             NPM_TOKEN: "{% raw %}{{ .NPM_TOKEN }}{% endraw %}"
 
