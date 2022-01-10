@@ -31,7 +31,7 @@ ADD ./ansible.cfg /etc/ansible/
 # PLEASE NOTE: https://snapcraft.io/store
 #  All of your Kubify services that have databases should have schema/seeds (for automated+rapid tests+infra to work properly) !! <- LOOK HERE PLEASE !!
 # RUN systemctl start snapd && DEBIAN_FRONTEND=noninteractive snap install flyway alembic
-RUN apt install -y python3-alembic python3-flask-migrate sudo
+RUN apt install -y python3-alembic python3-flask-migrate sudo bash
 RUN wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.3.0/flyway-commandline-8.3.0-linux-x64.tar.gz | tar xvz && sudo ln -s `pwd`/flyway-8.3.0/flyway /usr/local/bin/
 
 # Install Kindest Kind (local Kubernetes cluster)

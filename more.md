@@ -72,7 +72,7 @@ cd dev/svc/example-node-svc
 
 # start listening for code changes !!
 
-../../kubify start
+../../../kubify start
 
 ```
 
@@ -170,11 +170,11 @@ The local testing idioligy is that: You should be able to reset at any point. Th
 
 # Important Notes
 
-Dockerfile.dev = used for local development, used when ../../kubify start (or start_all)
+Dockerfile.dev = used for local development, used when ../../../kubify start (or start_all)
 
 Dockerfile.release = used or cloud, also used for depends_on, also used when ../../kubify run (or run_all)
 
-../../kubify start (or start_all) tells Skaffold (along with Skater Hot Reloader) to start the service and listen for
+../../../kubify start (or start_all) tells Skaffold (along with Skater Hot Reloader) to start the service and listen for
 
 code changes (see “sync” section of kubify.yml) for rapid code software developement listening folders
 

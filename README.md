@@ -89,9 +89,14 @@ wait
  
 # Setup Your Workstation
 
-Option A: Using a Container for Everything: `./kubify up_using_container`
+Option A: Using a Container for Everything (LTS, NEW Approach): `./kubify up_container`
+```
+# Example Workflow:
 
-Option B: Using a Local OS for Everything: `./kubify up`
+```
+    
+
+Option B: Using a Local OS (Install Directly on Mac, Linux or Windows, Instead of Inside Container) for Everything (Legacy Approach, This Will Always Still Be An Option, LTS): `./kubify up`
 
 
 
@@ -99,7 +104,7 @@ Option B: Using a Local OS for Everything: `./kubify up`
  
 Theme: One Testing Command (Across an Entire Org) to Rule Them All!!
  
-- Start Rapid Testing: `cd dev/svc/example-django-simple-svc && ../../kubify start`
+- Start Rapid Testing: `cd dev/svc/example-django-simple-svc && ../../../kubify start`
  
 - Edit a Secret: `../../kubify secrets edit dev`
  

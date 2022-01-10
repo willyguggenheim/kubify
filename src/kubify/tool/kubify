@@ -16,6 +16,7 @@ export KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY:-ecr}
 export KUBIFY_VERBOSE=${KUBIFY_VERBOSE:-0}
 # FOR DEBUG SET THIS TO 1:
 export KUBIFY_DEBUG=${KUBIFY_VERBOSE:-0}
+export DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG="kubify-local:9000"
 
 
 ACTUAL_OS_TYPE=mac
@@ -1551,10 +1552,15 @@ function enable_firewall {
 }
 
 
-function up_using_container {
+function up_container {
   mkdir -p ./._kubify_work;
   cp -R ~/.aws ./._kubify_work/;
-  docker build -t kubify-local -f Dockerfile .;
+  docker build -t ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} -f Dockerfile .;
+  docker exec -it ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} echo "I'm inside the Kubify Rapid Test Engine TM container!"
+  docker exec -it ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} echo "./kubify up"
+  docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} echo "../../../kubify run"
+  docker run --rm -ti -p 80:80 -p 443:443 --name kubify-rapid-test-engine ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} sleep 9999999
+  # EXAMPLE: docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it ${DOCKER_CONTAINER_KUBIFY_RAPID_TEST_ENGINE_TM_LOCAL_TAG} echo "../../../kubify start"
 }
 
 function up {
@@ -2192,7 +2198,7 @@ function start_dependencies {
         echo "Validated Required Service: ${dependancy_name} is Running"
         cd "${ORIGIN_APP_DIR}"
       fi
-      # grep if Running || or ../../kubify start in the dependant dir 
+      # grep if Running || or ../../../kubify start in the dependant dir 
     done
     cd "${ORIGIN_APP_DIR}"
   fi
