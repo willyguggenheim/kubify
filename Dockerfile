@@ -31,7 +31,7 @@ RUN apt update && apt -y upgrade
 # Copying the automation magic here (for building a trusted hardened container):
 RUN mkdir -p /etc/ansible
 RUN apt update
-RUN apt install -y git python3 ansible python3-pip curl
+RUN apt install -y git python3 ansible python3-pip curl awscli
 RUN git config --global user.name "${GIT_FIRST_LAST_NAME}"
 RUN git config --global user.email "${GIT_EMAIL}"
 ADD ./ansible.cfg /etc/ansible/

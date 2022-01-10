@@ -238,6 +238,7 @@ alias kubify="${DIR}/kubify"
 cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID | grep -Eo '[0-9]{1,12}'  &> /dev/null || aws sts get-caller-identity # login aws if not already logged in
 # NOTE: to clear AWS Account ID value cache file: rm -rf ./._kubify_work/env_var__cache__AWS_ACCOUNT_ID
 cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID | grep -Eo '[0-9]{1,12}'  &> /dev/null || aws sts get-caller-identity --query Account --output text > ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID
+cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID | grep -Eo '[0-9]{1,12}' || exit 1
 AWS_ACCOUNT_ID=`cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID`
 
 # Flags
