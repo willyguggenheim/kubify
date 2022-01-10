@@ -3041,8 +3041,8 @@ function up_container {
     --name "${KUBIFY_CONTAINER_NAME}" "${KUBIFY_CONTAINER}" sleep 9999999
   docker exec -it --privileged "${KUBIFY_CONTAINER_NAME}" echo "I'm inside the Kubify Rapid Test Engine TM container!"
   docker exec -it --privileged "${KUBIFY_CONTAINER_NAME}" echo "./kubify _up_container"
-  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" -it "${KUBIFY_CONTAINER_NAME}" echo "../../../kubify run"
-  docker exec -it --privileged -w "/src/kubify/dev/svc/example-node-complex-svc" -it "${KUBIFY_CONKUBIFY_CONTAINER_NAMETAINER}" echo "../../../kubify start"
+  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "${KUBIFY_CONTAINER_NAME}" echo "../../../kubify run"
+  docker exec -it --privileged -w "/src/kubify/dev/svc/example-node-complex-svc" "${KUBIFY_CONKUBIFY_CONTAINER_NAMETAINER}" echo "../../../kubify start"
 }
 
 function _up_container {
