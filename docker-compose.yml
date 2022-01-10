@@ -9,6 +9,7 @@ services:
     volumes:
       - ./:/src/kubify
       - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.kube/config:/root/.kube/config
       # - ./._kubify_work/.aws:/root/.aws
       # - ./dev/*:/src/kubify/dev/*
       # - ./src/kubify/k8s/*:/src/kubify/src/kubify/k8s/

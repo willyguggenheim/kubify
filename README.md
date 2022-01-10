@@ -94,6 +94,11 @@ Option A: Using a Container (Everything Installs/Runs in Container, NEW Approach
 # Example Workflow:
 ./kubify up_container # this is install (only need to run once)
 docker-compose run "cd dev/svc/example-django-simple-svc && kubify start"
+# make service code changes, rapid tester reloads automatically..
+# That's it! Happy Coding!
+# If you want to shutdown:
+docker-compose stop # if you want to stop the engine container
+kind stop # if you want to stop the cluster
 ```
     
 
@@ -105,6 +110,9 @@ cd dev/svc/example-django-simple-svc # service that you want to rapid test
 ../../../kubify secrets edit dev # if you want to edit secrets (then you would push)
 ../../../kubify start # starts service and listens for code changes (all dependant Services/Databases/awsResources run first)
 # make service code changes, rapid tester reloads automatically..
+# That's it! Happy Coding!
+# If you want to shutdown:
+kind stop # if you want to stop the cluster
 ```
  
  

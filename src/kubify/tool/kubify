@@ -1579,8 +1579,8 @@ function check_kubify {
   pwd
   BASE=`basename "$(dirname $PWD)"`
   # sanity check, this command should be run in the app dir
-  if [[ "$BASE" != "backend" && "$BASE" != "frontend" ]]; then
-    echo "This command should be run in a service directory located under: backend,frontend"
+  if [[ "$BASE" != "svc" && "$BASE" != "pub" ]]; then
+    echo "This command should be run in a service directory located under: src (backend) or pub (frontend)"
     exit 1
   fi
 }
@@ -2854,8 +2854,8 @@ function _new {
   while true; do
     cat << EOF
 Do you want to base this app on an existing template?
-  1. backend
-  2. frontend
+  1. backend (svc folder)
+  2. frontend (pub folder)
 EOF
     read -p "Your choice [1-2] (Ctrl-c to Quit): " choice
     if [ "$choice" -ge 1 -a "$choice" -le 2 ]; then
@@ -2867,14 +2867,14 @@ EOF
 
   case "$choice" in
     1)
-      echo "Using backend template..."
+      echo "Using backend (svc) template..."
       mkdir -p ${APP_DIR}
       cp -R ${TEMPLATES_DIR}/dev/svc/* ${APP_DIR}
       envsubst '${APP_NAME}' < ${TEMPLATES_DIR}/dev/svc/run.sh > ${APP_DIR}/run.sh
       cp ${TEMPLATES_DIR}/dot_dockerignore ${APP_DIR}/.dockerignore
       ;;
     2)
-      echo "Using frontend template..."
+      echo "Using frontend (pub) template..."
       mkdir -p ${APP_DIR}
       cp -R ${TEMPLATES_DIR}/dev/pub/* ${APP_DIR}
       envsubst '${APP_NAME}' < ${TEMPLATES_DIR}/dev/pub/package.json > ${APP_DIR}/package.json
@@ -3064,28 +3064,11 @@ nodes:
     protocol: TCP
 EOF
 
-  docker-compose up
+  docker-compose up -d
+  docker ps | grep kubify_kubify_1
+  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify_kubify_1" ../../../kubify run
+  # docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify_kubify_1" "../../../kubify run"
 
-  # TODO: CICD container automation
-  # docker pull ${KUBIFY_CONTAINER} || docker images | grep "kubify-local" || \
-  #   docker build -t "${KUBIFY_CONTAINER}" -f Dockerfile \
-  #     --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
-  #     --build-arg GIT_EMAIL="${GIT_EMAIL}" \
-  #     "${GIT_DIR}";
-  # for debugging container, uncomment next command (4 lines) #TODO: comment again
-    # DOCKER_BUILDKIT=0 docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
-    #   --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
-    #   --build-arg GIT_EMAIL="${GIT_EMAIL}" \
-    #   `pwd`/;
-  # docker stop "${KUBIFY_CONTAINER_NAME}" || true
-  # docker run -it --privileged -p 80:80 -p 443:443 \
-  #   -v "${GIT_DIR}":/src/kubify \
-  #   -v "${HOME}/.aws":/root/.aws \
-  #   --name "${KUBIFY_CONTAINER_NAME}" "${KUBIFY_CONTAINER}" "./kubify _up_container && echo sleep 9999999"
-  # docker exec -it --privileged --name "${KUBIFY_CONTAINER_NAME}" ls -trl
-  # docker exec -it --privileged "${KUBIFY_CONTAINER_NAME}" echo "./kubify _up_container"
-  # docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "${KUBIFY_CONTAINER_NAME}" echo "../../../kubify run"
-  # docker exec -it --privileged -w "/src/kubify/dev/svc/example-node-complex-svc" "${KUBIFY_CONKUBIFY_CONTAINER_NAMETAINER}" echo "../../../kubify start"
 }
 
 function _up_container {
@@ -3205,7 +3188,7 @@ $KUBECTL wait --namespace ingress-nginx \
     fi
   fi
 
-  # configure
+  configure
   kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
   docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/src/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/src/kubify/tool/scripts/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
 
