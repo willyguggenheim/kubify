@@ -89,24 +89,22 @@ wait
  
 # Setup Your Workstation
 
-Option A: Using a Container for Everything (LTS, NEW Approach): `./kubify up_container`
+Option A: Using a Container (Everything Installs/Runs in Container, NEW Approach): `./kubify up_container` (or "docker-compose up")
 ```
 # Example Workflow:
-
+./kubify up_container # this is install (only need to run once)
+docker-compose run "cd dev/svc/example-django-simple-svc && kubify start"
 ```
     
 
-Option B: Using a Local OS (Install Directly on Mac, Linux or Windows, Instead of Inside Container) for Everything (Legacy Approach, This Will Always Still Be An Option, LTS): `./kubify up`
-
-
-
-# Rapid Testing Services
- 
-Theme: One Testing Command (Across an Entire Org) to Rule Them All!!
- 
-- Start Rapid Testing: `cd dev/svc/example-django-simple-svc && ../../../kubify start`
- 
-- Edit a Secret: `../../kubify secrets edit dev`
+Option B: Using your OS (Direct Install Deps, Rest Runs in Containers): `./kubify up` (or "kubify install")
+```
+# Example Workflow:
+./kubify up # this is install (only need to run once)
+cd dev/svc/example-django-simple-svc
+../../../kubify secrets edit dev # if you want to edit secrets (then you would push)
+../../../kubify start # rapid testing the service (1 test command to rule them all)
+```
  
  
 

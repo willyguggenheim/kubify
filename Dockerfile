@@ -9,7 +9,7 @@ ENV GIT_EMAIL ${GIT_EMAIL}
 
 # Might be important, so just in case:
 USER root
-#ENV USER=root
+ENV USER=root
 #RUN chgrp root /etc/passwd && chmod ug+rw /etc/passwd
 #######
 
@@ -62,7 +62,8 @@ RUN ls /root/.aws || exit 1
 #######
 
 # Your services folder gets mounted automatically (for Kubify's rapid testing magic):
-ADD ./src/kubify /src/kubify/src/kubify
+ADD . /src/kubify/
+WORKDIR /src/kubify/
 
 # TODO: Make sure "install" is upgraded to work with full local cluster testing (like "up" does) 
 #  in a way that does not break cicd usage (willy created "install" for cicd usage originally)
@@ -70,11 +71,12 @@ COPY ./._kubify_work/certs /src/kubify/._kubify_work/certs
 COPY ./.git /src/kubify/.git
 # for debugging container, uncomment next line  #TODO: comment again
 ENV KUBIFY_VERBOSE 1
-RUN cd /src/kubify && \
-    ./src/kubify/tool/kubify install_container
+RUN ./kubify install_container
 ##
 
 RUN rm -rf /root/.aws
 
 RUN echo "_______________________________________________________________________________"
 RUN echo "THANK YOU FOR CHOOSING KUBIFY, YOUR AN EPIC CODE MACHINE, HAPPY RAPID TESTING!!"
+
+CMD sleep 9999999
