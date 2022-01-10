@@ -122,8 +122,14 @@ AutoPilot For Devs and DevOps ..
 
 
 Brought To You By: DJ EPIC CODER (Willy Guggenheim): 
-    - Latest List (to Celebr8 v9000.0.2 Pre-Release): https://open.spotify.com/playlist/7f2JYY3RampGTtB0SKXcW8?si=a9d1b199fb284ade
-    - Follow Me On Spotify: https://open.spotify.com/user/1245085779?si=7b16f3916e08407
+
+    1) Latest List (to Celebr8 v9000.0.2 Pre-Release): 
+
+        https://open.spotify.com/playlist/7f2JYY3RampGTtB0SKXcW8?si=a9d1b199fb284ade
+
+    2) Follow Me On Spotify: 
+
+        https://open.spotify.com/user/1245085779?si=7b16f3916e08407
 
 
 
