@@ -72,9 +72,8 @@ COPY ./.git /src/kubify/.git
 # for debugging container, uncomment next line  #TODO: comment again
 ENV KUBIFY_VERBOSE 1
 RUN ./kubify install_container
+RUN ./kubify _up_container || echo "supposed to fail, just doing caching"
 ##
-
-RUN rm -rf /root/.aws
 
 RUN echo "_______________________________________________________________________________"
 RUN echo "THANK YOU FOR CHOOSING KUBIFY, YOUR AN EPIC CODE MACHINE, HAPPY RAPID TESTING!!"

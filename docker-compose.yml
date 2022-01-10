@@ -1,14 +1,17 @@
 version: "3.9"
+
 services:
   kubify:
     build: .
-    ports:
-      - "443:443"
+    # ports:
+    #   - "443:443"
     working_dir: /src/kubify
     volumes:
-      - ./dev:/src/kubify/dev
-      - ./._kubify_work/.aws:/root/.aws
+      - ./:/src/kubify
       - /var/run/docker.sock:/var/run/docker.sock
+      # - ./._kubify_work/.aws:/root/.aws
+      # - ./dev/*:/src/kubify/dev/*
+      # - ./src/kubify/k8s/*:/src/kubify/src/kubify/k8s/
+      # - ./src/kubify/tools/*:/src/kubify/src/kubify/tools/
     privileged: true
     command: ./docker-compose.sh
-    # ./kubify _up_container && echo sleep 9999999
