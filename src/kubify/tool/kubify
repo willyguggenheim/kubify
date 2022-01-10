@@ -1557,6 +1557,7 @@ function enable_firewall {
 function up_container {
   mkdir -p ./._kubify_work;
   cp -R ~/.aws ./._kubify_work/;
+  # TODO: CICD to push container (for fast install option by docker pull try)
   # docker pull ${KUBIFY_CONTAINER} || \
     DOCKER_BUILDKIT=0  docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
       --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
