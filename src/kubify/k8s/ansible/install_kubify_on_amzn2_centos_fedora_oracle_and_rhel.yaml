@@ -195,7 +195,8 @@
 
     - name: add user to docker group 2
       become: yes
-      shell: sudo groupadd docker | true
+      shell: sudo groupadd docker
+      ignore_errors: true
 
     - name: add user to docker group 3
       become: no

@@ -36,7 +36,7 @@ s3DeployBucket="kubify-deploy"
     aws s3 ls s3://${s3DeployBucket} || aws s3 mb s3://${s3DeployBucket} | true
     aws s3api put-bucket-encryption \
         --bucket ${s3DeployBucket} \
-        --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}' | true
+        --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}' || true
 
     if [[ ! $(cat {{ app_dir }}/kubify.yml | grep ^aws_only | grep true) ]]
     then
@@ -250,7 +250,7 @@ STAGE #}
         rsync -a --delete ../layer/node_modules/ ./node_modules/
         #docker run -it -v `pwd`:/package lambda_layer_python:v1 /package/requirements.txt
         #todo: do the same for node (docker things):
-        #npm install | true
+        #npm install || true
     {% endif %}
     zip -r ../../{{ app_name }}-lambda-code.zip ./* > {{ app_kubify_dir }}/log-lambda-package-code-zip.log
 
