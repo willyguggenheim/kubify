@@ -21,7 +21,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y snapd
 
 # For full install (but CICD env sets KUBIFY_CI=1 at runtime to override this default):
 ENV KUBIFY_CI 0
-# For debugging container, set to 1
 ENV KUBIFY_VERBOSE 0
 
 # Add your DevSecOps OS Hardening things here:
@@ -68,6 +67,9 @@ ADD ./src/kubify /src/kubify/src/kubify
 # TODO: Make sure "install" is upgraded to work with full local cluster testing (like "up" does) 
 #  in a way that does not break cicd usage (willy created "install" for cicd usage originally)
 COPY ./._kubify_work/certs /src/kubify/._kubify_work/certs
+COPY ./.git /src/kubify/.git
+# for debugging container, uncomment next line  #TODO: comment again
+ENV KUBIFY_VERBOSE 1
 RUN cd /src/kubify && \
     ./src/kubify/tool/kubify install_container
 ##

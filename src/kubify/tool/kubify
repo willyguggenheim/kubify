@@ -3025,16 +3025,15 @@ function up_container {
   cp -R ~/.aws ./._kubify_work/;
   # TODO: CICD to push container (for fast install option by docker pull try), to make onboarding to kubify take 1 minute only (pull instead of build) ..
   # docker pull ${KUBIFY_CONTAINER} || docker images | grep "kubify-local" || \
-    docker build -t "${KUBIFY_CONTAINER}" -f Dockerfile \
+  # docker images | grep "kubify-local" || docker build -t "${KUBIFY_CONTAINER}" -f Dockerfile \
+  #     --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
+  #     --build-arg GIT_EMAIL="${GIT_EMAIL}" \
+  #     "${GIT_DIR}";
+  # for debugging container, uncomment next command (4 lines) #TODO: comment again
+  DOCKER_BUILDKIT=0 docker build --no-cache -t ${KUBIFY_CONTAINER} -f Dockerfile \
       --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
       --build-arg GIT_EMAIL="${GIT_EMAIL}" \
-      "${GIT_DIR}";
-  # for debugging container, uncomment
-    # DOCKER_BUILDKIT=0  docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
-    #   --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
-    #   --build-arg GIT_EMAIL="${GIT_EMAIL}" \
-    #   `pwd`/;
-  
+      `pwd`/;
   docker run --rm -ti --privileged -p 80:80 -p 443:443 \
     -v "${GIT_DIR}":/src/kubify \
     -v "${HOME}/.aws":/root/.aws \
