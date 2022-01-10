@@ -9,8 +9,8 @@ ENV GIT_EMAIL ${GIT_EMAIL}
 
 # Might be important, so just in case:
 USER root
-ENV USER=root
-RUN chgrp root /etc/passwd && chmod ug+rw /etc/passwd
+#ENV USER=root
+#RUN chgrp root /etc/passwd && chmod ug+rw /etc/passwd
 #######
 
 RUN apt update
@@ -56,9 +56,10 @@ COPY ./._kubify_work/.aws /root/.aws
 RUN ls /root/.aws || exit 1
 ##
 
-# Might be important, so just in case:
-COPY ./dock/Docker-Entrypoint-User.sh /Docker-Entrypoint-User.sh
-ENTRYPOINT /Docker-Entrypoint-User.sh
+# Might be important, so just in case (commenting, as it's issue):
+# COPY ./dock/Docker-Entrypoint-User.sh /Docker-Entrypoint-User.sh
+# ENTRYPOINT /Docker-Entrypoint-User.sh
+# RUN chmod +x /Docker-Entrypoint-User.sh
 #######
 
 # Your services folder gets mounted automatically (for Kubify's rapid testing magic):
@@ -72,7 +73,6 @@ RUN cd /src/kubify && \
 ##
 
 RUN rm -rf /root/.aws
-RUN chmod +x /Docker-Entrypoint-User.sh
 
 RUN echo "_______________________________________________________________________________"
 RUN echo "THANK YOU FOR CHOOSING KUBIFY, YOUR AN EPIC CODE MACHINE, HAPPY RAPID TESTING!!"

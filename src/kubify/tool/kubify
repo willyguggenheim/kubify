@@ -16,6 +16,7 @@ export KUBIFY_VERBOSE=${KUBIFY_VERBOSE:-0}
 # FOR DEBUG SET THIS TO 1:
 export KUBIFY_DEBUG=${KUBIFY_VERBOSE:-0}
 export KUBIFY_CONTAINER="willy0912/kubify-local:9000"
+export KUBIFY_CONTAINER_NAME="kubify-engine"
 
 
 ACTUAL_OS_TYPE=mac
@@ -3022,8 +3023,8 @@ function up_container {
   set -e
   mkdir -p ./._kubify_work;
   cp -R ~/.aws ./._kubify_work/;
-  # TODO: CICD to push container (for fast install option by docker pull try)
-  # docker pull ${KUBIFY_CONTAINER} || \
+  # TODO: CICD to push container (for fast install option by docker pull try), to make onboarding to kubify take 1 minute only (pull instead of build) ..
+  # docker pull ${KUBIFY_CONTAINER} || docker images | grep "kubify-local" || \
     docker build -t "${KUBIFY_CONTAINER}" -f Dockerfile \
       --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
       --build-arg GIT_EMAIL="${GIT_EMAIL}" \
@@ -3033,14 +3034,15 @@ function up_container {
     #   --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
     #   --build-arg GIT_EMAIL="${GIT_EMAIL}" \
     #   `pwd`/;
-  docker exec -it "docker.io/${KUBIFY_CONTAINER}" echo "I'm inside the Kubify Rapid Test Engine TM container!"
-  docker exec -it "docker.io/${KUBIFY_CONTAINER}" echo "./kubify _up_container"
-  docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it "docker.io/${KUBIFY_CONTAINER}" echo "../../../kubify run"
-  docker run --rm -ti -p 80:80 -p 443:443 \
+  
+  docker run --rm -ti --privileged -p 80:80 -p 443:443 \
     -v "${GIT_DIR}":/src/kubify \
     -v "${HOME}/.aws":/root/.aws \
-    --name kubify-rapid-test-engine "docker.io/${KUBIFY_CONTAINER}" sleep 9999999 &
-  docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it "docker.io/${KUBIFY_CONTAINER}" echo "../../../kubify start"
+    --name "${KUBIFY_CONTAINER_NAME}" "${KUBIFY_CONTAINER}" sleep 9999999
+  docker exec -it --privileged "${KUBIFY_CONTAINER_NAME}" echo "I'm inside the Kubify Rapid Test Engine TM container!"
+  docker exec -it --privileged "${KUBIFY_CONTAINER_NAME}" echo "./kubify _up_container"
+  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" -it "${KUBIFY_CONTAINER_NAME}" echo "../../../kubify run"
+  docker exec -it --privileged -w "/src/kubify/dev/svc/example-node-complex-svc" -it "${KUBIFY_CONKUBIFY_CONTAINER_NAMETAINER}" echo "../../../kubify start"
 }
 
 function _up_container {
