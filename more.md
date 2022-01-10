@@ -140,20 +140,6 @@ NOTE: `kubify []` (when you run any kubify command) will actually try to set thi
 
 
 
-!!IMPORTANT:
-
-To hard reset your local docker environment (includes kubify cluster):
-
-- To reset your docker (troubleshooting or fast cleaning):
-
-	- 1) (Optional) Reset your workdir `rm -f ./._kubify_work/kubify_config.sh`
-
-	- 2) (Optional) Hard reset your Docker Desktop (fixes a lot)!!
-
-	- 3) `./kubify up`
-
-
-
 # Hard Reset
 
 1) Reset your workdir `rm -f ./._kubify_work`

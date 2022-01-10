@@ -3,8 +3,7 @@
 # Disable exit on non 0
 set +e
 
-# https://docs.ansible.com/ansible/latest/reference_appendices/config.html#envvar-ANSIBLE_PYTHON_INTERPRETER
-# export ANSIBLE_PYTHON_INTERPRETER=`which python3`
+export ANSIBLE_PYTHON_INTERPRETER=`which python3`
 export INTERPRETER_PYTHON=auto_silent
 export ANSIBLE_PYTHON_INTERPRETER=auto_silent
 
@@ -32,54 +31,6 @@ if test -f "$FILE"; then
 else
   ACTUAL_OS_TYPE=mac
 fi
-
-# if ! [ -x "$(command -v sudo)" ]; then
-#       if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-#             apt-get update &> /dev/null
-#             apt-get install -y sudo &> /dev/null
-#       fi
-#       if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
-#             yum install -y sudo &> /dev/null
-#       fi
-# fi
-
-# if ! [ -x "$(command -v wget)" ]; then
-#   if [[ "$OSTYPE" == *"darwin"* ]]; then
-#     brew install wget &> /dev/null
-#   elif [[ "$OSTYPE" == *"linux"* ]]; then
-#       if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-#             sudo apt-get update &> /dev/null
-#             sudo apt-get install -y wget &> /dev/null
-#       fi
-#       if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
-#             sudo yum install -y wget &> /dev/null
-#       fi
-#   fi
-# fi
-
-# TODO: implement this progress bar when debug is turned off:
-# phases=( 
-#     'Phase A...'
-#     'Phase B...'
-#     'Phase C...'
-#     'ALMOST THERE...'
-# )   
-# for i in $(seq 1 100); do  
-#     sleep 0.1
-#     if [ $i -eq 100 ]; then
-#         echo -e "XXX\n100\nDone!\nXXX"
-#     elif [ $(($i % 25)) -eq 0 ]; then
-#         let "phase = $i / 25"
-#         echo -e "XXX\n$i\n${phases[phase]}\nXXX"
-#     else
-#         echo $i
-#     fi 
-# done | whiptail --title 'Kerbal Space Program' --gauge "${phases[0]}" 6 60 0
-
-
-# `kubify hard_reset_docker_mac`
-# alternative 1) docker system prune -a
-# alternative 2) open docker desktop, resize disk maximum disk size, apply, `kubify up`
 
 hard_reset_docker_mac() {
 
@@ -164,56 +115,6 @@ read_flag_verbose
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 mkdir -p "$DIR/../../../._kubify_work"
 mkdir -p ~/kubify
-
-function kubify_config {
-#   CONFIG_FILE="$DIR/../../../._kubify_work/kubify_config.sh"
-#   # echo $CONFIG_FILE
-#   # exit 1
-#   if [[ -f "$CONFIG_FILE" ]]; then
-#       . "$CONFIG_FILE"
-#   else
-
-#     if [ -z "${KUBIFY_EDITOR}" ]; then
-#         echo "KUBIFY_EDITOR env var (or config script line) is unset or set to the empty string, so asking:"
-#         echo "Would you like to use vi or sublime or vscode"
-#         echo "example: subl -w|vi|code"
-#         read KUBIFY_EDITOR
-#     fi
-
-#     if [ -z "${KUBIFY_CONTAINER_REGISTRY}" ]; then
-#         echo "KUBIFY_CONTAINER_REGISTRY env var (or config script line) is unset or set to the empty string, so asking:"
-#         echo "Would you like to use dockerhub or amazon ecr? (dockerhub or ecr)"
-#         read KUBIFY_CONTAINER_REGISTRY
-#     fi
-
-#     if [ -z "${UNIQUE_COMPANY_ACRONYM}" ]; then
-#         echo "UNIQUE_COMPANY_ACRONYM env var (or config script line) is unset or set to the empty string, so asking:"
-#         echo "What is your Unique company acronym (example: os)?"
-#         read UNIQUE_COMPANY_ACRONYM
-#     fi
-
-#     if [ -z "${KUBIFY_DEBUG}" ]; then
-#         echo "KUBIFY_DEBUG env var (or config script line) is unset or set to the empty string, so asking:"
-#         echo "Do you want to turn on debugging 0 No 1 Yes? (0 or 1)"
-#         read KUBIFY_DEBUG
-#     fi
-
-# cat << EOF > "$CONFIG_FILE"
-
-# export KUBIFY_CONTAINER_REGISTRY=$KUBIFY_CONTAINER_REGISTRY
-# export UNIQUE_COMPANY_ACRONYM=$UNIQUE_COMPANY_ACRONYM
-# export KUBIFY_VERBOSE=$KUBIFY_DEBUG
-# export KUBIFY_DEBUG=$KUBIFY_DEBUG
-# export EDITOR=$KUBIFY_EDITOR
-# EOF
-
-#   fi
-  # echo "kubify_config disabled and hardcoded.."
-  placeholder=placeholder
-}
-
-
-# kubify_config
 
 if [[ "$OSTYPE" == *"darwin"* ]]; then
   if ! [ -x "$(command -v brew)" ]; then
@@ -331,8 +232,7 @@ elif [[ "$OSTYPE" == *"linux"* ]]; then
   BASE64_DECODE="base64 -d"
   MINIKUBE="sudo minikube"
 fi
-# already defined in kubify_config delete these lines
-# UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM:-os}
+
 export NAMING_PREFIX=$UNIQUE_COMPANY_ACRONYM-$ENV-kubify
 
 export AWS_REGION=${KUBIFY_AWS_REGION:-us-east-1}
@@ -361,7 +261,6 @@ AWS_ACCOUNT_ID=`cat ${WORK_DIR}/env_var__cache__AWS_ACCOUNT_ID`
 KUBIFY_ENGINE=${KUBIFY_ENGINE:-local}         # Options: local or minikube (local is docker-desktop native performance & minikube is an auto-deployed VM)
 KUBIFY_CI=${KUBIFY_CI:-0}                     # This is set to 1 in a Continuous Integration environment
 KUBIFY_VERBOSE=${KUBIFY_VERBOSE:-0}           # Sets the verbose logging to true (if set to 1)
-# TODO delete this was moved to kubify_config.sh
 KUBIFY_DEBUG=${KUBIFY_DEBUG:-0}               # Sets the debug logging to true (if set to 1)
 KUBIFY_ENTRYPOINT_IMAGE=kubify/entrypoint   # The entrypoint image for ad-hoc commands
 #moved to config file
@@ -1392,43 +1291,6 @@ cmp -s "${WORK_DIR}/certs/ca.key" /usr/local/certificates/key || sudo cp "${WORK
 
 cat /proc/version | grep -i microsoft && sudo mount --make-shared / || true
 
-# https://kind.sigs.k8s.io/docs/user/configuration/
-# kind get clusters | grep ^kind$ || cat <<EOF | kind create cluster --config=-
-# kind: Cluster
-# apiVersion: kind.x-k8s.io/v1alpha4
-# nodes:
-# - role: control-plane
-#   extraMounts:
-#   - hostPath: "${GIT_DIR}"
-#     containerPath: /src/kubify
-#     readOnly: false
-#   - hostPath: "${HOME}/.aws"
-#     containerPath: /root/.aws
-#   - hostPath: "${HOME}/.ssh"
-#     containerPath: /root/.ssh
-#   - hostPath: "${HOME}/.gitconfig"
-#     containerPath: /root/.gitconfig
-#   - hostPath: /var/run/docker.sock
-#     containerPath: /var/run/docker.sock
-#     propagation: HostToContainer
-#     readOnly: false
-#   - hostPath: "${WORK_DIR}/certs"
-#     containerPath: /usr/local/certificates
-#   kubeadmConfigPatches:
-#   - |
-#     kind: InitConfiguration
-#     nodeRegistration:
-#       kubeletExtraArgs:
-#         node-labels: "ingress-ready=true"
-#   extraPortMappings:
-#   - containerPort: 80
-#     hostPort: 80
-#     protocol: TCP
-#   - containerPort: 443
-#     hostPort: 443
-#     protocol: TCP
-# EOF
-
 docker ps | grep kind || cat <<EOF | kind create cluster --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -2238,10 +2100,8 @@ function start {
       kubify secrets create ${ENV}
   fi
 
-  kubify_config
   aws_ecr_login
-  
-  # echo "function start kubify_config"
+
   cat "${APP_DIR}/kubify.yml" | grep aws_only | grep true || check_skaffold
   # echo "function start check_skaffold"
   echo "function start APP_NAME $APP_NAME"
@@ -2444,19 +2304,6 @@ function run_in_entrypoint {
     exec "$CMD"
   fi
 }
-
-# function __setup_symlinks {
-#   ln -sf /data/home/.aws /root/
-#   ln -sf /data/home/.ssh /root/
-#   ln -sf /data/home/.gitconfig /root/
-# }
-
-# function setup_symlinks {
-#   echo "Setting up symlinks in entrypoint container" &> "$KUBIFY_OUT"
-#   run_in_entrypoint 'ln -sf /data/home/.aws /root/ && ln -sf /data/home/.ssh /root/ && ln -sf /data/home/.gitconfig /root/'
-#   # TODO: add the rest of the env vars (already added KUBIFY_CONTAINER_REGISTRY)
-#   run_in_entrypoint KUBIFY_DEBUG=${KUBIFY_DEBUG} KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY} UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM} kubify __setup_symlinks || true
-# }
 
 function wait_for_deployment {
   check_arg $1 "No deployment name specified!"
@@ -3017,7 +2864,6 @@ function undeploy {
 function new {
   check_arg $1 "Error! Usage: kubify new <app_type> <app_name>"
   check_arg $2 "Error! Usage: kubify new <app_type> <app_name>"
-  # TODO: add the rest of the env vars (already added KUBIFY_CONTAINER_REGISTRY)
   run_in_entrypoint KUBIFY_DEBUG=${KUBIFY_DEBUG} KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY} UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM} kubify _new "$@"
 }
 
