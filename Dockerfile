@@ -72,6 +72,7 @@ RUN cd /src/kubify && \
 ##
 
 RUN rm -rf /root/.aws
+RUN chmod +x /Docker-Entrypoint-User.sh
 
 RUN echo "_______________________________________________________________________________"
 RUN echo "THANK YOU FOR CHOOSING KUBIFY, YOUR AN EPIC CODE MACHINE, HAPPY RAPID TESTING!!"

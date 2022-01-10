@@ -3033,14 +3033,14 @@ function up_container {
     #   --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
     #   --build-arg GIT_EMAIL="${GIT_EMAIL}" \
     #   `pwd`/;
-  docker exec -it "${KUBIFY_CONTAINER}" echo "I'm inside the Kubify Rapid Test Engine TM container!"
-  docker exec -it "${KUBIFY_CONTAINER}" echo "./kubify _up_container"
-  docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it "${KUBIFY_CONTAINER}" echo "../../../kubify run"
+  docker exec -it "docker.io/${KUBIFY_CONTAINER}" echo "I'm inside the Kubify Rapid Test Engine TM container!"
+  docker exec -it "docker.io/${KUBIFY_CONTAINER}" echo "./kubify _up_container"
+  docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it "docker.io/${KUBIFY_CONTAINER}" echo "../../../kubify run"
   docker run --rm -ti -p 80:80 -p 443:443 \
     -v "${GIT_DIR}":/src/kubify \
     -v "${HOME}/.aws":/root/.aws \
-    --name kubify-rapid-test-engine "${KUBIFY_CONTAINER}" sleep 9999999 &
-  docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it "${KUBIFY_CONTAINER}" echo "../../../kubify start"
+    --name kubify-rapid-test-engine "docker.io/${KUBIFY_CONTAINER}" sleep 9999999 &
+  docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it "docker.io/${KUBIFY_CONTAINER}" echo "../../../kubify start"
 }
 
 function _up_container {
