@@ -1415,23 +1415,6 @@ function enable_firewall {
   fi
 }
 
-
-function up_container {
-  mkdir -p ./._kubify_work;
-  cp -R ~/.aws ./._kubify_work/;
-  # TODO: CICD to push container (for fast install option by docker pull try)
-  # docker pull ${KUBIFY_CONTAINER} || \
-    DOCKER_BUILDKIT=0  docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
-      --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
-      --build-arg GIT_EMAIL="${GIT_EMAIL}" \
-      `pwd`/;
-  # docker exec -it ${KUBIFY_CONTAINER} echo "I'm inside the Kubify Rapid Test Engine TM container!"
-  # docker exec -it ${KUBIFY_CONTAINER} echo "./kubify up"
-  # docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it ${KUBIFY_CONTAINER} echo "../../../kubify run"
-  # docker run --rm -ti -p 80:80 -p 443:443 --name kubify-rapid-test-engine ${KUBIFY_CONTAINER} sleep 9999999
-  # EXAMPLE: docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it ${KUBIFY_CONTAINER} echo "../../../kubify start"
-}
-
 function up {
   set -e
   
@@ -2966,6 +2949,295 @@ function publish_cicd_build_image {
 
   docker push ${IMAGE_NAME}
 }
+
+#####
+## START OF CONTAINER MOD
+#####
+
+
+function install_container {
+  set -e
+  echo "Ensuring system dependencies"
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    {
+      # https://github.com/dennisausbremen/macOStrap/blob/a7665473faf87677a5c01e8a66d26508379f950f/functions/installer.sh
+      # if ! [ -x "$(command -v whiptail)" ]; then
+      #   # TODO do this dependency file
+      #   brew install newt
+      # fi
+      if ! [ -x "$(command -v ansible)" ]; then
+        # TODO do this dependency file
+        brew install ansible || brew install ansible
+      fi
+      if [[ `uname -m` == "arm64" ]]; then
+        echo "M1/M2 detected (Arm)"
+        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac_osx_m1_m1x.yaml"
+      else
+        # if "${K8S_DIR}/../../../._kubify_work/"
+        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac_osx.yaml"
+      fi
+    } &> "$KUBIFY_OUT"
+
+    if [[ "$KUBIFY_ENGINE" == "minikube" ]]; then
+      if [[ $MINIKUBE_VM_DRIVER == "hyperkit" ]];
+      then
+        if ask "Root privileges will be necessary to configure the hyperkit driver for Minikube"; then
+          echo "Configuring minikube driver..." &> "$KUBIFY_OUT"
+          sudo chown root:wheel /usr/local/opt/docker-machine-driver-hyperkit/bin/docker-machine-driver-hyperkit || true
+          sudo chmod u+s /usr/local/opt/docker-machine-driver-hyperkit/bin/docker-machine-driver-hyperkit || true
+        else
+          echo "Aborting."
+          exit 1
+        fi
+      fi
+    fi
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      #  if ! [ -x "$(command -v whiptail)" ]; then
+      #   # TODO do this dependency file
+      #   # https://askubuntu.com/questions/747143/create-a-progress-bar-in-bash
+      #   sudo apt-get update
+      #   sudo apt-get install -y whiptail
+      # fi
+    {
+      if ! [ -x "$(command -v ansible)" ]; then
+        if ! [ -x "$(command -v pip)" ]; then
+          sudo apt update || true
+          sudo apt install -y python3-pip || true
+        fi
+        pip3 install ansible
+        if ! [ -x "$(command -v ansible)" ]; then
+          sudo apt update || true
+          sudo apt install -y ansible || true
+        fi
+      fi
+      echo "NOTE: This might ask for your computer password (as it needs sudo)."
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+        ansible-playbook --connection=local \
+          "${K8S_DIR}/ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" \
+          --ask-become-pass -e ansible_python_interpreter=`which python3`
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+        ansible-playbook --connection=local \
+          "${K8S_DIR}/ansible/install_kubify_on_amzn2_centos_fedora_oracle_and_rhel.yaml" \
+          --ask-become-pass -e ansible_python_interpreter=`which python3`
+      fi
+
+
+    } &> "$KUBIFY_OUT"
+  else
+    echo "'kubify install' not supported on $OSTYPE ... yet"
+    exit 1
+  fi
+  # echo "Remember to add ${GIT_DIR}/kubify/tools/bin to your \$PATH in your .bashrc, .zshrc, etc"
+  # echo "Alternatively create a symlink to ${GIT_DIR}/kubify/tools/bin/kubify to your existing \$PATH"
+
+
+}
+
+function up_container {
+  mkdir -p ./._kubify_work;
+  cp -R ~/.aws ./._kubify_work/;
+  # TODO: CICD to push container (for fast install option by docker pull try)
+  # docker pull ${KUBIFY_CONTAINER} || \
+    DOCKER_BUILDKIT=0  docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
+      --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
+      --build-arg GIT_EMAIL="${GIT_EMAIL}" \
+      `pwd`/;
+  docker exec -it ${KUBIFY_CONTAINER} echo "I'm inside the Kubify Rapid Test Engine TM container!"
+  docker exec -it ${KUBIFY_CONTAINER} echo "./kubify _up_container"
+  docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it ${KUBIFY_CONTAINER} echo "../../../kubify run"
+  docker run --rm -ti -p 80:80 -p 443:443 --name kubify-rapid-test-engine ${KUBIFY_CONTAINER} sleep 9999999 &
+  docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it ${KUBIFY_CONTAINER} echo "../../../kubify start"
+}
+
+function _up_container {
+  set -e
+  
+  echo '💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻👩‍💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻'
+  echo '...................😎 Installing or Re-Installing Kubify 😎...................'
+  echo '💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻'
+
+  if [[ "$@" == "--skip-install" ]]; then
+    echo "Skipping installation"
+  else
+
+    # ensure sudo password is correct first #TODO: do this better in the python3 migration of this file and allow for non-sudo usage patterns, but for V2 let's do this:
+    # until sudo whoami
+    # do
+    #   echo "enter your computer password (since dnsmsq needs sudo)"
+    # done
+
+    install
+
+
+  echo "Installing Kind"
+
+[[ -d /usr/local/certificates ]] || sudo mkdir -p /usr/local/certificates || true
+ls /usr/local/certificates || sudo mkdir -p /usr/local/certificates || true
+cmp -s "${WORK_DIR}/certs/ca.crt" "${WORK_DIR}/certs/cert" || cp "${WORK_DIR}/certs/ca.crt" "${WORK_DIR}/certs/cert"
+cmp -s "${WORK_DIR}/certs/ca.crt" "${WORK_DIR}/certs/ca" || cp "${WORK_DIR}/certs/ca.crt" "${WORK_DIR}/certs/ca"
+cmp -s "${WORK_DIR}/certs/ca.key" "${WORK_DIR}/certs/key" || cp "${WORK_DIR}/certs/ca.key" "${WORK_DIR}/certs/key"
+cmp -s "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/cert || sudo cp "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/cert || true
+cmp -s "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/ca || sudo cp "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/ca || true
+cmp -s "${WORK_DIR}/certs/ca.key" /usr/local/certificates/key || sudo cp "${WORK_DIR}/certs/ca.key" /usr/local/certificates/key || true
+
+cat /proc/version | grep -i microsoft && sudo mount --make-shared / || true
+
+docker ps | grep kind || cat <<EOF | kind create cluster --config=-
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraMounts:
+  - hostPath: "${GIT_DIR}"
+    containerPath: /src/kubify
+    readOnly: false
+  - hostPath: "${HOME}/.aws"
+    containerPath: /root/.aws
+  - hostPath: "${HOME}/.ssh"
+    containerPath: /root/.ssh
+  - hostPath: "${HOME}/.gitconfig"
+    containerPath: /root/.gitconfig
+  - hostPath: /var/run/docker.sock
+    containerPath: /var/run/docker.sock
+    propagation: HostToContainer
+    readOnly: false
+  - hostPath: "${WORK_DIR}/certs"
+    containerPath: /usr/local/certificates
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+EOF
+
+sleep 5
+
+cat /proc/version | grep -i microsoft && sudo mount --make-shared / || true
+cat /proc/version | grep -i microsoft && docker pull k8s.gcr.io/ingress-nginx/controller:v0.47.0  && \
+  kind load docker-image k8s.gcr.io/ingress-nginx/controller:v0.47.0  && \
+  docker pull docker.io/jettech/kube-webhook-certgen:v1.5.1 && \
+  kind load docker-image docker.io/jettech/kube-webhook-certgen:v1.5.1  && \
+  docker pull docker:latest  && \
+  kind load docker-image docker:latest
+
+kubectl get serviceaccounts | grep default || kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default
+EOF
+
+#https://github.com/kubernetes-sigs/kind/issues/1281
+kubectl get pods probe-socket || kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: probe-socket
+  labels:
+    purpose: debug
+spec:
+  containers:
+  - name: probe-docker
+    image: docker:latest
+    imagePullPolicy: IfNotPresent
+    command: ['sleep', '600' ]
+    securityContext:
+      privileged: true
+    volumeMounts: 
+        - mountPath: /var/run 
+          name: docker-sock 
+  volumes: 
+    - name: docker-sock 
+      hostPath: 
+        path: /var/run 
+EOF
+
+$KUBECTL apply -f "${GIT_DIR}/src/kubify/templates/manifests/ingress-nginx-kind.yaml"
+
+# kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
+# kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
+# kubectl wait --timeout=90s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
+# $KUBECTL apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+
+$KUBECTL wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s 2>/dev/null || sleep 20
+      $KUBECTL wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s 2>/dev/null || sleep 20
+      $KUBECTL wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s || sleep 20
+      $KUBECTL wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s
+
+
+  fi
+
+  test_or_create_s3_artifacts_bucket
+
+  RUNNING=`check_local_env`
+
+  if [[ "${KUBIFY_ENGINE}" == "minikube" ]]; then
+    if [ "$RUNNING" != "Running" ]; then
+      echo "Starting local cluster (Please be patient)"
+      {
+        $MINIKUBE config set WantUpdateNotification false
+        $MINIKUBE start \
+          --profile             ${PROFILE} \
+          --vm-driver           "none"
+        $MINIKUBE addons enable ${MINIKUBE_ADDONS}
+        sudo chown -R $USER:$USER $HOME/.minikube || true
+        sudo chown -R $USER:$USER $HOME/.kube || true
+      } &> "$KUBIFY_OUT"
+    fi
+  elif [[ "${KUBIFY_ENGINE}" == "local" ]]; then
+    if [ -z "${RUNNING}" ]; then
+      echo "Error: Make sure Kubernetes is running locally."
+      exit 1
+    fi
+  fi
+
+  configure
+  kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+  docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/src/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/src/kubify/tool/scripts/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
+
+  if [[ "$ACTUAL_OS_TYPE" == "mac" ]]; then
+   open /Applications/Lens.app || echo ""
+  fi
+
+  # cd dev/svc/localstack-aws-svc
+  # ../../kubify run &> /dev/null &
+  # cd -
+
+  enable_firewall
+  echo '💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻👩‍💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻'
+  echo 'Function Up: SUCCESS: Installation/Re-Installation Complete!! Kubify for life!!'
+  echo '💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻'
+
+}
+
+
+
+####
+# END OF CONTAINER MOD
+####
+
+
 
 function help {
   cat << EOF
