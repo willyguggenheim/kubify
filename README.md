@@ -115,9 +115,12 @@ Theme: One Testing Command (Across an Entire Org) to Rule Them All!!
 This is FREE (and Open Source) turn key DevOps revolutionary software that I worked VERY hard on. If you use Kubify, make sure to donate (if you use this in prod, then MAKE SURE AND DONATE PLEASE): [![](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?business=MSRFJHSGCKGCG&item_name=Kubify&currency_code=USD)
 
 That's it! Thank you for coding and enjoy ..
- 
+
 AutoPilot For Devs and DevOps ..
 
+![FUTUREOFDEVOPS9000](./lib/docs/img/README_md_imgs/the-future.gif)
+
+Brought To You By: DJ EPIC CODER (Willy Guggenheim): Follow Me On Spotify: https://open.spotify.com/user/1245085779?si=7b16f3916e08407
 
 # Hashtags, More Hashtags
  
