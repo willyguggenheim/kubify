@@ -101,9 +101,10 @@ Option B: Using your OS (Direct Install Deps, Rest Runs in Containers): `./kubif
 ```
 # Example Workflow:
 ./kubify up # this is install (only need to run once)
-cd dev/svc/example-django-simple-svc
+cd dev/svc/example-django-simple-svc # service that you want to rapid test 
 ../../../kubify secrets edit dev # if you want to edit secrets (then you would push)
-../../../kubify start # rapid testing the service (1 test command to rule them all)
+../../../kubify start # starts service and listens for code changes (all dependant Services/Databases/awsResources run first)
+# make service code changes, rapid tester reloads automatically..
 ```
  
  

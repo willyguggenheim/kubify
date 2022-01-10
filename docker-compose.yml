@@ -6,7 +6,7 @@ services:
       - "443:443"
     working_dir: /src/kubify
     volumes:
-      - .:/src/kubify
+      - ./dev:/src/kubify/dev
       - ./._kubify_work/.aws:/root/.aws
       - /var/run/docker.sock:/var/run/docker.sock
     privileged: true
