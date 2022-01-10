@@ -32,6 +32,7 @@ Well hello there again.
  
 # Q1 2022 Upcoming Features (UP NEXT)
 
+0) Upgrade All Dependancies & Deep Testing
 0) Chrome & PostMan in Container (UI to Pop Up on Workstation, But Running in Container): https://medium.com/dot-debug/running-chrome-in-a-docker-container-a55e7f4da4a8
 1) Make an explainer video
 2) Make contributor training videos

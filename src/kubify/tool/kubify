@@ -191,23 +191,6 @@ if ! [ -x "$(command -v git config --get user.email)" ]; then
   exit 1
 fi
 
-# echo "Welcome back $(git config --get user.name)!"
-
-# if ! [ -x "$(command -v aws)" ]; then
-#   if [[ "$OSTYPE" == *"darwin"* ]]; then
-#     brew install awscli &> /dev/null
-#     brew link awscli &> /dev/null
-#   elif [[ "$OSTYPE" == *"linux"* ]]; then
-#       if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-#             sudo apt-get update &> /dev/null
-#             sudo apt-get install -y awscli &> /dev/null
-#       fi
-#       if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
-#             sudo yum install -y awscli &> /dev/null
-#       fi
-#   fi
-# fi
-
 if [[ -z "${AWS_SECRET_ACCESS_KEY}" ]]; then
   if [ ! -f ${HOME}/.aws/credentials ]; then
       aws sts get-caller-identity || aws configure 
@@ -3035,19 +3018,28 @@ function install_container {
 }
 
 function up_container {
+  set -e
   mkdir -p ./._kubify_work;
   cp -R ~/.aws ./._kubify_work/;
   # TODO: CICD to push container (for fast install option by docker pull try)
   # docker pull ${KUBIFY_CONTAINER} || \
-    DOCKER_BUILDKIT=0  docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
+    docker build -t "${KUBIFY_CONTAINER}" -f Dockerfile \
       --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
       --build-arg GIT_EMAIL="${GIT_EMAIL}" \
-      `pwd`/;
-  docker exec -it ${KUBIFY_CONTAINER} echo "I'm inside the Kubify Rapid Test Engine TM container!"
-  docker exec -it ${KUBIFY_CONTAINER} echo "./kubify _up_container"
-  docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it ${KUBIFY_CONTAINER} echo "../../../kubify run"
-  docker run --rm -ti -p 80:80 -p 443:443 --name kubify-rapid-test-engine ${KUBIFY_CONTAINER} sleep 9999999 &
-  docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it ${KUBIFY_CONTAINER} echo "../../../kubify start"
+      "${GIT_DIR}";
+  # for debugging container, uncomment
+    # DOCKER_BUILDKIT=0  docker build -t ${KUBIFY_CONTAINER} -f Dockerfile \
+    #   --build-arg GIT_GIT_FIRST_LAST_NAME="${GIT_FIRST_LAST}" \
+    #   --build-arg GIT_EMAIL="${GIT_EMAIL}" \
+    #   `pwd`/;
+  docker exec -it "${KUBIFY_CONTAINER}" echo "I'm inside the Kubify Rapid Test Engine TM container!"
+  docker exec -it "${KUBIFY_CONTAINER}" echo "./kubify _up_container"
+  docker exec -w "/src/kubify/dev/svc/localstack-aws-svc" -it "${KUBIFY_CONTAINER}" echo "../../../kubify run"
+  docker run --rm -ti -p 80:80 -p 443:443 \
+    -v "${GIT_DIR}":/src/kubify \
+    -v "${HOME}/.aws":/root/.aws \
+    --name kubify-rapid-test-engine "${KUBIFY_CONTAINER}" sleep 9999999 &
+  docker exec -w "/src/kubify/dev/svc/example-node-complex-svc" -it "${KUBIFY_CONTAINER}" echo "../../../kubify start"
 }
 
 function _up_container {

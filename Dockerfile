@@ -21,7 +21,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y snapd
 
 # For full install (but CICD env sets KUBIFY_CI=1 at runtime to override this default):
 ENV KUBIFY_CI 0
-ENV KUBIFY_VERBOSE 1
+# For debugging container, set to 1
+ENV KUBIFY_VERBOSE 0
 
 # Add your DevSecOps OS Hardening things here:
 RUN apt update && apt -y upgrade
@@ -61,7 +62,6 @@ ENTRYPOINT /Docker-Entrypoint-User.sh
 #######
 
 # Your services folder gets mounted automatically (for Kubify's rapid testing magic):
-RUN mkdir -p /src/kubify/tools
 ADD ./src/kubify /src/kubify/src/kubify
 
 # TODO: Make sure "install" is upgraded to work with full local cluster testing (like "up" does) 
@@ -71,7 +71,7 @@ RUN cd /src/kubify && \
     ./src/kubify/tool/kubify install_container
 ##
 
-# ENV KUBIFY_VERBOSE 0
+RUN rm -rf /root/.aws
 
 RUN echo "_______________________________________________________________________________"
 RUN echo "THANK YOU FOR CHOOSING KUBIFY, YOUR AN EPIC CODE MACHINE, HAPPY RAPID TESTING!!"
