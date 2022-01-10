@@ -42,7 +42,7 @@ What if you can test the entire cloud on your laptop?! Yes, the entire cloud, EX
 
 ```
 
-![KMSKEYS9000](./lib/docs/img/README_md_imgs/kms_keys.png)
+![KMSKEYS9000](./docs/img/README_md_imgs/kms_keys.png)
 
 ```
 
@@ -128,7 +128,7 @@ Make sure you have disk encryption on!!!!!!!!!!!!
 
 NOTE: `kubify []` (when you run any kubify command) will actually try to set this anyway, but double check .. 
 
-![DISKENC](./lib/docs/img/README_md_imgs/MAKE_SURE_YOU_HAVE_DISK_ENCRYPTION_ENABLED.png)
+![DISKENC](./docs/img/README_md_imgs/MAKE_SURE_YOU_HAVE_DISK_ENCRYPTION_ENABLED.png)
 
 !!THIS IS SUPER IMPORTANT!!
 
@@ -136,7 +136,7 @@ Make sure you are blocking all incoming connections to your workstation!!!!!!!!
 
 NOTE: `kubify []` (when you run any kubify command) will actually try to set this anyway, but double check .. 
 
-![BLOCKINCOMING](./lib/docs/img/README_md_imgs/MAKE_SURE_YOU_ARE_BLOCKING_INCOMING_CONNECTIONS.png)
+![BLOCKINCOMING](./docs/img/README_md_imgs/MAKE_SURE_YOU_ARE_BLOCKING_INCOMING_CONNECTIONS.png)
 
 
 
@@ -158,9 +158,9 @@ To hard reset your local docker environment (includes kubify cluster):
 
 1) Reset your workdir `rm -f ./._kubify_work`
 
-2) Reset your Docker Desktop (in settings or delete `/var/lib/docker/*` if on linux and restart docker)
+2) Reset your Docker Desktop (in settings or delete `/var/docker/*` if on linux and restart docker)
 
-![Reset Local K8s](./lib/docs/img/DEBUG_md_imgs/000001/reset_docker_desktop_k8s_stack.png)
+![Reset Local K8s](./docs/img/DEBUG_md_imgs/000001/reset_docker_desktop_k8s_stack.png)
 
 # If you want to Reset
 
@@ -272,7 +272,7 @@ For Devs/DevOps/DevSecOps/DevEx: Local testing (with the ENTIRE infra running lo
 
 
 
-![FAST9000](./lib/docs/img/README_md_imgs/fast.gif)
+![FAST9000](./docs/img/README_md_imgs/fast.gif)
 
 
 
@@ -356,7 +356,7 @@ Calibration of this tool: If a developer on day 1 can do all of these things wit
 
 
 
-![YES9000](./lib/docs/img/README_md_imgs/so-much-yes.gif)
+![YES9000](./docs/img/README_md_imgs/so-much-yes.gif)
 
 
 
@@ -490,7 +490,7 @@ This is what it feels like to run `kubify up`:
 
 
 
-![FIXED9000](./lib/docs/img/README_md_imgs/bugs-fixed-v1-ready.gif)
+![FIXED9000](./docs/img/README_md_imgs/bugs-fixed-v1-ready.gif)
 
 
 
@@ -502,7 +502,7 @@ So let's build awesome stuff together!!!
 
 
 
-![AUTOMATION9000](./lib/docs/img/README_md_imgs/iron-person.gif)
+![AUTOMATION9000](./docs/img/README_md_imgs/iron-person.gif)
 
 
 
@@ -516,7 +516,7 @@ In the Kubernetes world, this is truly revolutionary, one of a kind (due to loca
 
 
 
-![LEVELOVER9000](./lib/docs/img/README_md_imgs/level-up.gif)
+![LEVELOVER9000](./docs/img/README_md_imgs/level-up.gif)
 
 
 
@@ -530,11 +530,11 @@ Save huge on cloud costs. Run it all on your workstation. Run multiple environme
 
 The feeling your devs and devops get when the entire infra is portable and running on their workstation (for rapid testing on a full real environment):
 
-![OVER9000](./lib/docs/img/README_md_imgs/over-9000.gif)
+![OVER9000](./docs/img/README_md_imgs/over-9000.gif)
 
 `print laymans terms | summary`: This makes your DevOps, Security Teams and especially your devs multiple times as happy.
 
-![SERIOUSLYDEEPLYOVER9000](./lib/docs/img/README_md_imgs/the-feels.gif)
+![SERIOUSLYDEEPLYOVER9000](./docs/img/README_md_imgs/the-feels.gif)
 
 Still need motivation?: The Lead Developer and Creator, Willy Guggenheim, works next to 9 calm tiny chihuahuas, loves MetalCore, Latino Pop, Ambient, Classical, EDM & especially Hip Hop !!
 
@@ -542,7 +542,7 @@ Still need motivation (THAT IS EASY TO FIX): https://www.youtube.com/watch?v=7m0
 
 Kubify = The Open Source, Free, Portable, Fully Automated, DR-Enabled, Turn Key Head First Clou that let's you run your entire infra locally the same way as it deploys in the cloud !!
 
-![FUTUREOFDEVOPS9000](./lib/docs/img/README_md_imgs/the-future.gif)
+![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
 
 Made by devs, for devs
 

@@ -1,4 +1,4 @@
-![TURN_KEY_DEVOPS_RAPID_TESTER](./lib/docs/img/README_md_imgs/kubify-arch.drawio.png)
+![TURN_KEY_DEVOPS_RAPID_TESTER](./docs/img/README_md_imgs/kubify-arch.drawio.png)
 
 # Awesome !!
  
@@ -43,7 +43,7 @@ NOTE: Admin Rights are Not Required (from v9000.0.0+)
 - dev/env/ = what versions of services are deployed to what aws environment (including eks clusters, sls, cf and terraform kubify)
 - dev/svc/[*] = private services (folders and/or git submodule folders for backend eks services)
 - dev/pub/[*] = public services (folders and/or git submodule folders for frontend eks services)
-- lib/ = the magic
+- src/ = the magic
 
 # Concept
 
@@ -120,7 +120,7 @@ That's it! Thank you for coding and enjoy ..
 
 AutoPilot For Devs and DevOps ..
 
-![FUTUREOFDEVOPS9000](./lib/docs/img/README_md_imgs/the-future.gif)
+![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
 
 
 # Hashtags, More Hashtags

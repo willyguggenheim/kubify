@@ -3,7 +3,7 @@
 MY_PATH="`dirname \"$0\"`"
 echo "$MY_PATH"
 
-export PATH=$PATH:$MY_PATH/lib/src/kubify/tool
+export PATH=$PATH:$MY_PATH/src/kubify/tool
 
 # export KUBIFY_DEBUG=1
 kubify $@

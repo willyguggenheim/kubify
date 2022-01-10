@@ -1552,10 +1552,9 @@ function enable_firewall {
 
 
 function up_using_container {
-  cp -R ~/.aws lib/;
-  docker build -t kubify-local -f lib/Dockerfile lib/;
-  rm -rf lib/.aws;
-  # TODO: have it start container and print how to use..
+  mkdir -p ./._kubify_work;
+  cp -R ~/.aws ./._kubify_work/;
+  docker build -t kubify-local -f Dockerfile .;
 }
 
 function up {

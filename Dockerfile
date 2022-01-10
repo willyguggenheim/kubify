@@ -49,12 +49,12 @@ RUN curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.11.1/kind-$(uname)-amd64" &&
             mv ./kind /usr/local/bin/kind
 
 # TODO: this is a workaround (but I will improve this)
-COPY ./.aws /root/.aws
+COPY ./._kubify_work/.aws /root/.aws
 RUN ls /root/.aws || exit 1
 ##
 
 # Might be important, so just in case:
-COPY ./Docker-Entrypoint-User.sh /Docker-Entrypoint-User.sh
+COPY ./dock/Docker-Entrypoint-User.sh /Docker-Entrypoint-User.sh
 ENTRYPOINT /Docker-Entrypoint-User.sh
 #######
 
