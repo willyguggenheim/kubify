@@ -20,10 +20,6 @@ ENV KUBIFY_CI 0
 RUN apt update && apt -y upgrade
 #####
 
-# Your services folder gets mounted automatically (for Kubify's rapid testing magic):
-RUN mkdir -p /src/kubify/tools
-ADD ./src/kubify /src/kubify/src/kubify
-
 # Copying the automation magic here (for building a trusted hardened container):
 RUN mkdir -p /etc/ansible
 RUN apt update
@@ -57,15 +53,14 @@ COPY ./dock/Docker-Entrypoint-User.sh /Docker-Entrypoint-User.sh
 ENTRYPOINT /Docker-Entrypoint-User.sh
 #######
 
+# Your services folder gets mounted automatically (for Kubify's rapid testing magic):
+RUN mkdir -p /src/kubify/tools
+ADD ./src/kubify /src/kubify/src/kubify
+
 # TODO: Make sure "install" is upgraded to work with full local cluster testing (like "up" does) 
 #  in a way that does not break cicd usage (willy created "install" for cicd usage originally)
 RUN cd /src/kubify && \
-    ./src/kubify/tool/kubify install && \
-    rm -rf /src/kubify
-##
-
-######
-RUN rm -rf /root/.aws
+    ./src/kubify/tool/kubify install
 ##
 
 RUN echo "_______________________________________________________________________________"
