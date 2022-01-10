@@ -204,6 +204,7 @@
     - name: add user to docker group 3
       become: no
       shell: sudo chown $USER /var/run/docker.sock
+      ignore_errors: true
 
 ################################################################################
 # dns setup (real linux, not for WSL2)
