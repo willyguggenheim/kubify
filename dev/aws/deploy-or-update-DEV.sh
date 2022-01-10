@@ -8,6 +8,16 @@ echo "CLUSTERS (AND AUTOSCALERS) DEPLOYING.."
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 #####
+## Covers KMS Keys
+#####
+
+# ........
+
+# TODO: terraform apply (for KMS Keys)
+
+# ........
+
+#####
 ## Covers "eks" folder: Deploy/Update Clusters:
 #####
 
@@ -24,6 +34,9 @@ aws cloudformation list-stacks | grep kubify-cpu-dev-west && \
     eksctl upgrade cluster --approve --asg-access -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-west.yaml" || \
         eksctl create cluster --with-oidc --install-nvidia-plugin=false -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-west.yaml" || \
              echo "PLEASE NOTE: go ahead and ignore AlreadyExistsException warning above" &
+
+# TODO: eksctl utils enable-secrets-encryption -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-west.yaml" on each ..
+# https://eksctl.io/usage/kms-encryption/ # This Will Give Us a 4th Layer of Encrypting Secrets
 
 # East (HA us-east-1 dev DR) cluster deployments:
 export AWS_DEFAULT_REGION=us-east-1
