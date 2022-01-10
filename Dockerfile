@@ -26,12 +26,11 @@ ADD ./src/kubify /src/kubify/src/kubify
 
 # Copying the automation magic here (for building a trusted hardened container):
 RUN mkdir -p /etc/ansible
-ADD ./ansible.cfg /etc/ansible/
-
 RUN apt update
 RUN apt install -y git python3 ansible python3-pip curl wget
 RUN git config --global user.name "Willy Guggenheim"
 RUN git config --global user.email "willy@gugcorp.com"
+ADD ./ansible.cfg /etc/ansible/
 
 # PLEASE NOTE: https://snapcraft.io/store
 #  All of your Kubify services that have databases should have schema/seeds (for automated+rapid tests+infra to work properly) !! <- LOOK HERE PLEASE !!
