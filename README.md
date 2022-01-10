@@ -121,8 +121,10 @@ AutoPilot For Devs and DevOps ..
 ![FUTUREOFDEVOPS9000](./lib/docs/img/README_md_imgs/the-future.gif)
 
 Brought To You By: DJ EPIC CODER (Willy Guggenheim): 
+
 Follow Me On Spotify: https://open.spotify.com/user/1245085779?si=7b16f3916e08407
-Latest List (to Celebr8 v9000.0.1 Pre-Release): https://open.spotify.com/playlist/7f2JYY3RampGTtB0SKXcW8?si=a9d1b199fb284ade
+
+Latest List (to Celebr8 v9000.0.2 Pre-Release): https://open.spotify.com/playlist/7f2JYY3RampGTtB0SKXcW8?si=a9d1b199fb284ade
 
 # Hashtags, More Hashtags
  
