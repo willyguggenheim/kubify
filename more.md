@@ -23,6 +23,23 @@ So you might be using Docker-Compose for local testing, but that's not the entir
 What if you can test the entire cloud on your laptop?! Yes, the entire cloud, EXACTLY how it's deployed into AWS!!
 
 
+# By Why ?
+
+
+What if you can test the entire cloud on your laptop?! Yes, the entire cloud, EXACTLY how it's deployed into AWS!!
+
+Alright, so what if LocalStackAWS, Docker-Compose, Serverless-Framework, Terraform, CloudFormation, Kubernetes, EKS, Skaffold and Skater Hot Reloader had a baby? This is what it would look like. 1 Tool To Rule Them All, 1 Command To Test Anything In Your Org !!
+
+So you can code at lightning speed. So your commits are already tested in full on your machine. So you can feel confident about your code before you push it within the first 5 minutes of working at a company !!
+
+It's impossible right? Terraform and Docker-Compose will always be seperate tools?! NOPE. Clone This Repo if you want to live in the future !!
+
+
+# By Why ?
+
+Because Docker-Compose and Terraform are 2 different tools (Kubify is the combination of the two). Because Self Service Auto-DevOps needs a home (Kubify's strategy is most scalable for DevOps Support Model, Driving Self Service as First Class effort).
+
+What if you can rapid test changes to your Cloud Resources (Your ENTIRE Cloud), Services, Databases and Lambdas all at the same time, right on your Laptop? What if that was free? What if that was easy to migrate to?
 
 # Setup Your Workstation (in more detail)
 
@@ -560,6 +577,74 @@ Kubify = The Open Source, Free, Portable, Fully Automated, DR-Enabled, Turn Key 
 
 ![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
 
+# What Are All These Folders About?
+
+- dev/aws/ = eks 4-cluster ha+failover cpu+gpu deployers (deploys the 4 clusters: cpu+gpu in west & cpu+gpu in east for dr and ha)
+- dev/env/ = what versions of services are deployed to what aws environment (including eks clusters, sls, cf and terraform kubify)
+- dev/svc/[*] = private services (folders and/or git submodule folders for backend eks services)
+- dev/pub/[*] = public services (folders and/or git submodule folders for frontend eks services)
+- src/ = the magic
+
+# Concept
+
+- dev/svc/[*]/kubify.yml file = Docker-Compose, Serverless-Framework, Terraform, CloudFormation, all in 1 File and easy to Read (Accepts ShortHand Kubify SelfService Syntax and Even Real Full TF/CF/SLS/Manifest Syntax as Well) !!
+- `kubify start` = Ansible reads kubify.yml depends_on Service Chain (all Dependant Services Start in Order), Then It Automatically Creates CloudFormation Templates, Automatically Creates Terraform, ... and it Automatically Deploys Everything On Your Laptop (The SAME Way it Deploys To The Cloud, All AWS Resources On Your Laptop, Entire Cloud), Then All Of Those Services Listen For Code Changes (So You Can Edit Them All Locally At The Same Time) !!
+
+
+# Magic, Pure Magic!
+ 
+
+For more information on these topics, please review all the *.md files (more.md, docs.md and todo.md) ....
+
+This engine deploys your AWS resources for you (self service idioligy), both to the cloud AND to your workstation (you simulate the entire cloud on your laptop and rapid test on it) ....
+
+Streamlined Self Service for Developers (Auto DevOps)
+ 
+1 Yaml File Per Service (Easy to Migrate/Maintain)
+ 
+1 Yaml File Per Environment (Easy to Roll Back/Debug/Patch)
+ 
+Dependant Services Automatically Start Listen for Code Changes (Automatically)
+
+
+# Setup Your AWS Cloud
+ 
+ 
+1) Create Your KMS Keys (Example: 1 Per Env) and Add Users to Each.
+ 
+2) Run `dev/aws/deploy-or-update-DEV.sh` (Deploys and/or Updates Configs on your dev EKS Clusters).
+
+
+# Summary, Install/Reset Workstation
+
+
+1) Install Kubify:
+
+    Two Options:
+
+    A) Full Install (admin rights required during install): `./kubify up`
+
+    B) Install Inside Container (no admin rights required): `./kubify up_container`
+
+2) Uninstall Kubify:
+
+    Two Steps:
+
+    A) Delete The Kind-Kind Container: `kind delete cluster`
+
+    B) Delete RapidT Kubify Container: `docker-compose stop && docker-compose rm` 
+
+# Cleanup Cloud (For Testing Beta)
+
+```
+eksctl delete cluster --name "kubify-cpu-dev-west" --region us-west-2 &
+eksctl delete cluster --name "kubify-gpu-dev-west" --region us-west-2 &
+eksctl delete cluster --name "kubify-cpu-dev-east" --region us-east-1 &
+eksctl delete cluster --name "kubify-gpu-dev-east" --region us-east-1 &
+wait
+```
+
+
 
 # Sweet, Now What
  
@@ -571,7 +656,6 @@ Kubify = The Open Source, Free, Portable, Fully Automated, DR-Enabled, Turn Key 
 This is FREE (and Open Source) turn key DevOps revolutionary software that I worked VERY hard on. If you use Kubify, make sure to donate (if you use this in prod, then MAKE SURE AND DONATE PLEASE): [![](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?business=MSRFJHSGCKGCG&item_name=Kubify&currency_code=USD)
 
 You need music. Follow DJ EPIC CODER (Willy Guggenheim) on Spotify: https://open.spotify.com/user/1245085779?si=7b16f3916e08407
-
 
 Made by devs, for devs
 
