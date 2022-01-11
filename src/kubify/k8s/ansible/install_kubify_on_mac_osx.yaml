@@ -132,6 +132,12 @@
       when: homebrew_check.stat.exists
       ignore_errors: true
 
+    - name: Ensure Docker and Lens, VSCode are Installed
+       shell: brew install --cask docker visual-studio-code lens
+       when: homebrew_check.stat.exists
+       # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
+       ignore_errors: yes
+
     - name: Brew Kubesec (and Go) with Make
       shell: brew install shyiko/kubesec/kubesec
       when: homebrew_check.stat.exists
