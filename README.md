@@ -2,9 +2,7 @@
 
 # Awesome !!
  
-Well hello there..
-
-Ready to Simulate AWS Cloud Locally??
+Well hello there. Ready to Simulate AWS Cloud Locally??
 
 
 # By Why ?
@@ -14,7 +12,7 @@ Because Docker-Compose and Terraform are 2 different tools (so I fixed it).
 
 # Future State?
 
-Fork Terraform and build this into it.
+Fork Terraform and build Docker-Compose, LocalStack & 🛹 Skater Hot Reloader into it.
 
 
 # What do I need?
@@ -60,3 +58,5 @@ Just Docker (no admin rights required) !!
 #DEVEX
  
 💻
+
+🛹
