@@ -54,7 +54,7 @@ Option B,: Using a Local OS for Everything:
 
 1) Create Your KMS Keys (Example: 1 Per Env) and Add Users to Each.
 
-2) Run `dev/aws/deploy-or-update-DEV.sh` (to deploy your clusters if not already exists or/and update/upgrade your clusters config anytime)
+2) Run `dev/aws/deploy-west-east-eks-dev.sh` (to deploy your clusters if not already exists or/and update/upgrade your clusters config anytime)
 
  - this manages 4 eks clusters:
 

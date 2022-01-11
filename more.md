@@ -612,7 +612,7 @@ Dependant Services Automatically Start Listen for Code Changes (Automatically)
  
 1) Create Your KMS Keys (Example: 1 Per Env) and Add Users to Each.
  
-2) Run `dev/aws/deploy-or-update-DEV.sh` (Deploys and/or Updates Configs on your dev EKS Clusters).
+2) Run `dev/aws/deploy-west-east-eks-dev.sh` (Deploys and/or Updates Configs on your dev EKS Clusters).
 
 
 # Summary, Install/Reset Workstation

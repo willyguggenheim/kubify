@@ -28,7 +28,7 @@ Just Docker (no admin rights required) !!
 # Setup Your AWS Cloud
  
  
-`dev/aws/deploy-or-update-DEV.sh`
+`./kubify deploy_cloud dev`
 
 
 # Summary, Install/Reset Workstation

@@ -3201,6 +3201,18 @@ $KUBECTL wait --namespace ingress-nginx \
 
 }
 
+function deploy_cloud {
+
+  if [ "$1" ]; then
+    echo "IN PROGRESS: Deploying Kubify Cloud to \"${1}\" Environment.."
+    ${GIT_DIR}/dev/aws/deploy-west-east-eks-${1}.sh
+  else
+    echo "You did not specify an Env arg, default is dev Environment, so:"
+    echo "IN PROGRESS: Deploying Kubify Cloud to \"dev\" Environment.."
+    ${GIT_DIR}/dev/aws/deploy-west-east-eks-dev.sh
+  fi
+
+}
 
 
 ####
