@@ -1189,7 +1189,7 @@ function configure {
 
 function install {
   set -e
-  echo "Ensuring system dependencies"
+  echo "Installing/Updating/Patching/Re-Configuring Kubify (Ansible Playbooks Are Deploying) ..."
   if [[ "$OSTYPE" == *"darwin"* ]]; then
     {
       # https://github.com/dennisausbremen/macOStrap/blob/a7665473faf87677a5c01e8a66d26508379f950f/functions/installer.sh
@@ -2943,7 +2943,7 @@ function publish_cicd_build_image {
 
 function install_container {
   set -e
-  echo "Ensuring system dependencies"
+  echo "Installing/Updating/Patching/Re-Configuring Kubify (Ansible Playbooks Are Deploying) ..."
   if [[ "$OSTYPE" == *"darwin"* ]]; then
     {
       # https://github.com/dennisausbremen/macOStrap/blob/a7665473faf87677a5c01e8a66d26508379f950f/functions/installer.sh
@@ -3201,6 +3201,18 @@ $KUBECTL wait --namespace ingress-nginx \
 
 }
 
+function deploy_cloud {
+
+  if [ "$1" ]; then
+    echo "IN PROGRESS: Deploying Kubify Cloud to \"${1}\" Environment.."
+    ${GIT_DIR}/dev/aws/deploy-west-east-eks-${1}.sh
+  else
+    echo "You did not specify an Env arg, default is dev Environment, so:"
+    echo "IN PROGRESS: Deploying Kubify Cloud to \"dev\" Environment.."
+    ${GIT_DIR}/dev/aws/deploy-west-east-eks-dev.sh
+  fi
+
+}
 
 
 ####
