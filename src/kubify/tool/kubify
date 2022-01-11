@@ -1189,7 +1189,7 @@ function configure {
 
 function install {
   set -e
-  echo "Ensuring system dependencies"
+  echo "Installing/Updating/Patching/Re-Configuring Kubify (Ansible Playbooks Are Deploying) ..."
   if [[ "$OSTYPE" == *"darwin"* ]]; then
     {
       # https://github.com/dennisausbremen/macOStrap/blob/a7665473faf87677a5c01e8a66d26508379f950f/functions/installer.sh
@@ -2943,7 +2943,7 @@ function publish_cicd_build_image {
 
 function install_container {
   set -e
-  echo "Ensuring system dependencies"
+  echo "Installing/Updating/Patching/Re-Configuring Kubify (Ansible Playbooks Are Deploying) ..."
   if [[ "$OSTYPE" == *"darwin"* ]]; then
     {
       # https://github.com/dennisausbremen/macOStrap/blob/a7665473faf87677a5c01e8a66d26508379f950f/functions/installer.sh

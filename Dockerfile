@@ -70,7 +70,7 @@ WORKDIR /src/kubify/
 COPY ./._kubify_work/certs /src/kubify/._kubify_work/certs
 COPY ./.git /src/kubify/.git
 # for debugging container, uncomment next line  #TODO: comment again
-ENV KUBIFY_VERBOSE 1
+# ENV KUBIFY_VERBOSE 1
 RUN ./kubify install_container
 RUN ./kubify _up_container || echo "supposed to fail, just doing caching"
 ##
