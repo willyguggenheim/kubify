@@ -232,6 +232,11 @@
         executable: npm
       with_items: "{{ node_packages }}"
 
+    - name: Remove Conflicting Kind Installed With Brew (TODO switch it to use brew)
+      shell: brew remove kind || true
+      when: homebrew_check.stat.exists
+      ignore_errors: true
+
     - name: install apps via url
       become: no
       get_url:
