@@ -19,16 +19,12 @@ Fork Terraform and build this into it.
 
 # What do I need?
 
-Mac, Linux, Windows or any Docker
-
-AWS Account(s) and Access to AWS KMS, EKS and EC2 (or for the CICD to have access)
+Mac, Linux, Windows or any Docker and AWS.
 
 
 # Dependencies For Runtime?
  
-Just Docker !!
-
-NOTE: Admin Rights are Not Required (from v9000.0.0+)
+Just Docker (no admin rights required) !!
 
 
 # Setup Your AWS Cloud
