@@ -22,6 +22,37 @@ So you might be using Docker-Compose for local testing, but that's not the entir
 
 What if you can test the entire cloud on your laptop?! Yes, the entire cloud, EXACTLY how it's deployed into AWS!!
 
+
+
+# Setup Your Workstation (in more detail)
+
+Option A: Using a Container (Everything Installs/Runs in Container, NEW Approach): `./kubify up_container` (or "docker-compose up")
+```
+# Example Workflow:
+./kubify up_container # this is install (only need to run once)
+docker-compose run "cd dev/svc/example-django-simple-svc && kubify start"
+# make service code changes, rapid tester reloads automatically..
+# That's it! Happy Coding!
+# If you want to shutdown:
+docker-compose stop # if you want to stop the engine container
+kind stop # if you want to stop the cluster
+```
+    
+
+Option B: Using your OS (Direct Install Deps, Rest Runs in Containers): `./kubify up` (or "kubify install")
+```
+# Example Workflow:
+./kubify up # this is install (only need to run once)
+cd dev/svc/example-django-simple-svc # service that you want to rapid test 
+../../../kubify secrets edit dev # if you want to edit secrets (then you would push)
+../../../kubify start # starts service and listens for code changes (all dependant Services/Databases/awsResources run first)
+# make service code changes, rapid tester reloads automatically..
+# That's it! Happy Coding!
+# If you want to shutdown:
+kind stop # if you want to stop the cluster
+```
+
+
 # Setup
 
 
@@ -55,7 +86,6 @@ export KUBIFY_CONTAINER_REGISTRY=ecr
 export UNIQUE_COMPANY_ACRONYM=os
 
 export EDITOR="subl -w "
-
 
 
 ## Local Testing ##
@@ -529,6 +559,19 @@ Still need motivation (THAT IS EASY TO FIX): https://www.youtube.com/watch?v=7m0
 Kubify = The Open Source, Free, Portable, Fully Automated, DR-Enabled, Turn Key Head First Clou that let's you run your entire infra locally the same way as it deploys in the cloud !!
 
 ![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
+
+
+# Sweet, Now What
+ 
+
+1) Rapid Test Your Services Until They Work (Make Code Changes to Multiple Services and Watch them Hot Reload, Unit Test, ..) !!
+ 
+2) Contribute to this repository (it will remain open source for the long run) ..
+ 
+This is FREE (and Open Source) turn key DevOps revolutionary software that I worked VERY hard on. If you use Kubify, make sure to donate (if you use this in prod, then MAKE SURE AND DONATE PLEASE): [![](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?business=MSRFJHSGCKGCG&item_name=Kubify&currency_code=USD)
+
+You need music. Follow DJ EPIC CODER (Willy Guggenheim) on Spotify: https://open.spotify.com/user/1245085779?si=7b16f3916e08407
+
 
 Made by devs, for devs
 

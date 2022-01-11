@@ -56,7 +56,7 @@ NOTE: Admin Rights are Not Required (from v9000.0.0+)
 
 For more information on these topics, please review all the *.md files (more.md, docs.md and todo.md) ....
 
-Your entire AWS Cloud, deployed exactly the same way, while coding on the containers it deploys, while those containers hot reload and automatically run unit tests, while giving you a debugger port for your IDE, while knowing that. This is amazing ..
+This engine deploys your AWS resources for you (self service idioligy), both to the cloud AND to your workstation (you simulate the entire cloud on your laptop and rapid test on it) ....
 
 Streamlined Self Service for Developers (Auto DevOps)
  
@@ -86,53 +86,34 @@ eksctl delete cluster --name "kubify-gpu-dev-east" --region us-east-1 &
 wait
 ```
 
- 
-# Setup Your Workstation
 
-Option A: Using a Container (Everything Installs/Runs in Container, NEW Approach): `./kubify up_container` (or "docker-compose up")
-```
-# Example Workflow:
-./kubify up_container # this is install (only need to run once)
-docker-compose run "cd dev/svc/example-django-simple-svc && kubify start"
-# make service code changes, rapid tester reloads automatically..
-# That's it! Happy Coding!
-# If you want to shutdown:
-docker-compose stop # if you want to stop the engine container
-kind stop # if you want to stop the cluster
-```
-    
+# Summary, Install/Reset Workstation
 
-Option B: Using your OS (Direct Install Deps, Rest Runs in Containers): `./kubify up` (or "kubify install")
-```
-# Example Workflow:
-./kubify up # this is install (only need to run once)
-cd dev/svc/example-django-simple-svc # service that you want to rapid test 
-../../../kubify secrets edit dev # if you want to edit secrets (then you would push)
-../../../kubify start # starts service and listens for code changes (all dependant Services/Databases/awsResources run first)
-# make service code changes, rapid tester reloads automatically..
-# That's it! Happy Coding!
-# If you want to shutdown:
-kind stop # if you want to stop the cluster
-```
- 
- 
 
-# Cool, Now What
- 
+1) Install Kubify:
 
-1) Rapid Test Your Services Until They Work (Make Code Changes to Multiple Services and Watch them Hot Reload, Unit Test, ..) !!
- 
-2) Contribute to this repository (it will remain open source for the long run) ..
- 
-This is FREE (and Open Source) turn key DevOps revolutionary software that I worked VERY hard on. If you use Kubify, make sure to donate (if you use this in prod, then MAKE SURE AND DONATE PLEASE): [![](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?business=MSRFJHSGCKGCG&item_name=Kubify&currency_code=USD)
+    Two Options:
 
-You need music. Follow DJ EPIC CODER (Willy Guggenheim) on Spotify: https://open.spotify.com/user/1245085779?si=7b16f3916e08407
+    A) Full Install (admin rights required during install): `./kubify up`
 
-That's it! Thank you for coding and enjoy ..
+    B) Install Inside Container (no admin rights required): `./kubify up_container`
+
+2) Uninstall Kubify:
+
+    Two Steps:
+
+    A) Delete The Kind-Kind Container: `kind delete cluster`
+
+    B) Delete RapidT Kubify Container: `docker-compose stop && docker-compose rm` 
+
+
+
+# Thank You
 
 AutoPilot For Devs and DevOps ..
 
 ![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
+
 
 
 # Hashtags, More Hashtags
