@@ -117,7 +117,42 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 mkdir -p "$DIR/../../../._kubify_work"
 mkdir -p ~/kubify
 
-## Deps for vars
+## Deps for vars (since needed before ansible if brand new os)
+
+if ! [ -x "$(command -v git)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    xcode-select --install
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            sudo apt-get update &> /dev/null
+            sudo apt-get install -y git &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            sudo yum install -y git &> /dev/null
+      fi
+  fi
+fi
+
+if ! [ -x "$(command -v docker)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    brew install --cask docker
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            sudo apt-get update &> /dev/null
+            sudo apt-get install -y docker-ce &> /dev/null || sudo apt-get install -y docker &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            sudo yum install -y docker-ce &> /dev/null || sudo yum install -y docker &> /dev/null
+      fi
+  fi
+fi
+
+if [[ "$OSTYPE" == *"darwin"* ]]; then
+  if ! [ -x "$(command -v brew)" ]; then
+    # https://brew.sh
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+fi
 
 if ! [ -x "$(command -v sudo)" ]; then
       if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
@@ -139,27 +174,6 @@ if ! [ -x "$(command -v wget)" ]; then
       fi
       if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
             sudo yum install -y wget &> /dev/null
-      fi
-  fi
-fi
-
-if [[ "$OSTYPE" == *"darwin"* ]]; then
-  if ! [ -x "$(command -v brew)" ]; then
-    # https://brew.sh
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  fi
-fi
-
-if ! [ -x "$(command -v git)" ]; then
-  if [[ "$OSTYPE" == *"darwin"* ]]; then
-    xcode-select --install
-  elif [[ "$OSTYPE" == *"linux"* ]]; then
-      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-            sudo apt-get update &> /dev/null
-            sudo apt-get install -y git &> /dev/null
-      fi
-      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
-            sudo yum install -y git &> /dev/null
       fi
   fi
 fi
