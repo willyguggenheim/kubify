@@ -102,9 +102,14 @@ Easy Cloud Env, Easy Patching, Easy Version Rollback and Quality Commits, FAST!!
 
 The Future, NOW. Developer's Dreams are Coming True Here..
 
+```
+echo 
+"
 Thank you for watching,
 Willy Guggenheim
 Guggenheim Inc.
+"
+```
  
 # Hashtags, More Hashtags
 
