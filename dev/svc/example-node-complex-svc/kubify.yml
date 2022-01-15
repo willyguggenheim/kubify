@@ -5,6 +5,8 @@ metadata:
   name: example-node-complex-svc
 init: |
   echo "run init for example-node-complex-svc/app"
+depends_on:
+  - zookeeper-svc
 dev:
   sync:
     'app/***': 'app/'

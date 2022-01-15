@@ -171,8 +171,9 @@
 #use the new depends_on feature..
 
 - name: Deploying Cloudformation templates with deployCloudformation.sh
-  shell: "{{ app_kubify_dir }}/deployCloudformation.sh"
+  shell: "{{ app_kubify_dir }}/deployCloudformation.sh 2>/dev/null"
   when: app_name is not search(".*localstack.*")
+  ignore_errors: true
 
 
 

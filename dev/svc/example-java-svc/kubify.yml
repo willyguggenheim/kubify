@@ -5,6 +5,8 @@ metadata:
   name: example-java-svc
 init: |
   echo "run migrations for example-java-svc/app"
+depends_on:
+  - zookeeper-svc
 dev:
   # "sync" is if you want Kubify to listen for code changes (other option is 
   # using some cli listener for code changes in release.scripts.start)

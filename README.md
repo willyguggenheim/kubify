@@ -37,24 +37,51 @@ Mac, Linux, Windows or any Docker and AWS.
 Just Docker (no admin rights required) !!
  
  
-# Setup Your AWS Cloud
+# Start Cloud
  
-1) Create kms key alias named like kubify_secrets_[env]
+1) Create kms key(s) alias named like kubify_secrets_[env] (for each env)
 
 2) `./kubify deploy_cloud dev`
  
+
+# Stop Cloud
+
+`./kubify delete_clouds_testing`
  
-# Summary, Install/Reset Workstation
+
+# Start Debugging
  
-A) To install/run on your OS directly: `./kubify up`
+A) To install/run on your OS directly (brew): `./kubify up`
  
 or
  
-B) To install/run in a container: `./kubify up_container`
- 
+B) To install/run in a container (no admin rights): `./kubify up_container`
+
+
+# Rapid Test
+
+```
+cd dev/svc/example-node-complex-svc
+../../../kubify_verbose start
+# open another terminal (because you need to work on another dependant service at the same time)
+cd dev/svc/example-flask-svc
+../../../kubify_verbose start
+# make changes to both service's app folders (or any files/folders enabled in "sync" in kubify.yml)
+```
+
+
+# Stop Debugging
+
+`./kubify down`
+
  
 ![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
- 
+
+Your own REAL FULL environment (local & cloud). Entire AWS Cloud on Your Workstation!!
+
+Easy Cloud Env, Easy Patching, Easy Version Rollback and Quality Commits, FAST!!
+
+The Future, NOW. Developer's Dreams are Coming True Here..
  
 # Hashtags, More Hashtags
 💻💻💻💻💻💻💻💻💻💻💻💻
