@@ -1,8 +1,11 @@
 ![TURN_KEY_DEVOPS_RAPID_TESTER](./docs/img/README_md_imgs/kubify-arch.drawio.png)
 
+
 # Welcome
 
 Well hello there! Welcome to Kubify. The Turn-Key DevOps OS Stack.
+
+The world needs a fully Open Source and FREE DevOps Stack. Devs Approved.
 
 
 # Awesome !!
@@ -30,18 +33,18 @@ Mac, Linux, Windows or any Docker and AWS.
  
  
 # Dependencies For Runtime?
+
 Just Docker (no admin rights required) !!
  
  
 # Setup Your AWS Cloud
  
 1) Create kms key alias named like kubify_secrets_[env]
+
 2) `./kubify deploy_cloud dev`
  
  
- 
 # Summary, Install/Reset Workstation
- 
  
 A) To install/run on your OS directly: `./kubify up`
  
