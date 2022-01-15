@@ -7,7 +7,7 @@ Well hello there! Welcome to Kubify. The Turn-Key DevOps OS Stack.
 
 The world needs a fully Open Source and FREE DevOps Stack. Devs Approved.
 
-It's time to put Developers first.
+It's time to make your Developers happy.
 
 
 # Awesome !!
