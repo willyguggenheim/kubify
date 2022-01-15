@@ -2533,6 +2533,8 @@ function secrets {
               # mv "${SECRETS_FILE}"_SED "${SECRETS_FILE}"
           fi
 
+          aws kms list-aliases | grep kubify | grep ${ENV} || echo " please create your KMS key with it's alias, ARN should be like \"${!KEY_VAR}\" "
+
           kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" || kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" --cleartext
           echo "Reloading secrets in-cluster"
           _generate_manifests "$APP_DIR"
@@ -3146,8 +3148,8 @@ EOF
 
   docker-compose up -d
   docker ps | grep kubify-kubify-1
-  docker exec -it --privileged -w "/src/kubify" "kubify-kubify-1" ./kubify _up_container
-  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" ../../../kubify run
+  docker exec -it --privileged -w "/src/kubify" "kubify-kubify-1" ./kubify_verbose _up_container
+  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" ../../../kubify_verbose run
   # docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" "../../../kubify run"
 
 }
