@@ -35,8 +35,10 @@ Mac, Linux, Windows or any Docker and AWS.
 # Dependencies For Runtime?
 
 Just Docker (no admin rights required) !!
+
+NOTE: Docker Automatically Installs (if not already installed) ..
  
- 
+
 # Start Cloud
  
 1) Create kms key(s) alias named like kubify_secrets_[env] (for each env)
@@ -74,7 +76,14 @@ cd dev/svc/example-flask-svc
 
 `./kubify down`
 
- 
+
+# Pro Tips
+
+1) Your services (that have databases defined in kubify.yml) need to have Migrations/Seeds..
+
+2) Please Contribute to Open Source!!
+
+
 ![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
 
 Your own REAL FULL environment (local & cloud). Entire AWS Cloud on Your Workstation!!
