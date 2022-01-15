@@ -297,7 +297,7 @@ Think cloud, but open source. DevOps needs to evolve into DevOps 4.0, 4.5 and 5.
 
 ✅✅✅✅✅✅✅✅
 
-For SREs (where every second of uptime counts): Mult-Cloud is also important. Really important. Think site/api/microservice/mlops multi-cloud redundancy turn key!!
+For SREs (where every second of uptime counts): Mult-Cloud is also important. Really important. Think site/api/microservice/mlops multi-region redundancy turn key!!
 
 For Devs/DevOps/DevSecOps/DevEx: Local testing (with the ENTIRE infra running locally perfectly) should be a click of a button (THIS FEATURE IS LIVE)!!
 

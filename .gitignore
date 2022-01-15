@@ -94,7 +94,3 @@ obj
 # Liscense Keys External
 kubedb.txt
 **/kubedb.txt
-
-# Liscense Keys Internal
-kubify-multicloud.txt
-**/kubify-multicloud.txt
