@@ -133,6 +133,7 @@ if ! [ -x "$(command -v git)" ]; then
   fi
 fi
 
+
 if ! [ -x "$(command -v docker)" ]; then
   if [[ "$OSTYPE" == *"darwin"* ]]; then
     brew install --cask docker
@@ -143,6 +144,19 @@ if ! [ -x "$(command -v docker)" ]; then
       fi
       if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
             sudo yum install -y docker-ce &> /dev/null || sudo yum install -y docker &> /dev/null
+      fi
+  fi
+fi
+
+if ! [ -x "$(command -v docker ps)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    open --background -a Docker
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            systemctl start docker || service docker start
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            systemctl start docker || service docker start
       fi
   fi
 fi
