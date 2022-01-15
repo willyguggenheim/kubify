@@ -19,7 +19,6 @@ export KUBIFY_DEBUG=${KUBIFY_VERBOSE:-0}
 export KUBIFY_CONTAINER="docker.io/library/kubify_kubify:latest" # from docker-compose up
 export KUBIFY_CONTAINER_NAME="kubify-engine"
 
-
 ACTUAL_OS_TYPE=mac
 FILE=/proc/version
 if test -f "$FILE"; then
@@ -151,19 +150,65 @@ fi
 
 ## Deps for vars
 
-# if ! [ -x "$(command -v git)" ]; then
-#   if [[ "$OSTYPE" == *"darwin"* ]]; then
-#     xcode-select --install
-#   elif [[ "$OSTYPE" == *"linux"* ]]; then
-#       if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-#             sudo apt-get update &> /dev/null
-#             sudo apt-get install -y git &> /dev/null
-#       fi
-#       if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
-#             sudo yum install -y git &> /dev/null
-#       fi
-#   fi
-# fi
+if ! [ -x "$(command -v sudo)" ]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            apt-get update &> /dev/null
+            apt-get install -y sudo &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            yum install -y sudo &> /dev/null
+      fi
+fi
+
+if ! [ -x "$(command -v wget)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    brew install wget &> /dev/null
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            sudo apt-get update &> /dev/null
+            sudo apt-get install -y wget &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            sudo yum install -y wget &> /dev/null
+      fi
+  fi
+fi
+
+if [[ "$OSTYPE" == *"darwin"* ]]; then
+  if ! [ -x "$(command -v brew)" ]; then
+    # https://brew.sh
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+fi
+
+if ! [ -x "$(command -v git)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    xcode-select --install
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            sudo apt-get update &> /dev/null
+            sudo apt-get install -y git &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            sudo yum install -y git &> /dev/null
+      fi
+  fi
+fi
+
+if ! [ -x "$(command -v aws)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    brew install awscli &> /dev/null
+    brew link awscli &> /dev/null
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            sudo apt-get update &> /dev/null
+            sudo apt-get install -y awscli &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            sudo yum install -y awscli &> /dev/null
+      fi
+  fi
+fi
 
 git config --get user.name &> /dev/null
 if [ $? -eq 1 ]; then
