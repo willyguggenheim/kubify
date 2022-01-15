@@ -51,7 +51,7 @@ NOTE: Docker Automatically Installs (if not already installed) ..
 `./kubify delete_clouds_testing`
  
 
-# Start Debugging
+# Start Debugging Workflow
  
 A) To install/run on your OS directly (brew): `./kubify up`
  
@@ -60,7 +60,7 @@ or
 B) To install/run in a container (no admin rights): `./kubify up_container`
 
 
-# Rapid Test
+# Rapid Test Workflow
 
 ```
 cd dev/svc/example-node-complex-svc
@@ -72,7 +72,17 @@ cd dev/svc/example-flask-svc
 ```
 
 
-# Stop Debugging
+# Environment Isolation
+
+Security Minute: You should not give prod access to anyone. How?
+```
+cd dev/svc/example-node-complex-svc
+ENV=prod ./kubify start
+# hot patch services locally (and with the full real environment) without access to data!!
+```
+
+
+# Stop Debugging Workflow
 
 `./kubify down`
 
