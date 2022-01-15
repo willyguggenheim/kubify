@@ -101,7 +101,10 @@ Your own REAL FULL environment (local & cloud). Entire AWS Cloud on Your Worksta
 Easy Cloud Env, Easy Patching, Easy Version Rollback and Quality Commits, FAST!!
 
 The Future, NOW. Developer's Dreams are Coming True Here..
- 
+
+Thank you for watching,
+Willy Guggenheim
+Guggenheim Inc.
  
 # Hashtags, More Hashtags
 
