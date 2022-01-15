@@ -117,37 +117,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 mkdir -p "$DIR/../../../._kubify_work"
 mkdir -p ~/kubify
 
-if [[ "$OSTYPE" == *"darwin"* ]]; then
-  if ! [ -x "$(command -v brew)" ]; then
-    # https://brew.sh
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  fi
-fi
-
-MUST_INSTALL_YQ=0
-~/kubify/yq --version &> /dev/null || MUST_INSTALL_YQ=1
-~/kubify/yq --version | grep 4.7.0 &> /dev/null || MUST_INSTALL_YQ=1
-if [[ "$OSTYPE" == *"darwin"* && "$MUST_INSTALL_YQ" == 1 ]]; then
-  wget https://github.com/mikefarah/yq/releases/download/v4.7.0/yq_darwin_amd64.tar.gz -O - |\
-    tar xz && mv ./yq_darwin_amd64 ~/kubify/yq &> /dev/null | true
-  rm -f ./yq_darwin_amd64*
-  chmod +x ~/kubify/yq
-  ~/kubify/yq --version | grep 4.7.0 &> /dev/null || exit 1
-elif [[ "$OSTYPE" == *"linux"* && "$MUST_INSTALL_YQ" == 1 ]]; then
-  wget https://github.com/mikefarah/yq/releases/download/v4.7.0/yq_linux_amd64.tar.gz -O - |\
-    tar xz && mv ./yq_linux_amd64 ~/kubify/yq &> /dev/null
-  rm -f ./yq_linux_amd64*
-  chmod +x ~/kubify/yq
-  ~/kubify/yq --version | grep 4.7.0 &> /dev/null || exit 1
-fi
-
-
-if [[ $KUBIFY_CI != '1' ]]; then
-  PROFILE=${KUBIFY_PROFILE:-kind-kind}
-else
-  PROFILE=${KUBIFY_PROFILE:-default}
-fi
-
 ## Deps for vars
 
 if ! [ -x "$(command -v sudo)" ]; then
@@ -208,6 +177,38 @@ if ! [ -x "$(command -v aws)" ]; then
             sudo yum install -y awscli &> /dev/null
       fi
   fi
+fi
+
+
+if [[ "$OSTYPE" == *"darwin"* ]]; then
+  if ! [ -x "$(command -v brew)" ]; then
+    # https://brew.sh
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+fi
+
+MUST_INSTALL_YQ=0
+~/kubify/yq --version &> /dev/null || MUST_INSTALL_YQ=1
+~/kubify/yq --version | grep 4.7.0 &> /dev/null || MUST_INSTALL_YQ=1
+if [[ "$OSTYPE" == *"darwin"* && "$MUST_INSTALL_YQ" == 1 ]]; then
+  wget https://github.com/mikefarah/yq/releases/download/v4.7.0/yq_darwin_amd64.tar.gz -O - |\
+    tar xz && mv ./yq_darwin_amd64 ~/kubify/yq &> /dev/null | true
+  rm -f ./yq_darwin_amd64*
+  chmod +x ~/kubify/yq
+  ~/kubify/yq --version | grep 4.7.0 &> /dev/null || exit 1
+elif [[ "$OSTYPE" == *"linux"* && "$MUST_INSTALL_YQ" == 1 ]]; then
+  wget https://github.com/mikefarah/yq/releases/download/v4.7.0/yq_linux_amd64.tar.gz -O - |\
+    tar xz && mv ./yq_linux_amd64 ~/kubify/yq &> /dev/null
+  rm -f ./yq_linux_amd64*
+  chmod +x ~/kubify/yq
+  ~/kubify/yq --version | grep 4.7.0 &> /dev/null || exit 1
+fi
+
+
+if [[ $KUBIFY_CI != '1' ]]; then
+  PROFILE=${KUBIFY_PROFILE:-kind-kind}
+else
+  PROFILE=${KUBIFY_PROFILE:-default}
 fi
 
 git config --get user.name &> /dev/null
