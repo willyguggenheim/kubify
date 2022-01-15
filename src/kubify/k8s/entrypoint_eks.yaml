@@ -56,9 +56,9 @@ spec:
         - name: home-mount-ssh
           hostPath:
             path: /root/.ssh
-        - name: home-mount-gitconfig
-          hostPath:
-            path: /root/.gitconfig
+        # - name: home-mount-gitconfig
+        #   hostPath:
+        #     path: /root/.gitconfig
         - name: docker-sock
           hostPath:
             path: "{{DOCKER_SOCKET_FILE_LOCATION}}"
@@ -83,8 +83,8 @@ spec:
               name: home-mount-aws
             - mountPath: /root/.ssh
               name: home-mount-ssh
-            - mountPath: /root/.gitconfig
-              name: home-mount-gitconfig
+            # - mountPath: /root/.gitconfig
+            #   name: home-mount-gitconfig
             - mountPath: "{{DOCKER_SOCKET_FILE_LOCATION}}"
               name: docker-sock
             # - mountPath: /root/.npmrc

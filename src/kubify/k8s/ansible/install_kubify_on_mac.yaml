@@ -64,32 +64,35 @@
 
   pre_tasks:
     - name: Ensuring Homebrew Is Installed
-      stat:
-        path: "/usr/local/bin/brew"
+      command: 'brew --version'
       register: "homebrew_check"
+
+    - name: Ensuring Rosetta
+      command: 'softwareupdate --install-rosetta --agree-to-license'
+      ignore_errors: True
+
+    - name: Ensuring Git
+      command: 'git version || xcode-select --install'
+      ignore_errors: True
+
 
     - name: Fail If Homebrew Is Not Installed and install_homebrew_if_missing Is False
       fail:
         msg: "Homebrew is missing...Install from http://brew.sh/"
       when: >
-            not homebrew_check.stat.exists and
+            homebrew_check.rc != 0 and
             not install_homebrew_if_missing
   
     - name: Installing Homebrew
       command: '/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"'
       when: >
-            not homebrew_check.stat.exists and
+            homebrew_check.rc != 0 and
             install_homebrew_if_missing
-
-    - name: Ensuring Homebrew Is Installed 2
-      stat:
-        path: "/usr/local/bin/brew"
-      register: "homebrew_check"
 
     - name: Installing Homebrew
       command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
       when: >
-            not homebrew_check.stat.exists and
+            homebrew_check.rc != 0 and
             install_homebrew_if_missing
 
     - name: Ensuring Homebrew Is Installed 3
@@ -101,7 +104,6 @@
     - name: Updating Homebrew
       homebrew:
         update_homebrew: true
-      when: homebrew_check.stat.exists
       ignore_errors: True
 
     # WORKAROUND 001: brew install kubesec #gives an error
@@ -119,25 +121,22 @@
       homebrew_tap:
         name: "{{ brew_taps }}"
         state: "present"
-      when: homebrew_check.stat.exists
 
     # - name: Remove Homebrew packages
     #   homebrew:
     #     name: "{{ brew_remove_packages }}"
     #     state: "absent"
-    #   when: homebrew_check.stat.exists
+    #   
 
     - name: Installing & Upgrading Homebrew Packages
       homebrew:
         name: "{{ brew_packages }}"
         state: "upgraded"
         upgrade_all: "{{ upgrade_homebrew_packages }}"
-      when: homebrew_check.stat.exists
       ignore_errors: true
 
     - name: Ensure Docker and Lens, VSCode are Installed
       shell: brew install --cask docker visual-studio-code lens
-      when: homebrew_check.stat.exists
       ignore_errors: yes
 
     - name: Brew linking ensure kubectl
@@ -152,7 +151,6 @@
         name: "{{ brew_packages_with_force_link }}"
         state: "upgraded"
         upgrade_all: "{{ upgrade_homebrew_packages }}"
-      when: homebrew_check.stat.exists
       ignore_errors: true
 
     # https://docs.ansible.com/ansible/latest/collections/community/general/homebrew_module.html
@@ -161,14 +159,12 @@
         name: "{{ brew_packages_with_force_link }}"
         state: "linked"
         upgrade_all: "{{ upgrade_homebrew_packages }}"
-      when: homebrew_check.stat.exists
 
     - name: Installing & Upgrading Homebrew Cask Packages
       homebrew_cask:
         name: "{{ brew_cask_packages }}"
         state: "upgraded"
         upgrade_all: "{{ upgrade_homebrew_packages }}"
-      when: homebrew_check.stat.exists
       # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
       ignore_errors: yes
 
@@ -177,23 +173,21 @@
         name: "{{ brew_cask_packages }}"
         state: "installed"
         upgrade_all: "{{ upgrade_homebrew_packages }}"
-      when: homebrew_check.stat.exists
+      ignore_errors: true
+      
 
     - name: Ensure Docker
       shell: brew install --cask docker
-      when: homebrew_check.stat.exists
       # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
       ignore_errors: yes
 
     - name: Ensure VSCode
       shell: brew install --cask visual-studio-code
-      when: homebrew_check.stat.exists
       # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
       ignore_errors: yes
 
     - name: Ensure Lens
       shell: brew install --cask lens
-      when: homebrew_check.stat.exists
       # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
       ignore_errors: yes
 
@@ -203,7 +197,7 @@
 
     # - name: Brew Kubesec (and Go) with Make
     #   shell: brew install shyiko/kubesec/kubesec
-    #   when: homebrew_check.stat.exists
+    #   
     #   # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
     #   ignore_errors: yes
     # WORKAROUND 001: brew install kubesec #gives an error
@@ -233,7 +227,6 @@
 
     - name: Upgrade minikube
       shell: brew upgrade minikube
-      when: homebrew_check.stat.exists
       ignore_errors: true
 
     # - name: Install helm
@@ -241,7 +234,7 @@
     #     brew unlink kubernetes-helm
     #     brew install {{ helm_url }}
     #     brew link kubernetes-helm
-    #   when: homebrew_check.stat.exists
+    #   
 
     - name: install via pip
       become: no
@@ -260,11 +253,10 @@
 
     - name: Remove Conflicting Kind Installed With Brew (TODO switch it to use brew)
       shell: brew remove kind || true
-      when: homebrew_check.stat.exists
       ignore_errors: true
 
     - name: install apps via url
-      become: no
+      become: yes
       get_url:
         url: "{{ item.url }}"
         dest: "{{ local_bin }}/{{ item.bin }}"
@@ -407,6 +399,16 @@
       # when: file_docker_settings.stat.exists
       register: docker_config_changed
       when: docker_check_config_6.found
+
+    - name: docker desktop to use it's new framework
+      lineinfile:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: useVirtualizationFramework
+        # set to true for M1?
+        line: '  "useVirtualizationFramework" : true,'
+      tags: ['docker']
+      when: file_docker_settings.stat.exists
+      register: docker_config_changed
 
     # - name: enable docker-desktop flavor of kubernetes, part 2
     #   lineinfile:

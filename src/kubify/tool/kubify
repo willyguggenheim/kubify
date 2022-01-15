@@ -9,7 +9,7 @@ export ANSIBLE_PYTHON_INTERPRETER=auto_silent
 
 export KUBIFY_EDITOR="code --wait "
 export EDITOR="code --wait "
-export UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM:-changethis} # <--- CHANGE THIS TO YOUR COMPANY ACRONYM
+export UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM:-changethis2} # <--- CHANGE THIS TO YOUR COMPANY ACRONYM
 export KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY:-ecr}
 # FOR DEBUG SET THIS TO 1:
 export KUBIFY_VERBOSE=${KUBIFY_VERBOSE:-0}
@@ -767,9 +767,9 @@ function configure_cluster {
     # Testing New Version:
     helm repo add appscode https://charts.appscode.com/stable/
     helm repo update
-    KUBEDB_VERSION=v2021.08.23
+    KUBEDB_VERSION=v2021.12.21
     # KUBEDB_VERSION=v0.20.0
-    KUBEDB_CATALOG_VERSION=v2021.08.23
+    KUBEDB_CATALOG_VERSION=v2021.12.21
     # must use "demo" namespace in free edition
     helm install kubedb appscode/kubedb \
       --version ${KUBEDB_VERSION} \
@@ -1203,10 +1203,10 @@ function install {
       fi
       if [[ `uname -m` == "arm64" ]]; then
         echo "M1/M2 detected (Arm)"
-        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac_osx_m1_m1x.yaml"
+        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac.yaml"
       else
         # if "${K8S_DIR}/../../../._kubify_work/"
-        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac_osx.yaml"
+        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac.yaml"
       fi
     } &> "$KUBIFY_OUT"
 
@@ -1290,8 +1290,8 @@ nodes:
     containerPath: /root/.aws
   - hostPath: "${HOME}/.ssh"
     containerPath: /root/.ssh
-  - hostPath: "${HOME}/.gitconfig"
-    containerPath: /root/.gitconfig
+  # - hostPath: "${HOME}/.gitconfig"
+  #   containerPath: /root/.gitconfig
   - hostPath: /var/run/docker.sock
     containerPath: /var/run/docker.sock
     propagation: HostToContainer
@@ -3041,8 +3041,8 @@ nodes:
     containerPath: /root/.aws
   - hostPath: "${HOME}/.ssh"
     containerPath: /root/.ssh
-  - hostPath: "${HOME}/.gitconfig"
-    containerPath: /root/.gitconfig
+  # - hostPath: "${HOME}/.gitconfig"
+  #   containerPath: /root/.gitconfig
   - hostPath: /var/run/docker.sock
     containerPath: /var/run/docker.sock
     propagation: HostToContainer
