@@ -9,14 +9,14 @@ export ANSIBLE_PYTHON_INTERPRETER=auto_silent
 
 export KUBIFY_EDITOR="code --wait "
 export EDITOR="code --wait "
-export UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM:-changethis2} # <--- CHANGE THIS TO YOUR COMPANY ACRONYM
+export UNIQUE_COMPANY_ACRONYM=${UNIQUE_COMPANY_ACRONYM:-changethis} # <--- CHANGE THIS TO YOUR COMPANY ACRONYM
 export KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY:-ecr}
 # FOR DEBUG SET THIS TO 1:
 export KUBIFY_VERBOSE=${KUBIFY_VERBOSE:-0}
 # FOR DEBUG SET THIS TO 1:
 export KUBIFY_DEBUG=${KUBIFY_VERBOSE:-0}
 # willy0912/kubify-local:9000
-export KUBIFY_CONTAINER="docker.io/library/kubify_kubify:latest" # from docker-compose up
+export KUBIFY_CONTAINER="docker.io/library/kubify-kubify-1:latest" # from docker-compose up
 export KUBIFY_CONTAINER_NAME="kubify-engine"
 
 ACTUAL_OS_TYPE=mac
@@ -247,6 +247,7 @@ if [ $? -eq 1 ]; then
     read GIT_FIRST_LAST
     FIRST_LAST=${GIT_FIRST_LAST}
     git config --set user.name "${GIT_FIRST_LAST}" &> /dev/null
+    git config --global user.name "${GIT_FIRST_LAST}" &> /dev/null
 fi
 
 git config --get user.email &> /dev/null
@@ -255,6 +256,7 @@ if [ $? -eq 1 ]; then
     read GIT_EMAIL
     EMAIL=${EMAIL}
     git config --set user.email "${GIT_EMAIL}" &> /dev/null
+    git config --global user.email "${GIT_EMAIL}" &> /dev/null
 fi
 
 if ! [ -x "$(command -v git config --get user.email)" ]; then
@@ -3143,10 +3145,10 @@ EOF
   stat ~/kubify/kubedb.txt || touch ~/kubify/kubedb.txt
 
   docker-compose up -d
-  docker ps | grep kubify_kubify_1
-  docker exec -it --privileged -w "/src/kubify" "kubify_kubify_1" ./kubify _up_container
-  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify_kubify_1" ../../../kubify run
-  # docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify_kubify_1" "../../../kubify run"
+  docker ps | grep kubify-kubify-1
+  docker exec -it --privileged -w "/src/kubify" "kubify-kubify-1" ./kubify _up_container
+  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" ../../../kubify run
+  # docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" "../../../kubify run"
 
 }
 
