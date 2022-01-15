@@ -16,9 +16,8 @@ export KUBIFY_VERBOSE=${KUBIFY_VERBOSE:-0}
 # FOR DEBUG SET THIS TO 1:
 export KUBIFY_DEBUG=${KUBIFY_VERBOSE:-0}
 # willy0912/kubify-local:9000
-export KUBIFY_CONTAINER="docker.io/library/kubify_kubify:latest" # from docker-compose up
+export KUBIFY_CONTAINER="docker.io/library/kubify-kubify-1:latest" # from docker-compose up
 export KUBIFY_CONTAINER_NAME="kubify-engine"
-
 
 ACTUAL_OS_TYPE=mac
 FILE=/proc/version
@@ -118,6 +117,99 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 mkdir -p "$DIR/../../../._kubify_work"
 mkdir -p ~/kubify
 
+## Deps for vars (since needed before ansible if brand new os)
+
+if ! [ -x "$(command -v git)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    xcode-select --install
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            sudo apt-get update &> /dev/null
+            sudo apt-get install -y git &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            sudo yum install -y git &> /dev/null
+      fi
+  fi
+fi
+
+
+if ! [ -x "$(command -v docker)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    brew install --cask docker
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            sudo apt-get update &> /dev/null
+            sudo apt-get install -y docker-ce &> /dev/null || sudo apt-get install -y docker &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            sudo yum install -y docker-ce &> /dev/null || sudo yum install -y docker &> /dev/null
+      fi
+  fi
+fi
+
+if ! [ -x "$(docker ps)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    open --background -a Docker
+    echo "waiting until docker ps command works (please confirm it's running).."
+    for i in 1 2 3 4 5; do docker ps && break || sleep 5; done
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            systemctl start docker || service docker start || true
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            systemctl start docker || service docker start || true
+      fi
+  fi
+fi
+
+if [[ "$OSTYPE" == *"darwin"* ]]; then
+  if ! [ -x "$(command -v brew)" ]; then
+    # https://brew.sh
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+fi
+
+if ! [ -x "$(command -v sudo)" ]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            apt-get update &> /dev/null
+            apt-get install -y sudo &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            yum install -y sudo &> /dev/null
+      fi
+fi
+
+if ! [ -x "$(command -v wget)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    brew install wget &> /dev/null
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            sudo apt-get update &> /dev/null
+            sudo apt-get install -y wget &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            sudo yum install -y wget &> /dev/null
+      fi
+  fi
+fi
+
+if ! [ -x "$(command -v aws)" ]; then
+  if [[ "$OSTYPE" == *"darwin"* ]]; then
+    brew install awscli &> /dev/null
+    brew link awscli &> /dev/null
+  elif [[ "$OSTYPE" == *"linux"* ]]; then
+      if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
+            sudo apt-get update &> /dev/null
+            sudo apt-get install -y awscli &> /dev/null
+      fi
+      if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
+            sudo yum install -y awscli &> /dev/null
+      fi
+  fi
+fi
+
+
 if [[ "$OSTYPE" == *"darwin"* ]]; then
   if ! [ -x "$(command -v brew)" ]; then
     # https://brew.sh
@@ -149,36 +241,22 @@ else
   PROFILE=${KUBIFY_PROFILE:-default}
 fi
 
-## Deps for vars
-
-# if ! [ -x "$(command -v git)" ]; then
-#   if [[ "$OSTYPE" == *"darwin"* ]]; then
-#     xcode-select --install
-#   elif [[ "$OSTYPE" == *"linux"* ]]; then
-#       if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-#             sudo apt-get update &> /dev/null
-#             sudo apt-get install -y git &> /dev/null
-#       fi
-#       if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
-#             sudo yum install -y git &> /dev/null
-#       fi
-#   fi
-# fi
-
 git config --get user.name &> /dev/null
 if [ $? -eq 1 ]; then
     echo "What is your first and last name (for git config)?"
-    read GIT_FIRST_LAST
+    read -t 10 GIT_FIRST_LAST
     FIRST_LAST=${GIT_FIRST_LAST}
-    git config --set user.name "${GIT_FIRST_LAST}" &> /dev/null
+    git config --set user.name "${GIT_FIRST_LAST}" &> /dev/null || git config --set user.name "Iwas NeverGivenAname" &> /dev/null
+    git config --global user.name "${GIT_FIRST_LAST}" &> /dev/null || git config --global user.name "Iwas NeverGivenAname" &> /dev/null
 fi
 
 git config --get user.email &> /dev/null
 if [ $? -eq 1 ]; then
     echo "What is your email address (for git config)?"
-    read GIT_EMAIL
+    read -t 10 GIT_EMAIL
     EMAIL=${EMAIL}
-    git config --set user.email "${GIT_EMAIL}" &> /dev/null
+    git config --set user.email "${GIT_EMAIL}" &> /dev/null || git config --set user.email "awesome@sauce.whoknows" &> /dev/null
+    git config --global user.email "${GIT_EMAIL}" &> /dev/null || git config --global user.email "awesome@sauce.whoknows" &> /dev/null
 fi
 
 if ! [ -x "$(command -v git config --get user.email)" ]; then
@@ -767,9 +845,9 @@ function configure_cluster {
     # Testing New Version:
     helm repo add appscode https://charts.appscode.com/stable/
     helm repo update
-    KUBEDB_VERSION=v2021.08.23
+    KUBEDB_VERSION=v2021.12.21
     # KUBEDB_VERSION=v0.20.0
-    KUBEDB_CATALOG_VERSION=v2021.08.23
+    KUBEDB_CATALOG_VERSION=v2021.12.21
     # must use "demo" namespace in free edition
     helm install kubedb appscode/kubedb \
       --version ${KUBEDB_VERSION} \
@@ -1203,10 +1281,10 @@ function install {
       fi
       if [[ `uname -m` == "arm64" ]]; then
         echo "M1/M2 detected (Arm)"
-        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac_osx_m1_m1x.yaml"
+        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac.yaml"
       else
         # if "${K8S_DIR}/../../../._kubify_work/"
-        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac_osx.yaml"
+        ansible-playbook --connection=local --inventory=127.0.0.1, "${K8S_DIR}/ansible/install_kubify_on_mac.yaml"
       fi
     } &> "$KUBIFY_OUT"
 
@@ -1290,8 +1368,8 @@ nodes:
     containerPath: /root/.aws
   - hostPath: "${HOME}/.ssh"
     containerPath: /root/.ssh
-  - hostPath: "${HOME}/.gitconfig"
-    containerPath: /root/.gitconfig
+  # - hostPath: "${HOME}/.gitconfig"
+  #   containerPath: /root/.gitconfig
   - hostPath: /var/run/docker.sock
     containerPath: /var/run/docker.sock
     propagation: HostToContainer
@@ -2455,6 +2533,8 @@ function secrets {
               # mv "${SECRETS_FILE}"_SED "${SECRETS_FILE}"
           fi
 
+          aws kms list-aliases | grep kubify | grep ${ENV} || echo " please create your KMS key with it's alias, ARN should be like \"${!KEY_VAR}\" "
+
           kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" || kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" --cleartext
           echo "Reloading secrets in-cluster"
           _generate_manifests "$APP_DIR"
@@ -3041,8 +3121,8 @@ nodes:
     containerPath: /root/.aws
   - hostPath: "${HOME}/.ssh"
     containerPath: /root/.ssh
-  - hostPath: "${HOME}/.gitconfig"
-    containerPath: /root/.gitconfig
+  # - hostPath: "${HOME}/.gitconfig"
+  #   containerPath: /root/.gitconfig
   - hostPath: /var/run/docker.sock
     containerPath: /var/run/docker.sock
     propagation: HostToContainer
@@ -3067,10 +3147,10 @@ EOF
   stat ~/kubify/kubedb.txt || touch ~/kubify/kubedb.txt
 
   docker-compose up -d
-  docker ps | grep kubify_kubify_1
-  docker exec -it --privileged -w "/src/kubify" "kubify_kubify_1" ./kubify _up_container
-  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify_kubify_1" ../../../kubify run
-  # docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify_kubify_1" "../../../kubify run"
+  docker ps | grep kubify-kubify-1
+  docker exec -it --privileged -w "/src/kubify" "kubify-kubify-1" ./kubify_verbose _up_container
+  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" ../../../kubify_verbose run
+  # docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" "../../../kubify run"
 
 }
 

@@ -113,9 +113,9 @@
         state: present
         filename: docker
 
-    - name: "APT - install 'docker-ce'"
+    - name: "APT - install 'docker'"
       apt:
-        name: "docker-ce"
+        name: "docker"
         update_cache: yes
 
     - name: Configure aws profile
