@@ -148,15 +148,17 @@ if ! [ -x "$(command -v docker)" ]; then
   fi
 fi
 
-if ! [ -x "$(command -v docker ps)" ]; then
+if ! [ -x "$(docker ps)" ]; then
   if [[ "$OSTYPE" == *"darwin"* ]]; then
     open --background -a Docker
+    echo "waiting until docker ps command works (please confirm it's running).."
+    for i in 1 2 3 4 5; do docker ps && break || sleep 5; done
   elif [[ "$OSTYPE" == *"linux"* ]]; then
       if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-            systemctl start docker || service docker start
+            systemctl start docker || service docker start || true
       fi
       if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
-            systemctl start docker || service docker start
+            systemctl start docker || service docker start || true
       fi
   fi
 fi
