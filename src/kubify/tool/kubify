@@ -244,19 +244,19 @@ fi
 git config --get user.name &> /dev/null
 if [ $? -eq 1 ]; then
     echo "What is your first and last name (for git config)?"
-    read GIT_FIRST_LAST
+    read -t 10 GIT_FIRST_LAST
     FIRST_LAST=${GIT_FIRST_LAST}
-    git config --set user.name "${GIT_FIRST_LAST}" &> /dev/null
-    git config --global user.name "${GIT_FIRST_LAST}" &> /dev/null
+    git config --set user.name "${GIT_FIRST_LAST}" &> /dev/null || git config --set user.name "Iwas NeverGivenAname" &> /dev/null
+    git config --global user.name "${GIT_FIRST_LAST}" &> /dev/null || git config --global user.name "Iwas NeverGivenAname" &> /dev/null
 fi
 
 git config --get user.email &> /dev/null
 if [ $? -eq 1 ]; then
     echo "What is your email address (for git config)?"
-    read GIT_EMAIL
+    read -t 10 GIT_EMAIL
     EMAIL=${EMAIL}
-    git config --set user.email "${GIT_EMAIL}" &> /dev/null
-    git config --global user.email "${GIT_EMAIL}" &> /dev/null
+    git config --set user.email "${GIT_EMAIL}" &> /dev/null || git config --set user.email "awesome@sauce.whoknows" &> /dev/null
+    git config --global user.email "${GIT_EMAIL}" &> /dev/null || git config --global user.email "awesome@sauce.whoknows" &> /dev/null
 fi
 
 if ! [ -x "$(command -v git config --get user.email)" ]; then
