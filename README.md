@@ -7,6 +7,8 @@ Well hello there! Welcome to Kubify. The Turn-Key DevOps OS Stack.
 
 The world needs a fully Open Source and FREE DevOps Stack. Devs Approved.
 
+It's time to put Developers first.
+
 
 # Awesome !!
 
@@ -103,12 +105,10 @@ Easy Cloud Env, Easy Patching, Easy Version Rollback and Quality Commits, FAST!!
 The Future, NOW. Developer's Dreams are Coming True Here..
 
 ```
-echo 
-"
-Thank you for watching,
+Thank you for contributing to open source software!
+Thank you for your interest in Kubify!
 Willy Guggenheim
 Guggenheim Inc.
-"
 ```
  
 # Hashtags, More Hashtags
