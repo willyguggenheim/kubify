@@ -14,7 +14,10 @@
 
 This should be a Top-Level Repo in your git* org. The utopia (repo of repos, clone 1 for everything, including all possible submodule services). Automate all the rest of your org's repos in your fork of this repo.  💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
 
-1 Repo to Rule Them All (When you On-Board at a Company, You ONLY Need to Clone This 1 Repo and run 1 Command, THAT'S ALL IT TAKES, Top-Level Repo in Your Company) .. Even if you have 1000 Service Repos, 1000 DevOps Repos and 1000 MLOps Repos, Those All Become Git SubModules to This Repo (You Only Need to Clone This 1 Repo and Run 1 Command to On-Board to a Company, Including Automatic Configuration of Your Developer Environment Without The Need for Admin Rights or Access to Sensitive Environments, Ready to Code within Your First 2 Minutes, Easy to Understand, MAXIMUM CODE and SUPER EFFICIENCY for your super hard-working Devs) !!!!
+1 Repo to Rule Them All (When you On-Board at a Company, You ONLY Need to Clone This 1 Repo and run 1 Command, THAT'S ALL IT TAKES)
+(Top-Level Repo in Your Company) .. Even if you have 1000 Service Repos, 1000 DevOps Repos and 1000 MLOps Repos, Those All Become Git SubModules to This Repo (You Only Need to Clone This 1 Repo and Run 1 Command to On-Board to a Company, Including Automatic Configuration of Your Developer Environment Without The Need for Admin Rights or Access to Sensitive PII or Environments!!
+
+Enable all the your hard working Devs to be their best!! So your company can iterate FAST!!
 
 # What advantages does `kubify start` rapid testing framework give ?
 
@@ -70,7 +73,7 @@ Option B,: Using a Local OS for Everything:
 
 # What
 
-We need to tap into the true potential of Kubernetes. Let's also deeply automate Kubernetes. Let's do all of our rapid coding/testing (from now on) on a real working full environment (this is where Kubernetes REALLY shines, but no one seems to be using this local rapid testing featureset that I have seen, so I made this SUPER-EPIC-ROCKSTAR-CODER repo to fill that void and to build out a full-blown turn-key DevOps solution). As a developer, I know how hard you work, I know what you run into daily, it's a pattern. Let's build next-gen coding and self-service Auto-DevOps pure-genius patterns together!
+We need to tap into the true potential of Kubernetes. Let's also deeply automate Kubernetes. Let's do all of our rapid coding/testing (from now on) on a real working full environment (this is where Kubernetes REALLY shines, but no one seems to be using this local rapid testing featureset that I have seen, so I made this SUPER-EPIC-ROCKSTAR-CODER repo to fill that void and to build out a full-blown turn-key DevOps solution). As a developer, I know how hard you work, I know how hard all of us devs work, I know your pains, I know what you run into daily, it's a pattern, it can be fixed, with THIS repo/. Let's build next-gen coding and self-service Auto-DevOps pure-genius patterns together!!
 
 Kubify is a DevEx (Developer-First) Kubernetes Turn Key full SDLC Framework (DevOps Solution) that allows you to easily rapid test entire infra locally (the same way as it's deployed), driving amazing quality in services' code commits (with MAXIMUM efficiency) !! 💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
 
