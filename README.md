@@ -11,7 +11,7 @@ It's time to make your Developers happy.
 
 Guggenheim Inc (Willy Guggenheim) created Kubify to bring awesomeness to EKS.
 
-Working closely with AWS on making this more important in the OS communities (QuickStart Flavor Coming Soon)...
+QuickStart Flavor Coming Soon (Another way to deploy AWS OS EKS Kubify).
 
 💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
 ![HOWDY_DO_PARTNER_PROGRAM](./docs/img/README_md_imgs/AWS-Partner.jpeg)
