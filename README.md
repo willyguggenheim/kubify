@@ -9,17 +9,14 @@ The world needs a fully Open Source and FREE DevOps Stack. Devs Approved.
 
 It's time to make your Developers happy.
 
-```
-Guggenheim Inc (Willy Guggenheim) created Kubify to help you code faster
-and to make EKS amazing...
-Please CONTRIBUTE to this OS effort!!
-```
-
 QuickStart Flavor Coming Soon (Another way to deploy AWS OS EKS Kubify).
 
 💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
 
 ![HOWDY_DO_PARTNER_PROGRAM](./docs/img/README_md_imgs/AWS-Partner.jpeg)
+
+* Guggenheim Inc (Willy Guggenheim) created Kubify, but you should contribute as well..
+* Please CONTRIBUTE to this OS effort (help me, help you)!!
 
 💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
 
