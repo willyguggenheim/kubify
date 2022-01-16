@@ -1,6 +1,5 @@
 ![TURN_KEY_DEVOPS_RAPID_TESTER](./docs/img/README_md_imgs/kubify-arch.drawio.png)
 
-![HOWDY_DO_PARTNER_PROGRAM](./docs/img/README_md_imgs/AWS-Partner.jpeg)
 
 # Welcome
 
@@ -10,6 +9,13 @@ The world needs a fully Open Source and FREE DevOps Stack. Devs Approved.
 
 It's time to make your Developers happy.
 
+Guggenheim Inc (Willy Guggenheim) created Kubify to bring awesomeness to EKS.
+
+This is an AWS-blessed Partner Program Solution that will soon have a QuickStart flavor.
+
+💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
+![HOWDY_DO_PARTNER_PROGRAM](./docs/img/README_md_imgs/AWS-Partner.jpeg)
+💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
 
 # Awesome !!
 
@@ -114,7 +120,9 @@ Guggenheim Inc.
  
 # Hashtags, More Hashtags
 
-💻💻💻💻💻💻💻💻💻💻💻💻
+💻💻💻💻💻💻💻💻💻💻💻💻💻💻
+
+#BUILDAMAZINGTHINGS!!!
 
 #AUTOPILOTFORDEVOPS
 
@@ -131,5 +139,3 @@ Guggenheim Inc.
 💻💻
  
 🛹
- 
-
