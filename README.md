@@ -13,9 +13,11 @@ Guggenheim Inc (Willy Guggenheim) created Kubify to bring awesomeness to EKS.
 
 QuickStart Flavor Coming Soon (Another way to deploy AWS OS EKS Kubify).
 
-💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
+💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
+
 ![HOWDY_DO_PARTNER_PROGRAM](./docs/img/README_md_imgs/AWS-Partner.jpeg)
-💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
+
+💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
 
 # Awesome !!
 
@@ -116,6 +118,8 @@ Thank you for contributing to open source software!
 Thank you for your interest in Kubify!
 Willy Guggenheim
 Guggenheim Inc.
+https://open.spotify.com/user/1245085779?si=7b16f3916e08407c
+https://www.youtube.com/watch?v=7m0n8h8b89M
 ```
  
 # Hashtags, More Hashtags
