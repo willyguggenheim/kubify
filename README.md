@@ -13,9 +13,10 @@ QuickStart Flavor Coming Soon (Another way to deploy AWS OS EKS Kubify).
 
 💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
 
+* Guggenheim Inc (Willy Guggenheim) created Kubify, but you should contribute as well..
+
 ![HOWDY_DO_PARTNER_PROGRAM](./docs/img/README_md_imgs/AWS-Partner.jpeg)
 
-* Guggenheim Inc (Willy Guggenheim) created Kubify, but you should contribute as well..
 * Please CONTRIBUTE to this OS effort (help me, help you)!!
 
 💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
