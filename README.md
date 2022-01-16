@@ -118,9 +118,11 @@ Thank you for contributing to open source software!
 Thank you for your interest in Kubify!
 Willy Guggenheim
 Guggenheim Inc.
-https://open.spotify.com/user/1245085779?si=7b16f3916e08407c
-https://www.youtube.com/watch?v=7m0n8h8b89M
 ```
+
+Two super important links:
+* https://open.spotify.com/user/1245085779?si=7b16f3916e08407c
+* https://www.youtube.com/watch?v=7m0n8h8b89M
  
 # Hashtags, More Hashtags
 
