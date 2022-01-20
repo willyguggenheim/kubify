@@ -1539,6 +1539,7 @@ function down {
            kind delete cluster --name docker-desktop
            kind delete cluster --name kind
            kind get clusters
+           # CAN ALSO: brew services stop dnsmasq
            rm -rf "${WORK_DIR}"
       fi
     fi
