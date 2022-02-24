@@ -66,11 +66,11 @@ NOTE: Docker Automatically Installs (if not already installed) ..
 
 # Start Debugging Workflow
  
-A) To install/run on your OS directly (brew): `./kubify up`
+A) To install/run on your OS directly (needs admin rights, still mostly docker): `./kubify up`
  
 or
  
-B) To install/run in a container (no admin rights): `./kubify up_container`
+B) To install/run in a container (no admin rights, all docker): `./kubify up_container`
 
 
 # Rapid Test Workflow
