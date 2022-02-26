@@ -75,7 +75,7 @@ B) To install/run in a container (no admin rights, all docker): `./kubify up_con
 
 # Rapid Test Workflow
 
-```
+```bash
 cd dev/svc/example-node-complex-svc
 ../../../kubify_verbose start
 # open another terminal (because you need to work on another dependant service at the same time)
@@ -88,7 +88,7 @@ cd dev/svc/example-flask-svc
 # Environment Isolation
 
 Security Minute: You should not give prod access to anyone. How?
-```
+```bash
 cd dev/svc/example-node-complex-svc
 ENV=prod ./kubify start
 # hot patch services locally (and with the full real environment) without access to data!!
@@ -102,9 +102,11 @@ ENV=prod ./kubify start
 
 # Pro Tips
 
-1) Your services (that have databases defined in kubify.yml) need to have Migrations/Seeds..
+1) Your services (that have databases defined in kubify.yml) need to have Migrations/Seeds. This way when someone clones your repo, the service simply works with 1 simple command `kubify start` and is 100% ready to code.
 
-2) Please Contribute to Open Source!!
+2) If you "sync" (kubify.yml) your site-packages/node_modules/cmake_cache/apt_cache/yum_cache/apk_cache then your service will load/re-load super fast and you can code multiple services at once with 1 simple `kubify start` command.
+
+3) Please Contribute to this Open Source Repository, so we can help each other build amazing things!!
 
 
 ![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
