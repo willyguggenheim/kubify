@@ -1,3 +1,16 @@
+# Actions
+
+[![Docker](https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml)
+[![PyPi](https://img.shields.io/pypi/v/kubify.svg)](https://pypi.python.org/pypi/kubify)
+[![PyUp](https://pyup.io/repos/github/willyguggenheim/kubify/shield.svg)](https://pyup.io/repos/github/willyguggenheim/kubify/)
+[![Docs](https://readthedocs.org/projects/kubify/badge/?version=latest)](hhttps://kubify.readthedocs.io/en/latest/?version=latest)
+
+
+# Version
+
+9001.0.0
+
+
 ![TURN_KEY_DEVOPS_RAPID_TESTER](./docs/img/README_md_imgs/kubify-arch.drawio.png)
 
 
@@ -30,9 +43,11 @@ Fully Automated. First Class DevEx. Developers-First. Happy Devs. Fixes Spot. No
 You need your own environment, you need to test in real environment, you need to modify multiple services at the same time (without waiting for builds), you need to know your commit works before pushing it and you need the entire cloud on your laptop to do so..
 
 
-# By Why ?
+# But Why ?
  
 Because Docker-Compose and Terraform are 2 different tools (so I fixed it).
+
+This bridges the gap between developers and devops engineers, by create full self service.
  
 
 # Future State?
@@ -124,10 +139,13 @@ Willy Guggenheim
 Guggenheim Inc.
 ```
 
-Two super important links:
-* https://open.spotify.com/user/1245085779?si=7b16f3916e08407c
-* https://www.youtube.com/watch?v=7m0n8h8b89M
+
+# Development Leads
+
+* Willy Guggenheim <Willy.Guggenheim@Kubify.com>
+* Philip Tolk <Philip.Tolk@Kubify.com>
  
+
 # Hashtags, More Hashtags
 
 💻💻💻💻💻💻💻💻💻💻💻💻💻💻
