@@ -16,7 +16,7 @@ default.profraw
 .aws
 **/.aws
 # NOTE: COMMENT THE NEXT LINE IF YOU ARE IN A PRIVATE FORK (AND MAKE SURE TO UNCOMMENT IF YOU ARE CONTRIBUTING TO OS PUBLIC REPO OR ANY PUBLIC FORK):
-dev/svc/*/secrets
+services/*/secrets
 credentials
 **/credentials
 

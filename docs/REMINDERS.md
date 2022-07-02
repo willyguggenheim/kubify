@@ -12,3 +12,4 @@ auto-install both local and cloud on kubify start
 21) STORY_IN_PROGRESS: dr: automate This DR Failover Solution https://aws.amazon.com/blogs/containers/operating-a-multi-regional-stateless-application-using-amazon-eks/
 22) STORY_IN_PROGRESS: dr: automate KubeDB Multi-Region
 
+https://pypi.org/project/awshelper/ for sso (automated check and challange)

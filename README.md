@@ -91,10 +91,10 @@ B) To install/run in a container (no sudo/system rights, all docker, light versi
 # Rapid Test Workflow
 
 ```bash
-cd dev/svc/example-node-complex-svc
+cd services/example-node-complex-svc
 ../../../kubify_verbose start
 # open another terminal (because you need to work on another dependant service at the same time)
-cd dev/svc/example-flask-svc
+cd services/example-flask-svc
 ../../../kubify_verbose start
 # make changes to both service's app folders (or any files/folders enabled in "sync" in kubify.yml)
 ```
@@ -104,7 +104,7 @@ cd dev/svc/example-flask-svc
 
 Security Minute: You should not give prod access to anyone. How?
 ```bash
-cd dev/svc/example-node-complex-svc
+cd services/example-node-complex-svc
 ENV=prod ./kubify start
 # hot patch services locally (and with the full real environment) without access to data!!
 ```

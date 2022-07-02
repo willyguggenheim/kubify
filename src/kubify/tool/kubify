@@ -1506,7 +1506,7 @@ function up {
    open /Applications/Lens.app || echo ""
   fi
 
-  # cd dev/svc/localstack-aws-svc
+  # cd services/localstack-aws-svc
   # ../../kubify run &> /dev/null &
   # cd -
 
@@ -1803,8 +1803,8 @@ function dir {
 
   if [ -z "$service" ]; then
     echo $S_DIR
-  elif [ -d "${GIT_DIR}/dev/svc/$service" ]; then
-    echo ${S_DIR}dev/svc/$service
+  elif [ -d "${GIT_DIR}/services/$service" ]; then
+    echo ${S_DIR}services/$service
   elif [ -d "${GIT_DIR}/dev/pub/$service" ]; then
     echo ${S_DIR}dev/pub/$service
   else
@@ -1826,8 +1826,8 @@ function run-all {
     service=${split[0]}
     version=${version[1]:-latest}
 
-    if [ -d "${GIT_DIR}/dev/svc/$service" ]; then
-      cd "${GIT_DIR}/dev/svc/$service"
+    if [ -d "${GIT_DIR}/services/$service" ]; then
+      cd "${GIT_DIR}/services/$service"
       kubify run $version
     elif [ -d "${GIT_DIR}/dev/pub/$service" ]; then
       cd "${GIT_DIR}/dev/pub/$service"
@@ -1851,8 +1851,8 @@ function build-run-all {
     split=$(echo $entry | tr ":" "\n")
     service=${split[0]}
 
-    if [ -d "${GIT_DIR}/dev/svc/$service" ]; then
-      cd "${GIT_DIR}/dev/svc/$service"
+    if [ -d "${GIT_DIR}/services/$service" ]; then
+      cd "${GIT_DIR}/services/$service"
       kubify run
     elif [ -d "${GIT_DIR}/dev/pub/$service" ]; then
       cd "${GIT_DIR}/dev/pub/$service"
@@ -1876,8 +1876,8 @@ function stop-all {
     service=${split[0]}
     version=${version[1]:-latest}
 
-    if [ -d "${GIT_DIR}/dev/svc/$service" ]; then
-      cd "${GIT_DIR}/dev/svc/$service"
+    if [ -d "${GIT_DIR}/services/$service" ]; then
+      cd "${GIT_DIR}/services/$service"
       ../../kubify stop
     elif [ -d "${GIT_DIR}/dev/pub/$service" ]; then
       cd "${GIT_DIR}/dev/pub/$service"
@@ -2008,7 +2008,7 @@ function build-start-kubify {
     trap 'kill $BGPID1;kill $BGPID2; exit' INT
 
     echo "The date before build is: `date`"
-    cd ${WORK_DIR}/../dev/svc/be-svc
+    cd ${WORK_DIR}/../services/be-svc
     kubify start be-svc &> ${WORK_DIR}/${ENV}/logs/build-run-kubify-CORE_be-svc.log &
     BGPID1=$!
     cd ${WORK_DIR}/../dev/pub/fe-svc
@@ -2675,8 +2675,8 @@ function deploy {
   APP_VERSION=$5
   CONFIG_VERSION=$6
 
-  if [ -d "${GIT_DIR}/dev/svc/${APP_NAME}" ]; then
-    cd "${GIT_DIR}/dev/svc/${APP_NAME}"
+  if [ -d "${GIT_DIR}/services/${APP_NAME}" ]; then
+    cd "${GIT_DIR}/services/${APP_NAME}"
   elif [ -d "${GIT_DIR}/dev/pub/${APP_NAME}" ]; then
     cd "${GIT_DIR}/dev/pub/${APP_NAME}"
   else
@@ -2867,8 +2867,8 @@ function undeploy {
   NAMESPACE=$3
   ENV=$4
 
-  if [ -d "${GIT_DIR}/dev/svc/${APP_NAME}" ]; then
-    cd "${GIT_DIR}/dev/svc/${APP_NAME}"
+  if [ -d "${GIT_DIR}/services/${APP_NAME}" ]; then
+    cd "${GIT_DIR}/services/${APP_NAME}"
   elif [ -d "${GIT_DIR}/dev/pub/${APP_NAME}" ]; then
     cd "${GIT_DIR}/dev/pub/${APP_NAME}"
   else
@@ -2923,8 +2923,8 @@ EOF
     1)
       echo "Using backend (svc) template..."
       mkdir -p ${APP_DIR}
-      cp -R ${TEMPLATES_DIR}/dev/svc/* ${APP_DIR}
-      envsubst '${APP_NAME}' < ${TEMPLATES_DIR}/dev/svc/run.sh > ${APP_DIR}/run.sh
+      cp -R ${TEMPLATES_DIR}/services/* ${APP_DIR}
+      envsubst '${APP_NAME}' < ${TEMPLATES_DIR}/services/run.sh > ${APP_DIR}/run.sh
       cp ${TEMPLATES_DIR}/dot_dockerignore ${APP_DIR}/.dockerignore
       ;;
     2)
@@ -3123,8 +3123,8 @@ EOF
   docker-compose up -d
   docker ps | grep kubify-kubify-1
   docker exec -it --privileged -w "/src/kubify" "kubify-kubify-1" ./kubify _up_container
-  docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" ../../../kubify run
-  # docker exec -it --privileged -w "/src/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" "../../../kubify run"
+  docker exec -it --privileged -w "/src/kubify/services/localstack-aws-svc" "kubify-kubify-1" ../../../kubify run
+  # docker exec -it --privileged -w "/src/kubify/services/localstack-aws-svc" "kubify-kubify-1" "../../../kubify run"
 
 }
 

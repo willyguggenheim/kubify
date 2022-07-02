@@ -19,6 +19,9 @@ ENV TZ=Los_Angeles
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN DEBIAN_FRONTEND=noninteractive apt install -y snapd
 
+# Install EKS Control
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
 # For full install (but CICD env sets KUBIFY_CI=1 at runtime to override this default):
 ENV KUBIFY_CI 0
 ENV KUBIFY_VERBOSE 0
