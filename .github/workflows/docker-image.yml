@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . -t willy0912/kubify-local:$GITHUB_REF
+      run: docker build . -t willy0912/kubify-local:${GITHUB_REF##*/}
