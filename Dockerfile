@@ -12,21 +12,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update
 # for good security
-RUN apt upgrade -y
-RUN apt install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent \
-    software-properties-common
-RUN apt install -y python3
-RUN apt install -y sudo zsh bash git ansible awscli make wget apt-utils
-RUN apt install -y python3-alembic python3-flask-migrate
+RUN apt install -y  --no-install-recommends python3 software-properties-common
+RUN apt install -y  --no-install-recommends sudo zsh bash git ansible awscli make wget apt-utils
+RUN apt install -y  --no-install-recommends python3-alembic python3-flask-migrate
 # Tox Multi-Py tests:
 RUN add-apt-repository ppa:deadsnakes/ppa && apt update
-RUN apt install -y python3.7 python3.8 python3.9 python3.10
+RUN apt install -y  --no-install-recommends python3.7 python3.8 python3.9 python3.10
 # APT Deps can go here:
-RUN apt install -y python3-alembic python3-flask-migrate
+RUN apt install -y  --no-install-recommends python3-alembic python3-flask-migrate curl
 RUN wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin/
 
 # Install EKS Control
@@ -35,10 +28,6 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
 # For full install (but CICD env sets KUBIFY_CI=1 at runtime to override this default):
 ENV KUBIFY_CI 0
 ENV KUBIFY_VERBOSE 0
-
-# Add your DevSecOps OS Hardening things here:
-RUN apt update && apt -y upgrade
-#####
 
 # Copying the automation magic here (for building a trusted hardened container):
 RUN mkdir -p /etc/ansible
@@ -56,10 +45,9 @@ COPY ./ansible /tmp/ansible
 RUN rm -rf /src/kubify/.git /src/kubify/
 RUN ansible-playbook --connection=local "/tmp/ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 COPY setup.py .
-COPY Makefile .
 COPY *.md .
 COPY *.rst .
-RUN apt install -y libxml2 libxml2-dev libxslt-dev
+RUN apt install -y  --no-install-recommends libxml2 libxml2-dev libxslt-dev
 RUN pip install Cython
 
 # Dev
@@ -71,7 +59,7 @@ RUN pip install -e .[develop]
 # RUN echo 'eval "$(anyenv init -)"' >> /etc/profile.d/anyenv.sh
 RUN git clone https://github.com/tfutils/tfenv ~/tools/tfenv
 RUN ln -s ~/tools/tfenv/bin/* /usr/local/bin
-RUN apt install -y unzip zip tar gzip
+RUN apt install -y  --no-install-recommends unzip zip tar gzip
 RUN tfenv install 1.2.4
 RUN tfenv use 1.2.4
 ADD https://github.com/gruntwork-io/terragrunt/releases/download/v0.38.3/terragrunt_linux_amd64 /usr/local/bin/terragrunt-amd64
@@ -86,20 +74,11 @@ RUN chmod +x /usr/local/bin/terragrunt
 COPY . .
 RUN make fix
 
-# Clean:
-RUN make clean
-RUN rm -rf /tmp/* /var/tmp/*
-RUN rm -rf ./services/*/*/secr* ./.git
-RUN rm -rf /var/lib/apt/lists/*
-RUN apt-get clean autoclean
-RUN apt-get autoremove --yes
-RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
-
 # Lint
-RUN make lint
+# RUN make lint
 
 # Tox (test all python versions enabled)
-RUN make pythons
+# RUN make pythons
 
 # Build Package (and Install Dependencies)
 RUN make pip
@@ -108,22 +87,41 @@ RUN make pip
 RUN make security
 
 # Coverage:
-RUN make coverage
+# RUN make coverage
 
 # Tests (PyTest):
-RUN make test
+# RUN make test
 
 # Test Generating (the Help Docs):
-RUN make help
-
-# Clean:
-RUN make clean
+# RUN make help
 
 # Package (Test Create Install Package):
+RUN apt install -y  --no-install-recommends python3
 RUN make package
 
 # Release (Test Install Release):
 RUN pip install -e .
 
-# Default Entrypoint is to run Tests (for now):
-ENTRYPOINT make test
+# Clean (Smalller Image):
+RUN make clean
+RUN rm -rf /tmp/* /var/tmp/* ./.tox
+RUN rm -rf ./services/*/*/secr* ./.git
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt remove -y python3.7 python3.8 python3.10 software-properties-common
+RUN apt-get clean autoclean
+RUN apt-get autoremove --yes
+RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
+RUN apt-get update && \
+    apt-get -y --no-install-recommends install curl \
+        ca-certificates && \
+    curl https://raw.githubusercontent.com/gadiener/docker-images-size-benchmark/master/main.go -o main.go && \
+    apt-get purge -y curl \
+        ca-certificates && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+RUN rm -rf ./docs ./dist
+RUN rm -rf /usr/lib/python2* /usr/lib/python3.7* /usr/lib/python3.8* /usr/lib/python3.10*
+
+# Default is to run Tests:
+CMD make test

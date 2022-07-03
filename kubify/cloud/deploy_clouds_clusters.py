@@ -10,16 +10,16 @@ from python_terraform import *
 # state bucket with regionaly redundancy
 S3_BUCKET_TF_STATE_NAME = "kubify-tf-state"
 AWS_REGION = "us-west-2"
-test_or_create_s3_artifacts_bucket(
-    bucket_name="kubify-tf-state", region="us-west-2")
+# test_or_create_s3_artifacts_bucket(
+#     bucket_name="kubify-tf-state", region="us-west-2")
 
-# security checks
-checkov()
-bandit()
+# # security checks
+# checkov()
+# bandit()
 
-# linting
-flake8()
-black()
+# # linting
+# flake8()
+# black()
 
 # terraform.__init__()
 tf = Terraform(working_dir='terraform')

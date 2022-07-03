@@ -92,7 +92,7 @@ def deleteCluster():
 print("1) for list of clusters ")
 print("2) for create cluster ")
 print("3) for delete cluster ")
-user_input = int(input("select operation "))
+user_input = input("select operation ")
 print(type(user_input))
 if user_input == 1:
     clusters = getClusters()
