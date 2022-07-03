@@ -26,6 +26,6 @@ if tf.plan(refresh=True, var={'cluster_name':os.environ.get("KUBIFY_ENV", 'dev')
    while input("Deploy Clouds? [y/n]") == "y":
       tf.apply(refresh=False, var={'cluster_name':os.environ.get("KUBIFY_ENV", 'dev')})
 
-@terraform('aws_eks', scope='session')
-def test_eks(aws_eks):
-   assert aws_eks["modules.aws.eks.outputs.arn"].contains(":cluster/kubify") == True
+# @terraform('aws_eks', scope='session')
+# def test_eks(aws_eks):
+#    assert aws_eks["modules.aws.eks.outputs.arn"].contains(":cluster/kubify") == True

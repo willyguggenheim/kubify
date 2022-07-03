@@ -51,8 +51,12 @@ COPY *.md .
 COPY *.rst .
 RUN apt install -y libxml2 libxml2-dev libxslt-dev
 RUN pip install Cython
+
+# Security Checks:
+RUN make security
+
+# Build Package
 RUN make pip
-##
 
 # Terraform:
 # RUN git clone https://github.com/riywo/anyenv ~/.anyenv
