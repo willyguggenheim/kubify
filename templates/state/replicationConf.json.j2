@@ -1,0 +1,14 @@
+{
+    "Role": "arn:aws:iam::{{ACCOUNT_ID_GOES_HERE}}:role/kubify-tf-state",
+    "Rules": [
+      {
+        "Status": "Enabled",
+        "Priority": 1,
+        "DeleteMarkerReplication": { "Status": "Disabled" },
+        "Filter": { "Prefix": "Documents" },
+        "Destination": {
+          "Bucket": "arn:aws:s3:::kubify-tf-state-dr"
+        }
+      }
+    ]
+}

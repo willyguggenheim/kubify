@@ -1,0 +1,10 @@
+{{- if .Values.ingress.enabled }}
+- You can connect to this pgadmin with your browser on this [link](http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.hostname }})
+{{- end }}
+- Your login is **{{ .Values.security.mail }}**
+- Your password is **{{ .Values.security.password }}**
+
+*NOTES about deletion :*
+
+- **You can safely delete this chart and recreate one later**
+- There is no data volume

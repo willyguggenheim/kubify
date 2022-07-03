@@ -1,0 +1,445 @@
+---
+- name: Install required Kubify tools & dependencieson MacOSx (for workstation or cicd)
+  hosts: localhost
+  vars:
+    local_bin: /usr/local/bin
+    kind_version: 0.14.0
+    # skaffold_version: 1.39.1
+    # skaffold_url: https://storage.googleapis.com/skaffold/releases/v{{ skaffold_version }}/skaffold-darwin-amd64
+    brew_taps:
+      - johanhaleby/kubetail
+      # - shyiko/kubesec
+    brew_cask_packages:
+      - docker
+      - visual-studio-code
+      - lens
+    brew_cask_packages:
+      - docker
+      - visual-studio-code
+      - lens
+    # brew_remove_packages:
+    #   - skaffold
+    kind_url: https://github.com/kubernetes-sigs/kind/releases/download/v{{ kind_version }}/kind-darwin-amd64
+    # helm_url: https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/helm.rb
+    brew_packages:
+      - minikube
+      - jq
+      - jsonnet
+      - kubetail
+      - kubernetes-cli
+      - kubecfg
+      - kubectx
+      - helm
+      - helmfile
+      - coreutils
+      - awscli
+      - dnsmasq
+      - watch
+      - npm
+      - skaffold
+      - gpg
+      - glide
+      - go
+    brew_packages_with_force_link:
+      - kubernetes-cli
+      - minikube
+      - yq
+    node_packages:
+      - json-diff
+      - serverless
+      - serverless-python-requirements
+      - serverless-reqvalidator-plugin
+      - serverless-aws-documentation
+      - serverless-localstack
+      - serverless-plugin-aws-alerts
+    install_homebrew_if_missing: true
+    # TODO: set back to true
+    upgrade_homebrew_packages: true
+    get_url_downloads:
+      # - {'bin': 'skaffold', 'url': '{{ skaffold_url }}'}
+      - {'bin': 'kind', 'url': '{{ kind_url }}' }
+    pip_packages:
+      - jmespath
+      - pyjwt
+
+  pre_tasks:
+    - name: Ensuring Homebrew Is Installed
+      command: 'brew --version'
+      register: "homebrew_check"
+
+    - name: Ensuring Rosetta
+      command: 'softwareupdate --install-rosetta --agree-to-license'
+      ignore_errors: True
+
+    - name: Ensuring Git
+      command: 'git version || xcode-select --install'
+      ignore_errors: True
+
+
+    - name: Fail If Homebrew Is Not Installed and install_homebrew_if_missing Is False
+      fail:
+        msg: "Homebrew is missing...Install from http://brew.sh/"
+      when: >
+            homebrew_check.rc != 0 and
+            not install_homebrew_if_missing
+  
+    - name: Installing Homebrew
+      command: '/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"'
+      when: >
+            homebrew_check.rc != 0 and
+            install_homebrew_if_missing
+
+    - name: Installing Homebrew
+      command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+      when: >
+            homebrew_check.rc != 0 and
+            install_homebrew_if_missing
+
+    - name: Ensuring Homebrew Is Installed 3
+      stat:
+        path: "/usr/local/bin/brew"
+      register: "homebrew_check"
+
+  tasks:
+    - name: Updating Homebrew
+      homebrew:
+        update_homebrew: true
+      ignore_errors: True
+
+    # WORKAROUND 001: brew install kubesec #gives an error
+    # - name: Check that the /usr/local/bin/kubesec exists
+    #   stat:
+    #     path: /usr/local/bin/kubesec
+    #   register: stat_result
+
+    # WORKAROUND 001: brew install kubesec #gives an error
+    # - name: Install kubesec (workaround, since brew package has issues)
+    #   shell: curl -sSL https://github.com/shyiko/kubesec/releases/download/0.9.2/kubesec-0.9.2-darwin-amd64 -o kubesec && chmod a+x kubesec && sudo mv kubesec /usr/local/bin/
+    #   when: not stat_result.stat.exists
+
+    - name: Install Homebrew Taps
+      homebrew_tap:
+        name: "{{ brew_taps }}"
+        state: "present"
+
+    # - name: Remove Homebrew packages
+    #   homebrew:
+    #     name: "{{ brew_remove_packages }}"
+    #     state: "absent"
+    #   
+
+    - name: Installing & Upgrading Homebrew Packages
+      homebrew:
+        name: "{{ brew_packages }}"
+        state: "upgraded"
+        upgrade_all: "{{ upgrade_homebrew_packages }}"
+      ignore_errors: true
+
+    - name: Ensure Docker and Lens, VSCode are Installed
+      shell: brew install --cask docker visual-studio-code lens
+      ignore_errors: yes
+
+    - name: Brew linking ensure kubectl
+      shell: brew link --overwrite kubernetes-cli
+      ignore_errors: true
+
+    - name: Brew linked binaries sha256 checks and linking
+      shell: brew link --overwrite minikube jq jsonnet kubetail kubernetes-cli kubecfg kubectx helm helmfile coreutils awscli dnsmasq watch npm skaffold
+
+    - name: Installing & Upgrading Homebrew Packages 2
+      homebrew:
+        name: "{{ brew_packages_with_force_link }}"
+        state: "upgraded"
+        upgrade_all: "{{ upgrade_homebrew_packages }}"
+      ignore_errors: true
+
+    # https://docs.ansible.com/ansible/latest/collections/community/general/homebrew_module.html
+    - name: Ensure Homebrew Packages Are Linked 2
+      homebrew:
+        name: "{{ brew_packages_with_force_link }}"
+        state: "linked"
+        upgrade_all: "{{ upgrade_homebrew_packages }}"
+
+    - name: Installing & Upgrading Homebrew Cask Packages
+      homebrew_cask:
+        name: "{{ brew_cask_packages }}"
+        state: "upgraded"
+        upgrade_all: "{{ upgrade_homebrew_packages }}"
+      # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
+      ignore_errors: yes
+
+    - name: Ensure Homebrew Cask Packages Are Linked
+      homebrew_cask:
+        name: "{{ brew_cask_packages }}"
+        state: "installed"
+        upgrade_all: "{{ upgrade_homebrew_packages }}"
+      ignore_errors: true
+      
+
+    - name: Ensure Docker
+      shell: brew install --cask docker
+      # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
+      ignore_errors: yes
+
+    - name: Ensure VSCode
+      shell: brew install --cask visual-studio-code
+      # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
+      ignore_errors: yes
+
+    - name: Ensure Lens
+      shell: brew install --cask lens
+      # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
+      ignore_errors: yes
+
+    # - name: Brew linked the installed cask package binaries sha256 checks and linking
+    #   shell: brew link --overwrite docker visual-studio-code lens
+    #   ignore_errors: yes
+
+    # - name: Brew Kubesec (and Go) with Make
+    #   shell: brew install shyiko/kubesec/kubesec
+    #   
+    #   # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
+    #   ignore_errors: yes
+    # WORKAROUND 001: brew install kubesec #gives an error
+    # - name: Install kubesec (workaround, since brew package has issues)
+    #   shell: curl -sSL https://github.com/shyiko/kubesec/releases/download/0.9.2/kubesec-0.9.2-darwin-amd64 -o kubesec && chmod a+x kubesec && sudo mv kubesec /usr/local/bin/ && curl -sSL https://github.com/shyiko/kubesec/releases/download/0.9.2/kubesec-0.9.2-darwin-amd64.asc -o kubesec.asc && curl -sS https://keybase.io/shyiko/pgp_keys.asc | gpg --import && gpg --verify kubesec.asc /usr/local/bin/kubesec
+    #   when: not stat_result.stat.exists
+    # WORKAROUND 002: kubesec on mac osx monterey (git@github.com:willyguggenheim/kubesec.git)
+    - name: Make sure go is linked
+      shell: go version || brew unlink go
+    - name: Make sure go is linked
+      shell: brew link go
+    # WORKAROUND 002: kubesec on mac osx monterey (git@github.com:willyguggenheim/kubesec.git)
+    - name: Make sure go path is created
+      shell: mkdir -p ~/kubify/go/bin
+    # WORKAROUND 002: kubesec on mac osx monterey (git@github.com:willyguggenheim/kubesec.git)
+    - name: Install kubesec (use my fork, since brew package has issues)
+      shell: GOPATH=~/kubify/go GO111MODULE="on" go install github.com/willyguggenheim/kubesec@latest && chmod a+x ~/kubify/go/bin/kubesec && sudo mv ~/kubify/go/bin/kubesec /usr/local/bin/kubesec
+    # WORKAROUND 002: kubesec on mac osx monterey (git@github.com:willyguggenheim/kubesec.git)
+    - name: Test kubesec
+      shell: kubesec --help
+
+    - name: Start Docker Desktop 1
+      shell: open --background -a Docker
+
+    - name: Waiting for Docker to configure
+      shell: while ! /usr/local/bin/docker ps 2>&1;   do     echo "Waiting for Docker Desktop to finish Installing.." && sleep 2;   done
+
+    - name: Upgrade minikube
+      shell: brew upgrade minikube
+      ignore_errors: true
+
+    # - name: Install helm
+    #   shell: |
+    #     brew unlink kubernetes-helm
+    #     brew install {{ helm_url }}
+    #     brew link kubernetes-helm
+    #   
+
+    - name: install via pip
+      become: no
+      pip:
+        name: "{{ pip_packages }}"
+        extra_args: --user
+        executable: pip3
+    
+    - name: install via npm
+      become: no
+      npm:
+        name: "{{ item }}"
+        global: "yes"
+        executable: npm
+      with_items: "{{ node_packages }}"
+
+    - name: Remove Conflicting Kind Installed With Brew (TODO switch it to use brew)
+      shell: brew remove kind || true
+      ignore_errors: true
+
+    - name: install apps via url
+      become: yes
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ local_bin }}/{{ item.bin }}"
+        force: "yes"
+        mode: 0755
+      with_items: "{{ get_url_downloads }}"
+
+    - name: stat docker settings.json
+      stat:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+      tags: ['docker']
+      register: file_docker_settings
+
+    - name: stat docker settings.json
+      stat:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+      tags: ['docker']
+      register: file_docker_settings
+
+    - name: Check if Docker settings.json config key named "memoryMiB" is already defined
+      lineinfile:
+        state: absent
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: ".*memoryMiB.*"
+      check_mode: true
+      changed_when: false # This just makes things look prettier in the logs
+      register: docker_check_config_1
+      when: file_docker_settings.stat.exists
+
+    - name: configure docker memory limit
+      lineinfile:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: memoryMiB
+        line: '  "memoryMiB": 6144,'
+      tags: ['docker']
+      # when: file_docker_settings.stat.exists
+      register: docker_config_changed
+      when: docker_check_config_1.found
+
+    - name: Check if Docker settings.json config key named "cpus" is already defined
+      lineinfile:
+        state: absent
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: ".*cpus.*"
+      check_mode: true
+      changed_when: false # This just makes things look prettier in the logs
+      register: docker_check_config_2
+      when: file_docker_settings.stat.exists
+
+    - name: configure docker cpu limit
+      lineinfile:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: cpus
+        line: '  "cpus": 4,'
+      tags: ['docker']
+      # when: file_docker_settings.stat.exists
+      register: docker_config_changed
+      when: docker_check_config_2.found
+
+    - name: Check if Docker settings.json config key named "useVirtualizationFramework" is already defined
+      lineinfile:
+        state: absent
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: ".*useVirtualizationFramework.*"
+      check_mode: true
+      changed_when: false # This just makes things look prettier in the logs
+      register: docker_check_config_3
+      when: file_docker_settings.stat.exists
+
+    - name: docker desktop to use it's new framework
+      lineinfile:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: useVirtualizationFramework
+        # set to true for M1?
+        line: '  "useVirtualizationFramework" : false,'
+      tags: ['docker']
+      # when: file_docker_settings.stat.exists
+      register: docker_config_changed
+      when: docker_check_config_3.found
+
+    - name: Check if Docker settings.json config key named "kubernetesEnabled" is already defined
+      lineinfile:
+        state: absent
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: ".*kubernetesEnabled.*"
+      check_mode: true
+      changed_when: false # This just makes things look prettier in the logs
+      register: docker_check_config_4
+      when: file_docker_settings.stat.exists
+
+    - name: disable docker-desktop flavor of kubernetes, part 1 (migrated to Kind)
+      lineinfile:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: kubernetesEnabled
+        line: '  "kubernetesEnabled" : false,'
+      tags: ['docker']
+      # when: file_docker_settings.stat.exists
+      register: docker_config_changed
+      when: docker_check_config_4.found
+
+
+
+    - name: Check if Docker settings.json config key named "swapMiB" is already defined
+      lineinfile:
+        state: absent
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: ".*swapMiB.*"
+      check_mode: true
+      changed_when: false # This just makes things look prettier in the logs
+      register: docker_check_config_5
+      when: file_docker_settings.stat.exists
+
+    - name: swapMiB docker config set
+      lineinfile:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: swapMiB
+        line: '  "swapMiB" : 4096,'
+      tags: ['docker']
+      # when: file_docker_settings.stat.exists
+      register: docker_config_changed
+      when: docker_check_config_5.found
+
+
+    - name: Check if Docker settings.json config key named "diskSizeMiB" is already defined
+      lineinfile:
+        state: absent
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: ".*diskSizeMiB.*"
+      check_mode: true
+      changed_when: false # This just makes things look prettier in the logs
+      register: docker_check_config_6
+      when: file_docker_settings.stat.exists
+
+    - name: diskSizeMiB docker config set
+      lineinfile:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: diskSizeMiB
+        line: '  "diskSizeMiB" : 120000,'
+      tags: ['docker']
+      # when: file_docker_settings.stat.exists
+      register: docker_config_changed
+      when: docker_check_config_6.found
+
+    - name: docker desktop to use it's new framework
+      lineinfile:
+        path: "~/Library/Group Containers/group.com.docker/settings.json"
+        regexp: useVirtualizationFramework
+        # set to true for M1?
+        line: '  "useVirtualizationFramework" : true,'
+      tags: ['docker']
+      when: file_docker_settings.stat.exists
+      register: docker_config_changed
+
+    # - name: enable docker-desktop flavor of kubernetes, part 2
+    #   lineinfile:
+    #     path: ~/Library/Group\ Containers/group.com.docker/settings.json
+    #     regexp: showKubernetesSystemContainers
+    #     line: '  "showKubernetesSystemContainers": false,'
+    #   tags: ['docker']
+    #   when: file_docker_settings.stat.exists
+  
+    - name: Stop Docker Desktop
+      # shell: osascript -e 'quit app "Docker"' || test -z "$(docker ps -q 2>/dev/null)" && osascript -e 'quit app "Docker"'
+      shell: osascript -e 'quit app "Docker"' && sleep 2
+      when: docker_config_changed.changed
+
+    # - name: Reset PKI Certs (Workaround 002)
+    #   shell: rm -f "~/Library/Group Containers/group.com.docker/pki"
+    #   when: file_docker_settings.stat.exists
+
+    - name: Start Docker Desktop 2
+      shell: open --background -a Docker
+      when: docker_config_changed.changed
+
+    - name: Waiting for docker ps command to succeed
+      shell: while ! /usr/local/bin/docker ps 2>&1;   do     echo "Waiting for Kubernetes for Docker Desktop to Install and Configure" && sleep 2;   done
+
+    # - name: Waiting for Kubernetes (on Docker Desktop) to configure
+    #   shell: while ! /usr/local/bin/kubectl get namespaces 2>&1;   do     echo "Waiting for Kubernetes for Docker Desktop to Install and Configure" && sleep 2;   done
+    #   when: file_docker_settings.stat.exists
+
+    - name: Workaround Lens
+      shell: brew install --cask lens
+
+    # - name: Start Lens K8s UI
+    #   shell: open /Applications/Lens.app

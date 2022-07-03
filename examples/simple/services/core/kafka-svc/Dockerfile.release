@@ -1,0 +1,19 @@
+FROM wurstmeister/kafka:latest
+
+RUN mkdir -p /certs
+COPY ./test/kafka/certs/kafka.server.keystore.jks /certs/kafka.server.keystore.jks
+COPY ./test/kafka/certs/kafka.server.truststore.jks /certs/kafka.server.truststore.jks
+
+RUN mkdir -p /root/config/
+COPY ./test/kafka/config/kafka_server_jaas.conf /root/config/kafka_server_jaas.conf
+
+RUN apk add --no-cache \
+        python3 \
+        py3-pip \
+    && pip3 install --upgrade pip \
+    && pip3 install \
+        awscli \
+    && rm -rf /var/cache/apk/*
+
+COPY ./entrypoint-kubify-debug.sh ./entrypoint-kubify-debug.sh
+ENTRYPOINT ./entrypoint-kubify-debug.sh

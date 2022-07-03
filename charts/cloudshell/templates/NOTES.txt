@@ -1,0 +1,16 @@
+{{- if .Values.ingress.enabled }}
+- You can connect to this cloudshell with your browser on this [link](http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.hostname }})
+{{- end }}
+{{- if .Values.persistence.enabled }}
+- The following path **{{ .Values.persistence.mountPath }}** is a persistant volume with a size of **{{ .Values.persistence.size }}** 
+{{- end }}
+- Only one instance of {{ .Chart.Name }} can be started in a project.
+
+*NOTES about deletion :*
+
+- **You can safely delete this chart and recreate one later**
+{{- if .Values.persistence.enabled }}
+- The volume associated with the following path **{{ .Values.persistence.mountPath }}** will be not be deleted
+- If you start a cloudshell, it will reuse this volume silently.
+- If you want to delete this volume definitily : `kubectl delete pvc data-{{ include "library-chart.fullname" . }}-0`
+{{- end }}

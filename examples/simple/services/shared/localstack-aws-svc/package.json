@@ -1,0 +1,8 @@
+{
+    "name": "localstack-aws-svc",
+    "version": "0.0.2",
+    "description": "Simulate AWS Services Locally",
+    "dependencies": {
+        "express": "^4.17.1"
+    }
+}

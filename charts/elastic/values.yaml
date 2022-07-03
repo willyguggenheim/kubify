@@ -1,0 +1,43 @@
+elasticsearch:
+  image: elasticsearch
+  esJavaOpts: -Xmx8g -Xms8g
+  replicas: 3
+  resources:
+    limits:
+      memory: 10Gi
+    requests:
+      memory: 10Gi
+  sysctlInitContainer:
+    enabled: false
+  volumeClaimTemplate:
+    accessModes: ["ReadWriteOnce"]
+    resources:
+      requests:
+        storage: 30Gi
+  discoverable:
+    allow: true
+
+kibana:
+  image: kibana
+
+ingress:
+  enabled: true
+  tls: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hostname: chart-example.local
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+security:
+  allowlist:
+    enabled: true
+    ip: "0.0.0.0/0" 
+  networkPolicy: 
+    enabled: true
+    from: 
+    - ipBlock:
+        cidr: 10.233.103.0/32
+    - ipBlock:
+        cidr: 10.233.111.0/32 

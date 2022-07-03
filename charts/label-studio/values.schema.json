@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "security": {
+      "description": "security specific configuration",
+      "type": "object",
+      "properties": {
+          "password": {
+            "type": "string",
+            "description": "Password",
+            "default": "changeme",
+            "x-form": {
+                "value": "{{project.password}}"
+            }
+          },
+          "username": {
+            "type": "string",
+            "title": "username",
+            "default": "username",
+            "x-form": {
+              "value": "{{user.email}}"
+            }
+          },
+          "allowlist": {
+              "type": "object",
+              "description": "IP protection",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "title": "Enable IP protection",
+                  "description": "Only the configured set of IPs will be able to reach the service",
+                  "default": true,
+                  "x-form": {
+                    "value": "{{region.defaultIpProtection}}"
+                  }
+                },
+                "ip": {
+                  "type": "string",
+                  "description": "the white list of IP is whitespace",
+                  "title": "Whitelist of IP",
+                  "x-form": {
+                    "value": "{{user.ip}}"
+                  }
+                }
+              }
+          },
+          "networkPolicy": {
+              "type": "object",
+              "description": "Define access policy to the service",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "title": "Enable network policy",
+                  "description": "Only pod from the same namespace will be allowed",
+                  "default": true,
+                  "x-form": {
+                    "value": "{{region.defaultNetworkPolicy}}"
+                  }
+                }
+              }
+          }
+      }
+  },
+    "ingress": {
+      "type": "object",
+      "form": true,
+      "title": "Ingress Details",
+      "properties": {
+        "hostname": {
+          "type": "string",
+          "form": true,
+          "title": "Hostname",
+          "x-form": {
+            "value": "{{project.id}}-{{k8s.randomSubdomain}}.{{k8s.domain}}"
+        }
+        }
+      }
+    },
+    "global": {
+      "description": "postgres specific configuration",
+      "type": "object",
+      "title": "Database",
+      "properties": {
+        "postgresql": {
+          "description": "postgres specific configuration",
+          "type": "object",
+          "title": "Database",
+          "properties": {
+            "postgresqlUsername": {
+              "type": "string",
+              "title": "Admin user",
+              "default": "admin",
+              "x-form": {
+                "value": "{{project.id}}"
+              }
+            },
+            "postgresqlPassword": {
+              "type": "string",
+              "title": "Password",
+              "default": "changeme",
+              "x-form": {
+                "value": "{{project.password}}"
+              }
+            },
+            "postgresqlDatabase": {
+              "description": "Name for the default database that is created when the image is first started.",
+              "type": "string",
+              "title": "Database",
+              "default": "mlflow"
+            }
+          }
+        }
+      }
+    }
+  }
+}

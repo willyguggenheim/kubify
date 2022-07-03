@@ -1,0 +1,181 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "mongodb": {
+      "description": "mongodb specific configuration",
+      "type": "object",
+      "properties": {
+        "image": {
+          "description": "image specific configuration",
+          "type": "object",
+          "properties": {
+            "tag": {
+              "description": "mongodb major version",
+              "type": "string",
+              "enum": ["4.0", "4.2","4.4"],
+              "default": "4.4"
+            }
+          }
+        },
+        "auth": {
+          "description": "auth specific configuration",
+          "type": "object",
+          "properties": {
+            "rootPassword": {
+              "description": "root password",
+              "type": "string",
+              "default": "changeme",
+              "x-form": {
+                "value": "{{project.password}}"
+              }
+            },
+            "database": {
+              "description": "default db",
+              "type": "string",
+              "default": "defaultdb"
+            },
+            "username": {
+              "description": "user name of the default database",
+              "type": "string",
+              "default": "user",
+              "x-form": {
+                "value": "{{project.id}}"
+              }
+            },
+            "password": {
+              "description": "password of the user",
+              "type": "string",
+              "default": "changeme",
+              "x-form": {
+                "value": "{{project.password}}"
+              }
+            }
+          }
+        },
+        "persistence": {
+          "description": "Configuration for persistence",
+          "type": "object",
+          "properties": {
+              "enabled": {
+                  "type": "boolean",
+                  "description": "Create a persistent volume",
+                  "default": true
+              },
+              "size": {
+                "type": "string",
+                "title": "Persistent volume size",
+                "description": "Size of the persistent volume",
+                "default": "10Gi",
+                "form": true,
+                "render": "slider",
+                "sliderMin": 1,
+                "sliderMax": 100,
+                "sliderStep": 1,
+                "sliderUnit": "Gi",
+                "hidden": {
+                  "value": false,
+                  "path": "mongodb/persistence/enabled"
+                }                    
+            }
+          }
+        },
+        "resources": {
+          "description": "Your service will have at least the requested resources and never more than its limits. No limit for a resource and you can consume everything left on the host machine.",
+          "type": "object",
+          "properties": {
+              "requests": {
+                  "description": "Guaranteed resources",
+                  "type": "object",
+                  "properties": {
+                    "cpu": {
+                      "description": "The amount of cpu guaranteed",
+                      "title": "CPU",
+                      "type": "string",
+                      "default": "100m",
+                      "render": "slider",
+                      "sliderMin": 50,
+                      "sliderMax": 40000,
+                      "sliderStep": 50,
+                      "sliderUnit": "m",
+                      "sliderExtremity": "down",
+                      "sliderExtremitySemantic": "guaranteed",
+                      "sliderRangeId": "cpu"
+                    },
+                    "memory": {
+                      "description": "The amount of memory guaranteed",
+                      "title": "memory",
+                      "type": "string",
+                      "default": "2Gi",
+                      "render": "slider",
+                      "sliderMin": 1,
+                      "sliderMax": 200,
+                      "sliderStep": 1,
+                      "sliderUnit": "Gi",
+                      "sliderExtremity": "down",
+                      "sliderExtremitySemantic": "guaranteed",
+                      "sliderRangeId": "memory"
+                    }
+                  }
+              },
+              "limits": {
+                  "description": "max resources",
+                  "type": "object",
+                  "properties": {
+                      "cpu": {
+                          "description": "The maximum amount of cpu",
+                          "title": "CPU",
+                          "type": "string",
+                          "default": "30000m",
+                          "render": "slider",
+                          "sliderMin": 50,
+                          "sliderMax": 40000,
+                          "sliderStep": 50,
+                          "sliderUnit": "m",
+                          "sliderExtremity": "up",
+                          "sliderExtremitySemantic": "Maximum",
+                          "sliderRangeId": "cpu"
+                        },
+                        "memory": {
+                          "description": "The maximum amount of memory",
+                          "title": "Memory", 
+                          "type": "string",
+                          "default": "50Gi",
+                          "render": "slider",
+                          "sliderMin": 1,
+                          "sliderMax": 200,
+                          "sliderStep": 1,
+                          "sliderUnit": "Gi",
+                          "sliderExtremity": "up",
+                          "sliderExtremitySemantic": "Maximum",
+                          "sliderRangeId": "memory"
+                        }
+                  }
+              }
+          }
+        }
+      }
+    },
+    "security": {
+      "description": "security specific configuration",
+      "type": "object",
+      "properties": {
+          "networkPolicy": {
+            "type": "object",
+            "description": "Define access policy to the service",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "title": "Enable network policy",
+                "description": "Only pod from the same namespace will be allowed",
+                "default": true,
+                "x-form": {
+                  "value": "{{region.defaultNetworkPolicy}}"
+                }
+              }
+            }
+          }
+      }
+    }
+  }
+}

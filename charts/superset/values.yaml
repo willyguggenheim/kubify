@@ -1,0 +1,76 @@
+superset:
+  image:
+    repository: apache/superset
+    tag: 9cdaa280429ec297db16d56c94fd77b5d2aff107
+    pullPolicy: IfNotPresent
+  init:
+    adminUser:
+      username: admin
+      firstname: Superset
+      lastname: Admin
+      email: admin@superset.com
+      password: admin
+    initscript: |-
+      #!/bin/sh
+      set -eu
+      echo "Upgrading DB schema..."
+      superset db upgrade
+      echo "Initializing roles..."
+      superset init
+      {{ if .Values.init.createAdmin }}
+      echo "Creating admin user..."
+      superset fab create-admin \
+                      --username {{ .Values.init.adminUser.username }} \
+                      --firstname {{ .Values.init.adminUser.firstname }} \
+                      --lastname {{ .Values.init.adminUser.lastname }} \
+                      --email {{ .Values.init.adminUser.email }} \
+                      --password {{ .Values.init.adminUser.password }} \
+                      || true
+      {{- end }}
+      {{ if .Values.init.loadExamples }}
+      echo "Loading examples..."
+      superset load_examples
+      {{- end }}
+      if [ -f "{{ .Values.extraConfigMountPath }}/import_datasources.yaml" ]; then
+        if [ -s "{{ .Values.extraConfigMountPath }}/import_datasources.yaml" ]; then
+          echo "Importing database connections.... "
+          superset import_datasources -p {{ .Values.extraConfigMountPath }}/import_datasources.yaml
+        fi
+      fi
+  bootstrapScript: |
+    #!/bin/bash
+    rm -rf /var/lib/apt/lists/* && \
+    pip install \
+      psycopg2-binary==2.9.1 \
+      sqlalchemy-trino==0.4.1 \
+      PyHive==0.6.5 \
+      elasticsearch-dbapi==0.2.9 \
+      redis==3.5.3 && \
+    if [ ! -f ~/bootstrap ]; then echo "Running Superset with uid {{ .Values.runAsUser }}" > ~/bootstrap; fi
+  extraConfigs:
+    import_datasources.yaml: |
+      {{ include "superset.discovery" . }}
+  discovery:
+    hive: true
+    mongodb: true
+    postgres: true
+    elastic: true
+    trino: true
+    sparkThriftServer: true
+
+
+
+
+ingress:
+  enabled: true
+  tls: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hostname: chart-example.local
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+
+

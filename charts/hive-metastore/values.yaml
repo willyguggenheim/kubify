@@ -1,0 +1,107 @@
+# Default values for postgres.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  postgresql:
+    postgresqlDatabase: "metastore"
+    postgresqlUser: "admin"
+    postgresqlPassword: "changeme"
+  
+replicaCount: 1
+
+service:
+  image:
+    version: "inseefrlab/jupyter-datascience:py3.9.12-spark3.2.1-v0.0.1"
+    pullPolicy: IfNotPresent
+    custom:
+      enabled: false
+      version: "inseefrlab/jupyter-datascience:py3.9.12-spark3.2.1-v0.0.1"
+  warehouseDir: s3a://bucket/hive-warehouse
+
+environment:
+  s3: true
+
+
+s3:
+  # Specifies whether a config map should be created
+  create: true
+  # The name of the configmap to use.
+  # If not set and create is true, a name is generated using the fullname template
+  configMapName: ""
+  accessKeyId: ""
+  endpoint: ""
+  defaultRegion: ""
+  secretAccessKey: ""
+  sessionToken: ""
+discoverable:
+  allow: true
+liveness:
+  enabled : "true"
+
+security:
+  networkPolicy: 
+    enabled: true
+
+postgresql:
+  image:
+    tag: "12"
+  fullnameOverride: "hive-metastore-db"
+
+listener:
+  enabled: true
+  className: org.pengfei.hive.listener.CustomHiveListener
+  kafkaBrokerUrl: kafka-0.kafka-headless:9092
+  kafkaTopicName: hive-meta
+  domainNamespace: user-pengfei
+  jarPath: /opt/hive/lib/hive-listener.jar
+
+readiness:
+  enabled: "true"
+
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: "hive-metastore"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+networking:
+  type: ClusterIP
+  port: 9083
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

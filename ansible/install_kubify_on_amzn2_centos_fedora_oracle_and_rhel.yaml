@@ -1,0 +1,284 @@
+- name: Install required Kubify tools & dependencieson Debian (or Ubuntu, WSL2, .. for workstation or cicd)
+  # hosts: all
+  hosts: localhost
+  vars:
+    local_bin: /usr/local/bin
+    kubetail_url: https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail
+    kubesec_version: 0.9.2
+    skaffold_version: 1.39.1
+    kubecfg_version: 0.20.0
+    helm_version: 3.9.0
+    helmfile_version: 0.144.0
+    kind_version: 0.14.0
+    kubesec_url: https://github.com/shyiko/kubesec/releases/download/{{ kubesec_version }}/kubesec-{{ kubesec_version }}-linux-amd64
+    skaffold_url: https://storage.googleapis.com/skaffold/releases/v{{ skaffold_version }}/skaffold-linux-amd64
+    kubecfg_url: https://github.com/bitnami/kubecfg/releases/download/v{{ kubecfg_version }}/kubecfg-linux-amd64
+    helm_url: https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz
+    helmfile_url: https://github.com/roboll/helmfile/releases/download/v{{ helmfile_version }}/helmfile_linux_amd64
+    minikube_url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    kubectx_url: https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx
+    kubens_url: https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens
+    kind_url: https://github.com/kubernetes-sigs/kind/releases/download/v{{ kind_version }}/kind-linux-amd64
+
+    yum_packages:
+      - wget
+      - curl
+      - python3-setuptools
+      - python3-pip
+      - jq
+      - kubectl
+      - socat
+      # for timeout command on delete
+      - coreutils
+      - npm
+      # just in case IDEs are putting extra characters on Windows when saving files
+      - dos2unix
+      # optional, as should be installed
+      - watch
+      # for optional debugging commands, such as nslookup
+      - net-tools
+
+    # when not WSL (when not windows, when real linux, then also install these)
+    yum_packages_not_wsl:
+      - docker-ce
+      - network-manager
+      # dnsmasq is included/bundled in network-manager, so commenting next line
+      # - dnsmasq
+
+    pip_packages:
+      - yq
+      - awscli
+      - jsonnet
+      - jmespath
+      - pyjwt
+
+    node_packages:
+      - json-diff
+      - serverless
+      - serverless-python-requirements
+      - serverless-reqvalidator-plugin
+      - serverless-aws-documentation
+      - serverless-localstack
+      - serverless-plugin-aws-alerts
+
+    get_url_downloads:
+      - {'bin': 'kubetail', 'url': '{{ kubetail_url }}'}
+      - {'bin': 'kubesec', 'url': '{{ kubesec_url }}'}
+      - {'bin': 'skaffold', 'url': '{{ skaffold_url }}'}
+      - {'bin': 'kubecfg', 'url': '{{ kubecfg_url }}' }
+      - {'bin': 'kubectx', 'url': '{{ kubectx_url }}' }
+      - {'bin': 'kubens', 'url': '{{ kubens_url }}' }
+      # using kind, since Docker Desktop is not on Linux yet
+      - {'bin': 'kind', 'url': '{{ kind_url }}' }
+      - {'bin': 'helmfile', 'url': '{{ helmfile_url }}'}
+      - {'bin': 'minikube', 'url': '{{ minikube_url }}'}
+
+    unarchive_downloads:
+      - {'bin': 'helm', 'url': '{{ helm_url }}'}
+
+  tasks:
+################################################################################
+# DOCKER
+################################################################################
+
+    - name: Docker Apt - Install required system packages
+      become: yes
+      yum: name={{ item }} state=latest update_cache=yes
+      loop: [ 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+    - name: Docker Apt - Update yum and install docker-ce
+      become: yes
+      yum: update_cache=yes name=docker-ce state=latest
+
+    # - name: Installing Nvidia CUDA-11.4 Driver
+    #   ansible.builtin.include_role:
+    #     name: nvidia_driver
+
+    # - name: Installing Nvidia cuDNN Neural Network Library
+    #   ansible.builtin.include_role:
+    #     name: nvidia_cudnn
+
+    - name: Installing Nvidia-Docker Integration
+      ansible.builtin.include_role:
+        name: nvidia_docker
+
+    - name: Docker Pip - Install Docker Module for Python
+      become: yes
+      pip:
+        name: docker
+        extra_args: --user
+        executable: pip3
+
+################################################################################
+# KUBERNETES
+################################################################################
+
+    - name: check dir
+      stat:
+        path: "{{ local_bin }}"
+      register: local_bin_exists
+
+    - name: create local bin dir
+      become: yes
+      file:
+        path: "{{ local_bin }}"
+        state: directory
+      when: ! local_bin_exists.stat.exists
+
+    - name: install apps via url
+      become: yes
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ local_bin }}/{{ item.bin }}"
+        mode: 0755
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+      with_items: "{{ get_url_downloads }}"
+
+    - name: untar helm files
+      unarchive:
+        src: "{{ helm_url }}"
+        dest: "/tmp"
+        remote_src: yes
+        mode: 0755
+
+    - name: copy helm to PATH
+      become: yes
+      copy:
+        src: /tmp/linux-amd64/{{ item }}
+        dest: /usr/local/bin
+        remote_src: yes
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: 0755
+      with_items:
+        - helm
+
+
+################################################################################
+# Package Managers
+################################################################################
+    - name: install via yum common linux deps, for all linux
+      become: yes
+      yum:
+        name: "{{ yum_packages }}"
+        update_cache: yes
+        state: present
+
+    # - name: install cuDNN
+    #   become: yes
+    #   yum:
+    #     name: "nvidia-cudnn"
+    #     update_cache: yes
+    #     state: present
+
+    - name: check if running in wsl2
+      shell: cat /proc/version | grep -i microsoft
+      register: check_if_running_in_wsl2
+      ignore_errors: true
+
+    - name: install additional dependenciesvia yum, when is not wsl2
+      become: yes
+      yum:
+        name: "{{ yum_packages_not_wsl }}"
+        update_cache: yes
+        state: present
+      when: check_if_running_in_wsl2 is failed
+
+    # TODO: (double check) make sure this uses a python virtual env folder (to not install on system)
+    - name: install via pip
+      become: yes
+      pip:
+        name: "{{ pip_packages }}"
+        executable: pip3
+
+    # TODO: (double check) make sure this uses a node virtual env folder (to not install on system)
+    - name: install via npm
+      become: yes
+      npm:
+        name: "{{ item }}"
+        global: "yes"
+        executable: npm
+      with_items: "{{ node_packages }}"
+
+
+################################################################################
+# Misc
+################################################################################
+    - name: add user to docker group
+      become: yes
+      user:
+        append: yes
+        user: "{{ ansible_user_id }}"
+        groups: docker
+
+    - name: add user to docker group 2
+      become: yes
+      shell: groupadd docker
+      ignore_errors: true
+
+    - name: add user to docker group 3
+      become: no
+      shell: sudo usermod -aG docker $USER
+      ignore_errors: true
+
+    - name: add user to docker group 3
+      become: no
+      shell: sudo chown $USER /var/run/docker.sock
+      ignore_errors: true
+
+################################################################################
+# dns setup (real linux, not for WSL2)
+#
+# This portion requires NetworkManager to handling
+################################################################################
+
+    - name: check dnsmasq location - Linux
+      stat:
+        path: /etc/NetworkManager/dnsmasq.d
+      register: dnsmasq_linux_is_in_network_manager
+      when: check_if_running_in_wsl2 is failed
+
+    - set_fact:
+        dir_dnsmasq_linux: "{{ '/etc/NetworkManager' if dnsmasq_linux_is_in_network_manager.stat.exists else '/etc' }}"
+      when: check_if_running_in_wsl2 is failed
+
+    # TODO: make the wsl2 version of this 
+    - name: "check {{ dir_dnsmasq_linux }}/NetworkManager.conf"
+      stat:
+        path: "{{ dir_dnsmasq_linux }}/NetworkManager.conf"
+      register: networkmanager_conf_exists
+      when: check_if_running_in_wsl2 is failed
+
+
+    - name: snap install kontena-lens --classic
+      become: yes
+      shell: sudo snap install kontena-lens --classic
+      register: check_if_running_in_wsl2
+      ignore_errors: true
+
+
+################################################################################
+# dns setup (almost real linux, this is for WSL2 on Windows)
+#
+# This portion requires NetworkManager to handling
+################################################################################
+
+# TODO
+
+
+
+
+################################################################################
+# checks
+################################################################################
+
+    # # This tries to open an internet connection for up to 30 seconds before failure.
+    # - name: wait for network connection to come back up (test access to kubify.com, to test dnsmasq forwarding)
+    #   wait_for:
+    #     host: kubify.com
+    #     port: 53
+    #     timeout: 30
+    #     msg: |
+    #       "Waiting for (up to 30s) for Internet to come back up. Please check"
+    #       "README.md for troubleshooting steps if you see this"

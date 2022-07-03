@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "library-chart.fullname" . }}
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "library-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "library-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config-coresite
+          configMap:
+            name: {{ include "library-chart.configMapNameCoreSite" . }}
+        - name: config-server
+          configMap:
+            name: {{ include "library-chart.fullname" . }}
+        {{- if .Values.sidecar.proxy.subrequest.enabled }}
+        - name: config-nginx
+          configMap:
+            name: {{ include "library-chart.fullname" . }}-nginx
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.service.image.repository }}:{{ .Values.service.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.service.image.pullPolicy }}
+          args: 
+            - -d
+            - --config
+            - /opt/docker/conf/delta-sharing-server-config.yaml
+          volumeMounts:
+            - mountPath: /opt/docker/conf/core-site.xml
+              subPath: core-site.xml
+              name: config-coresite
+            - mountPath: /opt/docker/conf/delta-sharing-server-config.yaml
+              subPath: delta-sharing-server-config.yaml
+              name: config-server
+        {{- if and (not .Values.sidecar.proxy.subrequest.enabled) (not .Values.sidecar.proxy.jwt.enabled) }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- end -}}
+      {{- if .Values.sidecar.proxy.subrequest.enabled }}
+        - name: nginx
+          image: nginx
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+              - name: config-nginx
+                mountPath: /etc/nginx/nginx.conf
+                subPath: nginx.conf
+                readOnly: true
+      {{- end -}}
+      {{- if .Values.sidecar.proxy.jwt.enabled }}
+        - name: sidecar-jwt-proxy
+          image: git-registry.lab.sspcloud.fr/alexisdondon/delta-jwt-sidecar:0.0.1
+          env:
+            - name: SERVER_PORT
+              value: "8081"
+            - name: APP_DELTAURL
+              value: "http://localhost:8080"
+            - name: APP_JWT_SECRET
+              value: "{{ .Values.sidecar.proxy.jwt.secret}}"
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      {{- end -}}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

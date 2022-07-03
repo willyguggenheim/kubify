@@ -1,0 +1,52 @@
+# The DataScience Kubify MLOps Toolkit
+
+---
+apiVersion: k8.kubify.local/v1
+kind: Config
+metadata:
+  name: kubify-mlops-toolkit
+
+# helm native
+helm:
+  charts:
+    # first looks in ../../charts folder, if not there then it tries bitnami/[]
+    - argo-cd
+    - argo-workflows
+    - blazingsql
+    - cloudshell
+    - dask
+    - data-profiler
+    - delta-sharing-server
+    - elastic
+    - fastai
+    - hive-metastore
+    - jena
+    - jupyter
+    - kafka
+    - label-studio
+    - library-chart
+    - mariadb
+    - mlflow
+    - mongodb
+    - neo4j
+    - nocodb
+    - openrefine
+    - pgadmin
+    - pinot
+    - postgresql
+    - rapidsai
+    - kuberay-operator
+    - ray-cluster
+    - redash
+    - rstudio
+    - spark-history
+    - spark-thrift-server
+    - superset
+    - tensorflow
+    - trino
+    - ubuntu
+    - vscode
+
+dags:
+    # looks in ./dags folder
+    - example

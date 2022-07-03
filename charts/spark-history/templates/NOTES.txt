@@ -1,0 +1,6 @@
+{{- if .Values.ingress.enabled }}
+- You can connect to the spark history with your browser on this [link](http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.hostname }})
+{{- end }}
+{{- if .Values.spark.directory }}
+- the log's directory is **{{ .Values.spark.directory }}**
+{{- end }}

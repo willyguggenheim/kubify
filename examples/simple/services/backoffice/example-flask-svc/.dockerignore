@@ -1,0 +1,4 @@
+*.swp
+/kubify.yml
+/secrets
+/config

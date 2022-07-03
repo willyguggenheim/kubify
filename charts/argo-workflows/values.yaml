@@ -1,0 +1,55 @@
+ingress:
+  enabled: true
+  tls: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hostname: chart-example.local
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+security:
+  allowlist:
+    enabled: true
+    ip: "0.0.0.0/0"
+  networkPolicy: 
+    enabled: true
+    from: 
+    - ipBlock:
+        cidr: 10.233.103.0/32
+    - ipBlock:
+        cidr: 10.233.111.0/32
+
+serviceAccount:
+  create: true
+  name: workflow
+  role: workflow
+  roleBinding: workflow
+
+argo-workflows:
+  createAggregateRoles: false
+  singleNamespace: true
+  workflow:
+    serviceAccount:
+      create: true # Specifies whether a service account should be created
+      annotations: {}
+      name: "argo-workflows" # Service account which is used to run workflows
+  controller:
+    workflowNamespaces: []
+    replicas: 1
+    #containerRuntimeExecutor: k8sapi
+    clusterWorkflowTemplates:
+      enabled: false
+
+  server:
+    enabled: true
+    clusterWorkflowTemplates:
+      enabled: false
+
+    extraArgs:
+      #- --auth-mode=sso
+      - --auth-mode=server
+
+    ingress:
+      enabled: false
