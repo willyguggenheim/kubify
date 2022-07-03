@@ -12,7 +12,7 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [ 'py-make', 'kubernetes', 'kubeconfig', 'pick', 'boto3' ]
 
-test_requirements = ['pytest>=3', ]
+test_requirements = [ 'pytest>=3', 'bandit' ]
 
 setup(
     author="kubify",

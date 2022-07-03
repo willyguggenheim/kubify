@@ -95,7 +95,10 @@ eksctl-destroy-cloud: # eks
 	./dev/aws/destroy-west-east-eks-dev.sh
 
 cloud:
-	terraform init && terraform apply
+	./terraform/install.sh
 
 pip:
 	pip install -e .[develop]
+
+fix-from-windows-chars: # or use mac/linux/devcontainer/wsl2 when coding
+	find . -type f -print0 | xargs -0 dos2unix

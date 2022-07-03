@@ -1,6 +1,11 @@
 # This is the Latest LTS (still as of January 2022):
 FROM ubuntu:20.04
 
+# APT Deps go here !!
+RUN apt update
+RUN apt install -y git python3 ansible python3-pip curl awscli \
+                   make wget tfsec tfenv
+
 # Required --build-arg variables:
 ARG GIT_FIRST_LAST_NAME=local
 ENV GIT_FIRST_LAST_NAME ${GIT_FIRST_LAST_NAME}
@@ -32,8 +37,6 @@ RUN apt update && apt -y upgrade
 
 # Copying the automation magic here (for building a trusted hardened container):
 RUN mkdir -p /etc/ansible
-RUN apt update
-RUN apt install -y git python3 ansible python3-pip curl awscli
 RUN git config --global user.name "${GIT_FIRST_LAST_NAME}"
 RUN git config --global user.email "${GIT_EMAIL}"
 ADD ./ansible.cfg /etc/ansible/
