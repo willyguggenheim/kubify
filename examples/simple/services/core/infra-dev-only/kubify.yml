@@ -1,0 +1,25 @@
+aws_only: true
+
+aws:
+  kubify-security-bucket-art:
+    -
+      Name: kubify-kubify-security-bucket-art
+
+  workspaces-directory:
+    - 
+      Name: kubify-vdi
+      Domain: 'kubify-vdi.local'
+
+  workspaces:
+    -
+      Username: usr-willy-guggenheim-1
+      Size: xlarge
+      OS: linux
+
+  lambda:
+    -
+      Handler: handlers/action.lambda_create_users
+      Name: kubify-vdi-lambda-create-users-{{ env }}
+    -
+      Handler: handlers/action.lambda_register_directory
+      Name: kubify-vdi-lambda-register-directory-{{ env }}
