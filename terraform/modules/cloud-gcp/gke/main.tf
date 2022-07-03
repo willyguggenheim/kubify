@@ -52,7 +52,8 @@ module "gcp-network" {
 }
 
 module "gke" {
-  source                 = "./modules/gcp-gke"
+  source                 = "terraform-google-modules/kubernetes-engine/google"
+  version                = "21.2.0"
   project_id             = var.project_id
   name                   = var.cluster_name
   regional               = true
