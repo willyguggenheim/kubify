@@ -20,6 +20,10 @@ test_requirements = [
     'terraenv>=0.12', 'pytest-terraform>=0.6.1', 'python-terraform>=0.10.0', 'pytest-cov>=2.5.1',   
     ]
 
+extras = {
+    'test': test_requirements,
+}
+
 setup(
     author="kubify",
     author_email='w@kubify.com',
@@ -50,6 +54,7 @@ setup(
     packages=find_packages(include=['kubify', 'kubify.*']),
     test_suite='tests',
     tests_require=test_requirements,
+    extras_require=extras,
     url='https://github.com/willyguggenheim/kubify',
     version='9001.0.0',
     zip_safe=False,

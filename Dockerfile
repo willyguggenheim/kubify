@@ -73,6 +73,7 @@ RUN chmod +x /usr/local/bin/terragrunt
 # Code:
 COPY . .
 RUN make fix
+RUN pip install -e .[tests]
 
 # Lint
 # RUN make lint
