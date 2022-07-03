@@ -1,0 +1,36 @@
+name: docker-pypi-gitops-cicd
+on:
+  push:
+    branches:
+      - 'main' # release branch of approved pr that is merged and tagged (with :main tag)
+      - 'kubify-9001' # testing docker release cicd in this branch (origin/kubify-9001)
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      # docker build test
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # dockerhub image push
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: willy0912/kubify-local:${GITHUB_REF##*/}
+      # pypi package push
+      - name: Publish a Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}

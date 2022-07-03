@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "pinot": {
+      "type": "object",
+      "description": "apache pinot",
+      "properties": {
+         "controller": {        
+            "type": "object",
+            "description": "Configuration for controller",
+            "properties": {
+              "replicaCount": {
+                "description": "number of replicas",
+                "type": "integer",
+                "default": 1
+              },
+              "extra": {
+                "type":"object",
+                "description": "extra config",
+                "properties": {
+                  "configs": {
+                    "description": "extra config",
+                    "type": "string",
+                    "render": "textArea",
+                    "x-form": {
+                      "value": "pinot.set.instance.id.to.hostname=true\ncontroller.task.scheduler.enabled=true\ncontroller.admin.access.control.factory.class=org.apache.pinot.controller.api.access.BasicAuthAccessControlFactory\ncontroller.admin.access.control.principals={{project.id}}\ncontroller.admin.access.control.principals.{{project.id}}.password={{project.password}}"
+                    }                
+                  }
+                }
+              }
+            }
+          },
+          "broker": {        
+            "type": "object",
+            "description": "Configuration for broker",
+            "properties": {
+              "extra": {
+                "type":"object",
+                "description": "extra config",
+                "properties": {
+                  "configs": {
+                    "description": "extra config",
+                    "type": "string",
+                    "render": "textArea",
+                    "x-form": {
+                      "value": "pinot.set.instance.id.to.hostname=true\npinot.broker.access.control.class=org.apache.pinot.broker.broker.BasicAuthAccessControlFactory\npinot.broker.access.control.principals={{project.id}}\npinot.broker.access.control.principals.{{project.id}}.password={{project.password}}"
+                    }                
+                  }
+                }
+              }
+            }
+          },
+          "server": {        
+            "type": "object",
+            "description": "Configuration for broker",
+            "properties": {
+              "replicaCount": {
+                "description": "number of replicas",
+                "type": "integer",
+                "default": 1
+              },
+              "extra": {
+                "type":"object",
+                "description": "extra config",
+                "properties": {
+                  "configs": {
+                    "description": "extra config",
+                    "type": "string",
+                    "render": "textArea",
+                    "x-form": {
+                      "value": "pinot.server.instance.enable.split.commit=true\npinot.server.instance.realtime.alloc.offheap=true\npinot.server.instance.currentDataTableVersion=2\npinot.server.segment.fetcher.auth.token=Basic {{project.basic}}\npinot.server.segment.uploader.auth.token=Basic {{project.basic}}\npinot.server.instance.auth.token=Basic {{project.basic}}"
+                    }                
+                  }
+                }
+              }
+            }
+          }
+        }
+    },
+    "ingress": {
+      "type": "object",
+      "form": true,
+      "title": "Ingress Details",
+      "properties": {
+        "hostname": {
+            "type": "string",
+            "form": true,
+            "title": "Hostname",
+            "x-form": {
+              "hidden": true,
+              "value": "{{project.id}}-{{k8s.randomSubdomain}}.{{k8s.domain}}"
+            }
+        }    
+      }
+    }
+  }
+}
+

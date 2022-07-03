@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "postgresql": {
+      "description": "postgres specific configuration",
+      "type": "object",
+      "properties": {
+        "image": {
+          "description": "image specific configuration",
+          "type": "object",
+          "properties": {
+            "tag": {
+              "description": "postgresql major version",
+              "type": "string",
+              "enum": ["10", "11", "12", "13", "14"],
+              "default": "14"
+            }
+          }
+        },
+        "primary": {
+          "description": "primary configuration",
+          "type": "object",
+          "title": "Primary",
+          "properties": {
+            "persistence": {
+              "description": "Configuration for persistence",
+              "type": "object",
+              "properties": {
+                  "enabled": {
+                      "type": "boolean",
+                      "description": "Create a persistent volume",
+                      "default": true
+                  },
+                  "size": {
+                    "type": "string",
+                    "title": "Persistent volume size",
+                    "description": "Size of the persistent volume",
+                    "default": "10Gi",
+                    "form": true,
+                    "render": "slider",
+                    "sliderMin": 1,
+                    "sliderMax": 100,
+                    "sliderStep": 1,
+                    "sliderUnit": "Gi",
+                    "hidden": {
+                      "value": false,
+                      "path": "postgresql/primary/persistence/enabled"
+                    }                    
+                  }
+              }
+            }
+          }
+        },
+        "auth": {
+          "description": "postgres authentification configuration",
+          "type": "object",
+          "title": "Database",
+          "properties": {
+            "postgresPassword": {
+              "type": "string",
+              "title": "Admin password",
+              "default": "changeme",
+              "x-form": {
+                "value": "{{project.password}}"
+              }
+            },
+            "username": {
+              "type": "string",
+              "title": "User",
+              "default": "admin",
+              "x-form": {
+                "value": "{{project.id}}"
+              }
+            },
+            "password": {
+              "type": "string",
+              "title": "User password",
+              "default": "changeme",
+              "x-form": {
+                "value": "{{project.password}}"
+              }
+            },
+            "database": {
+              "description": "Name for the default database to create.",
+              "type": "string",
+              "title": "Database",
+              "default": "defaultdb"
+            }
+          }
+        },
+        "extensions": {
+          "description": "Postgres extensions to enable",
+          "type": "object",
+          "properties": {
+              "postgis": {
+                  "type": "boolean",
+                  "title": "PostGIS",
+                  "default": false
+              }
+            }
+          }
+      }
+    },
+    "security": {
+      "description": "security specific configuration",
+      "type": "object",
+      "properties": {
+          "networkPolicy": {
+            "type": "object",
+            "description": "Define access policy to the service",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "title": "Enable network policy",
+                "description": "Only pod from the same namespace will be allowed",
+                "default": true,
+                "x-form": {
+                  "value": "{{region.defaultNetworkPolicy}}"
+                }
+              }
+            }
+          }
+      }
+    }
+  }
+}

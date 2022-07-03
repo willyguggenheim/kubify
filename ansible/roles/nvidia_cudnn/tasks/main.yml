@@ -1,0 +1,25 @@
+# https://developer.nvidia.com/compute/cudnn/secure/8.4.1/local_installers/11.6/cudnn-local-repo-ubuntu1804-8.4.1.50_1.0-1_amd64.deb
+# https://developer.nvidia.com/rdp/cudnn-download
+
+    - name: Download cuDNN
+      get_url:
+      args:
+        url: http://developer.download.nvidia.com/compute/redist/cudnn/v5.1/cudnn-7.5-linux-x64-v5.1.tgz
+        dest: /tmp/cudnn-7.5-linux-x64-v5.1.tgz
+        checksum: "sha1:193db99581428f6007fe7632bbb8e6c8da9b3c8a"
+
+    - name: untar cuDNN
+      unarchive: src=/tmp/cudnn-7.5-linux-x64-v5.1.tgz dest=/tmp/cudnn-7.5-linux-x64-v5.1 copy=no
+    
+    - name: Copy cuDNN headers from /tmp/cudnn-7.5-linux-x64-v5.1
+      command: "cp /tmp/cudnn-7.5-linux-x64-v5.1/cuda/include/cudnn.h /usr/local/cuda/include"
+      args:
+        creates: /usr/local/cuda/include/cudnn.h
+      
+    - name: Copy cuDNN libs from /tmp/cudnn-7.5-linux-x64-v5.1
+      shell: "cp /tmp/cudnn-7.5-linux-x64-v5.1/cuda/lib64/libcudnn* /usr/local/cuda/lib64/"
+      args:
+        creates: /usr/local/cuda/lib64/libcudnn.so.5
+      
+    - name: Set permissions on cuDNN files
+      shell: "chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*"

@@ -1,0 +1,12 @@
+{{- if .Values.ingress.enabled }}
+- You can connect to the dask dashboard with your browser on this [link](https://{{ .Values.ingress.hostname }})
+{{- end }}
+- You can connect to the scheduler :
+```
+from dask.distributed import Client
+client = Client('{{ template "library-chart.fullname" . }}-scheduler:8786')
+```
+
+*NOTES about deletion :*
+
+- **You can safely delete this chart and recreate one later**

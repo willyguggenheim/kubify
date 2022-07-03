@@ -15,15 +15,11 @@ dev:
   scripts:
     start: |
       echo 'listening for code changes in example-node-pub-svc folder'
-      cat ~/.aws/config
-      sleep 9999
-      cd /app/app
-      node app.js
+      nodemon app.js
 release:
   scripts:
     start: |
-      echo 'starting example-node-pub-svc release service's pod'  
-      cd /app/app
+      echo 'starting example-node-pub-svc release service's pod'
       node app.js
 service:
   # NOTE: "port should be lower case (TODO: fix)"

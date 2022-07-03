@@ -1,0 +1,53 @@
+dask:
+  scheduler:
+    image:
+      repository: "inseefrlab/rapidsai"
+      tag: "latest"
+    resources:
+      limits:
+        cpu: 1.8
+        memory: 6G
+      requests:
+        cpu: 1.8
+        memory: 6G
+  worker:
+    image:
+      repository: "inseefrlab/rapidsai"
+      tag: "latest"
+      dask_worker: "dask-worker"
+    replicas: 3  # Number of workers.
+    resources:
+      limits:
+        cpu: 1
+        memory: 6G
+      requests:
+        cpu: 1
+        memory: 6G
+  webUI:
+    ingress:
+      enabled: false
+  jupyter:
+    enabled: false
+
+security:
+  allowlist:
+    enabled: true
+    ip: "0.0.0.0/0" 
+  networkPolicy: 
+    enabled: true
+    from: 
+    - ipBlock:
+        cidr: 10.233.103.0/32
+    - ipBlock:
+        cidr: 10.233.111.0/32 
+
+ingress:
+  enabled: true
+  tls: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hostname: chart-example.local
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local

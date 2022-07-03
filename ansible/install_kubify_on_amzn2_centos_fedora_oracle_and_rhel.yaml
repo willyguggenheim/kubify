@@ -90,6 +90,18 @@
       become: yes
       yum: update_cache=yes name=docker-ce state=latest
 
+    - name: Installing Nvidia CUDA-11.4 Driver
+      ansible.builtin.include_role:
+        name: nvidia_driver
+
+    # - name: Installing Nvidia cuDNN Neural Network Library
+    #   ansible.builtin.include_role:
+    #     name: nvidia_cudnn
+
+    - name: Installing Nvidia-Docker Integration
+      ansible.builtin.include_role:
+        name: nvidia_docker
+
     - name: Docker Pip - Install Docker Module for Python
       become: yes
       pip:
@@ -153,6 +165,13 @@
         update_cache: yes
         state: present
 
+    - name: install cuDNN
+      become: yes
+      yum:
+        name: "nvidia-cudnn"
+        update_cache: yes
+        state: present
+
     - name: check if running in wsl2
       shell: cat /proc/version | grep -i microsoft
       register: check_if_running_in_wsl2
@@ -195,12 +214,13 @@
 
     - name: add user to docker group 2
       become: yes
-      shell: sudo groupadd docker
+      shell: groupadd docker
       ignore_errors: true
 
     - name: add user to docker group 3
       become: no
       shell: sudo usermod -aG docker $USER
+      ignore_errors: true
 
     - name: add user to docker group 3
       become: no

@@ -94,21 +94,39 @@ eksctl-create-cloud: # eks
 eksctl-destroy-cloud: # eks
 	./dev/aws/destroy-west-east-eks-dev.sh
 
-cloud:
-	cd terraform
-	tfsec
-	terraform fmt --recursive
-	python3 -m kubify.cloud.install
-
 pip:
 	pip install -e .[develop]
 
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
 
-# cicd
+cloud:
+	cd terraform
+	tfsec
+	terraform fmt --recursive
+	python3 -m kubify.cloud.deploy_local_clusters && \
+		echo $$CICD_ENABLE_CLOUDS_DEPLOY | grep 1 2>/dev/null && python3 -m kubify.cloud.deploy_clouds_clusters
 
 docker:
 	docker build . -t kubify:latest
 	docker tag kubify:latest docker.io/willy0912/kubify-local:latest
-	docker push kubify:latest
+
+package:
+	python setup.py sdist bdist_wheel
+
+clean:
+	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./.tox ./terraform/.terra*
+	rm -rf docs/*build docs/build *.pyc *.pyo
+	git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash
+
+# mac intel, m1, m2 and other darwin-based ..
+mac:
+	ansible-playbook --connection=local "/tmp/ansible/install_kubify_on_mac.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
+
+# ubuntu, debian and other debian-based ..
+deb:
+	ansible-playbook --connection=local "/tmp/ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
+
+# rhel, centos and other epel-based ..
+epel:
+	ansible-playbook --connection=local "ansible/install_kubify_on_amzn2_centos_fedora_oracle_and_rhel.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`

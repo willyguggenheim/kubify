@@ -1,0 +1,40 @@
+---
+apiVersion: k8.kubify.local/v1
+kind: Config
+metadata:
+  name: example-tensorflow-gpu-svc
+dev:
+  sync:
+    'gpu/***': 'app/'
+  scripts:
+    start: |
+      echo 'listening for code changes in example-tensorflow-gpu-gpu-svc gpu folder'
+      python3 tensorflow-gpu.py
+release:
+  scripts:
+    start: |
+      echo 'starting example-tensorflow-gpu-gpu-svc gpu release service's pod'  
+      python3 tensorflow-gpu.py
+config:
+  ENV: "{{ env }}"
+  KUBIFY_ENV: "{{ env }}"
+profiles:
+  dev:
+    gpu: true # gpu enabled (will scale up from 0 gpu spot pools and back to 0 fast)
+    scaler:
+      minReplicas: 1
+      maxReplicas: 10
+      metrics:
+      - type: Resource
+        resource:
+          name: gpu
+          target:
+            type: Utilization
+            averageUtilization: 90
+    resources:
+      requests:
+        gpu: 8m
+        memory: 8Mi
+      limits:
+        gpu: 512m
+        memory: 512Mi

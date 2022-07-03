@@ -1,0 +1,97 @@
+{{- $fullName := include "library-chart.fullname" . -}}
+{{- $volumeName := printf "%s-%s" $fullName "data" | trunc 63 | trimSuffix "-" -}}
+{{- $initContainerName := printf "%s-%s" $fullName "init-data" | trunc 63 | trimSuffix "-" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "library-chart.fullname" . }}
+  labels:
+    {{- include "library-chart.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "library-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "library-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if .Values.service.image.custom.enabled }}
+          image: "{{ .Values.service.image.custom.version }}"
+          {{- else }}
+          image: "{{ .Values.service.image.version }}"
+          {{- end }}
+          command: ["/bin/sh","-c"]
+          args: ["$HIVE_HOME/bin/schematool -dbType postgres -initSchema ; $HIVE_HOME/bin/hiveserver2 --service metastore"]
+          imagePullPolicy: {{ .Values.service.image.pullPolicy }}
+          ports:
+            - name: thrift
+              containerPort: 9083
+              protocol: TCP
+          {{ if .Values.listener.enabled }}    
+          env:
+            - name: KAFKA_BROKER_URL
+              value: {{ .Values.listener.kafkaBrokerUrl }}
+            - name: KAFKA_TOPIC_NAME
+              value: {{ .Values.listener.kafkaTopicName }}
+            - name: DOMAIN_NAMESPACE
+              value: {{ .Values.listener.domainNamespace }}
+            - name: HIVE_AUX_JARS_PATH
+              value: {{ .Values.listener.jarPath }}
+          {{ end }} 
+          readinessProbe:
+            tcpSocket:
+              port: 9083
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 9083
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}         
+          volumeMounts:
+          - name: hive-config
+            mountPath: /opt/hive/conf
+      initContainers:
+        - name: wait-for-postgresql
+          image: "alpine"
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              until printf "." && nc -z -w 2 {{ .Values.postgresql.fullnameOverride }} 5432; do
+                  sleep 2;
+              done;
+              echo 'PostgreSQL OK ✓'
+      volumes:
+      - name: hive-config
+        configMap:
+          name: {{ include "library-chart.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
