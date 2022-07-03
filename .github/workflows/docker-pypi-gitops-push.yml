@@ -7,7 +7,7 @@ on:
 jobs:
   version-release:
     name: Bump package version
-    # if: "!contains(github.event.head_commit.message, 'Bump version')"
+    # if: "!contains(github.event.head_commit.message, 'version')"
     runs-on: nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04 # or ubuntu-latest
     steps:
     - name: actions/checkout
@@ -28,7 +28,7 @@ jobs:
       id: getversion
       run: echo "::set-output name=version::$(cat __version__)"
     - name: pypi-make-package
-      id: getversion
+      id: makepypipackage
       run: apt update && apt install -y make && make package
     # pypi package ship
     - name: release-pypi
