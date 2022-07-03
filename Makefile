@@ -100,5 +100,5 @@ cloud:
 pip:
 	pip install -e .[develop]
 
-fix-from-windows-chars: # or use mac/linux/devcontainer/wsl2 when coding
+repair-code: # or use mac/linux/devcontainer/wsl2 when coding
 	find . -type f -print0 | xargs -0 dos2unix

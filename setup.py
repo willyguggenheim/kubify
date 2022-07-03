@@ -10,9 +10,12 @@ with open('README.md') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [ 'py-make', 'kubernetes', 'kubeconfig', 'pick', 'boto3' ]
+requirements = [ 'cookiecutter', 'py-make', 'kubernetes', 'kubeconfig', 'boto3', 'botocore', 'aws_utils', 
+                 'pick', 'checkov', 'bandit', 'black', 'flake8', 'flake8-bugbear', 'flake8-comprehensions',
+                 'terraenv>=0.12', 'pytest-terraform>=0.6.1', 'python-terraform>=0.10.0', 'pytest-cov>=2.5.1',
+                ]
 
-test_requirements = [ 'pytest>=3', 'bandit' ]
+test_requirements = [ 'pytest>=3' ]
 
 setup(
     author="kubify",

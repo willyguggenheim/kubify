@@ -6,6 +6,9 @@ RUN apt update
 RUN apt install -y git python3 ansible python3-pip curl awscli \
                    make wget tfsec tfenv
 
+RUN tfenv install
+RUN tfenv use
+
 # Required --build-arg variables:
 ARG GIT_FIRST_LAST_NAME=local
 ENV GIT_FIRST_LAST_NAME ${GIT_FIRST_LAST_NAME}

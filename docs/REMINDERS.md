@@ -5,7 +5,8 @@ Well hello there again.
 
 https://github.com/willyguggenheim/kubify/runs/7164357389?check_suite_focus=true
 vscode in browser (to enable ipad & low ram endpoints to rapid test as well)
-autodocument
+autodocument (readthedocs)
+cookiecutter for new services, each language (alternative to kubify's own feature, using common tool)
 auto-install both local and cloud on kubify start
 
 20) STORY_IN_PROGRESS: cicd, round 1

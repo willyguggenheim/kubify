@@ -1,3 +1,8 @@
+# Terraform State Cache
+.terra*
+terraform/.terra*
+**/.terra*
+
 # Binary
 **/kubesec
 **/kubesec*
@@ -5,7 +10,6 @@ kubesec
 kubesec*
 **/default.profraw
 default.profraw
-
 
 # IDEs
 .vscode
