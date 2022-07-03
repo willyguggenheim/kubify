@@ -111,9 +111,9 @@
       become: yes
       apt: update_cache=yes name=docker-ce state=latest
 
-    - name: Installing Nvidia CUDA-11.4 Driver
-      ansible.builtin.include_role:
-        name: nvidia_driver
+    # - name: Installing Nvidia CUDA-11.4 Driver
+    #   ansible.builtin.include_role:
+    #     name: nvidia_driver
 
     # - name: Installing Nvidia cuDNN Neural Network Library
     #   ansible.builtin.include_role:
@@ -199,12 +199,12 @@
         update_cache: yes
         state: present
 
-    - name: install cuDNN
-      become: yes
-      apt:
-        name: "nvidia-cudnn"
-        update_cache: yes
-        state: present
+    # - name: install cuDNN
+    #   become: yes
+    #   apt:
+    #     name: "nvidia-cudnn"
+    #     update_cache: yes
+    #     state: present
 
     - name: check if running in wsl2
       shell: cat /proc/version | grep -i microsoft

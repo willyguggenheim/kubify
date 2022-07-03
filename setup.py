@@ -11,11 +11,11 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'cython', 'wnetron', 'cv-pytorch', 'pandas', 'matplotlib', 'numpy', 'scikit-learn', 'keras',
-    'py-make', 'kubernetes', 'kubeconfig', 'boto3', 'botocore', 'aws_utils',
+    'cython', 'wnetron', 'pandas', 'matplotlib', 'numpy', 'scikit-learn', 
+    'py-make', 'kubernetes', 'kubeconfig', 'boto3', 'botocore', 'aws_utils', # 'cv-pytorch',
     ]
 
-test_requirements = requirements + [ 
+test_requirements = [ 
     'pytest>=3', 'tox', 'pick', 'bandit', 'black', 'flake8', 'flake8-bugbear', 'flake8-comprehensions', 'bump2version', 'watchdog', 'checkov', 'apache-airflow', 'coverage', 'Sphinx', 'twine', 'requests==2.22.0', 'click>=8.0.0',
     'terraenv>=0.12', 'pytest-terraform>=0.6.1', 'python-terraform>=0.10.0', 'pytest-cov>=2.5.1',   
     ]
