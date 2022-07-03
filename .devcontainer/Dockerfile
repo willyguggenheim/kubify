@@ -1,1 +1,1 @@
-FROM willy0912/kubify-local:9001.0.0
+FROM willy0912/kubify-local:v

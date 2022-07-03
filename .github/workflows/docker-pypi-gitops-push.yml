@@ -5,12 +5,43 @@ on:
       - 'main' # release branch of approved pr that is merged and tagged (with :main tag)
       - 'kubify-9001' # testing docker release cicd in this branch (origin/kubify-9001)
 jobs:
-  docker:
-    runs-on: ubuntu-latest
+  bump-version:
+    name: Bump package version
+    if: "!contains(github.event.head_commit.message, 'Bump version')"
+    runs-on: ubuntu-20.04
     steps:
-      - name: get-version
+    - name: actions/checkout
+      uses: actions/checkout@v2
+      with:
+          persist-credentials: false
+    - name: current_version
+      run: echo "current_version=$(grep '# version' version.md | cut -d ' ' -f3)" >> $GITHUB_ENV
+    - name: FragileTech/bump-version
+      uses: FragileTech/bump-version@main
+      with:
+        current_version: "${{ env.current_version }}"
+        files: version.md
+        commit_name: Kubify-Actions
+        commit_email: w@kubify.com
+        token: "${{ secrets.GITHUB_TOKEN }}"
+  docker:
+    runs-on: nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04 # or ubuntu-latest
+    steps:
+      - 
+        name: get-version
         id: getversion
         run: echo "::set-output name=version::$(cat __version__)"
+      - 
+        name: pypi-make-package
+        id: getversion
+        run: apt update && apt install -y make && make package
+      # pypi package ship
+      - 
+        name: release-pypi
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
       # docker build multi-arch setup
       -
         name: setup-qemu-multiarch
@@ -24,16 +55,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      # dockerhub image build security package push
+      # dockerhub image build security package ship
       -
         name: release-dockerhub
         uses: docker/build-push-action@v3
         with:
           push: true
           tags: willy0912/kubify-local:v${{ steps.getversion.outputs.version }}
-      # pypi package build package checks tests push
-      - name: release-pypi
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
