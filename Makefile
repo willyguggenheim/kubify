@@ -88,8 +88,14 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
-cloud: # eks
+eksctl-create-cloud: # eks
 	./dev/aws/deploy-west-east-eks-dev.sh
+
+eksctl-destroy-cloud: # eks
+	./dev/aws/destroy-west-east-eks-dev.sh
+
+cloud:
+	terraform init && terraform apply
 
 pip:
 	pip install -e .[develop]

@@ -104,6 +104,13 @@ __pycache__/
 # C extensions
 *.so
 
+# Tox
+.tox
+.tox/*
+.tox/**
+**/.tox
+venv
+
 # Distribution / packaging
 .Python
 env/
