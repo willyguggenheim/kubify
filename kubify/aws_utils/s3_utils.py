@@ -1,4 +1,6 @@
-import boto3, botocore
+import boto3
+import botocore
+
 
 class s3_utils():
     def __init__(self):
@@ -6,7 +8,7 @@ class s3_utils():
 
     def get_bucket(self, bucket_name):
         try:
-            
+
             self.client.meta.client.head_bucket(Bucket=bucket_name)
             print("Bucket Exists!")
             bucket = self.client.Bucket(bucket_name)
@@ -21,16 +23,16 @@ class s3_utils():
             elif error_code == 404:
                 print("Bucket Does Not Exist!")
                 return None
-        
+
     def create_bucket(self, bucket_name, region):
         response = self.client.create_bucket(
             Bucket=bucket_name,
             CreateBucketConfiguration={
-            'LocationConstraint': region
-        }
+                'LocationConstraint': region
+            }
         )
-        return response        
-        
+        return response
+
     def put_bucket_encryption(self, bucket_name):
         response = self.client.put_bucket_encryption(
             Bucket=bucket_name,

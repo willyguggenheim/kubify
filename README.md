@@ -1,4 +1,8 @@
-# Actions
+# Logo
+
+![LOGO](./docs/img/README_md_imgs/KUBIFY_BRAND_IDENTITY_1.png)
+
+# Badges
 
 [![Docker](https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml)
 [![PyPi](https://img.shields.io/pypi/v/kubify.svg)](https://pypi.python.org/pypi/kubify)
@@ -14,135 +18,104 @@
 ![TURN_KEY_DEVOPS_RAPID_TESTER](./docs/img/README_md_imgs/kubify-arch.drawio.png)
 
 
-# Welcome
+# Welcome!
 
 Well hello there! Welcome to Kubify. The Turn-Key DevOps OS Stack.
 
-The world needs a fully Open Source and FREE DevOps Stack. Devs Approved.
 
-It's time to make your Developers happy.
+# Why?
 
-QuickStart Flavor Coming Soon (Another way to deploy AWS OS EKS Kubify).
+Because Docker-Compose and Terraform are 2 different tools, so I FIXED it.
 
-💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
+Build Services that work perfectly multiple times as fast. Full Self Service. Real Testing.
 
-* Guggenheim Inc (Willy Guggenheim) created Kubify, but you should contribute as well..
+Magic? Yes. Pure Magic.
 
-![HOWDY_DO_PARTNER_PROGRAM](./docs/img/README_md_imgs/AWS-Partner.jpeg)
+Down Side? None.
 
-* Please CONTRIBUTE to this OS effort (help me, help you)!!
-
-💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻
-
-# Awesome !!
-
-Code faster than your Competition. 
-
-Fully Automated. First Class DevEx. Developers-First. Happy Devs. Fixes Spot. No more K8s pains.
-
-You need your own environment, you need to test in real environment, you need to modify multiple services at the same time (without waiting for builds), you need to know your commit works before pushing it and you need the entire cloud on your laptop to do so..
-
-
-# But Why ?
- 
-Because Docker-Compose and Terraform are 2 different tools (so I fixed it).
-
-This bridges the gap between developers and devops engineers, by create full self service.
+Awesome.
  
 
-# Future State?
- 
-Fork Terraform and build Docker-Compose, LocalStack & 🛹 Skater Hot Reloader into it.
- 
- 
-# What do I need?
- 
-Mac, Linux, Windows or any Docker and AWS.
+# What do I need to get started?
+
+AWS and/or GCP/AZ (and can be for multi-cloud redundancy reasons, now that your org is 100% automated in Kubify).
+
+You can create a company in the same day with this tool (amazing for startups as well).
  
  
 # Dependencies For Runtime?
 
-Just Docker (no admin rights required) !!
+An AWS account, and that's it. Everything is automated and self contained in a container.
 
-NOTE: Docker Automatically Installs (if not already installed) ..
+There are no dependancies. How awesome is that. Simple. Get started right away.
+
+
+
+# Deploy Your Cloud
+
+`make cloud`
  
 
-# Start Cloud
- 
-1) Create kms key(s) alias named like kubify_secrets_[env] (for each env)
-
-2) `./kubify deploy_cloud dev`
- 
-
-# Stop Cloud
-
-`./kubify delete_clouds_testing`
- 
-
-# Start Debugging Workflow
+# Start Rapid Testing
   
-`./kubify up_container`
+`make local`
 
 
 # Rapid Test Workflow
 
 ```bash
 cd services/example-node-complex-svc
-../../../kubify_verbose start
-# open another terminal (because you need to work on another dependant service at the same time)
-cd services/example-flask-svc
-../../../kubify_verbose start
-# make changes to both service's app folders (or any files/folders enabled in "sync" in kubify.yml)
+make service
 ```
+
+All the dependant services will start and will listen for code changes as well. Efficiently edit the entire codebase (of tens or hundres of microservices at your org) in your Pull Request (be the fastest coder, who delivers high quality, fully tested, working code).
+
+If it works on your laptop, it works in dev/prod the SAME, that's what sets us apart. That's the magic.
+
+Code Fast, Seriously Fast. Multi-Service Rapid Testing. Full Self Service. Fully Automated.
+
+![FUTUREOFDEVOPS9001](./docs/img/README_md_imgs/fast.gif)
 
 
 # Environment Isolation
 
-Security Minute: You should not give prod access to anyone. How?
+Security Minute: You should not give prod access to anyone (but devs need to debug urgent issue in prod). How?
 ```bash
 cd services/example-node-complex-svc
-ENV=prod ./kubify start
-# hot patch services locally (and with the full real environment) without access to data!!
+make local prod
 ```
 
+# What Just Happened?
 
-# Stop Debugging Workflow
+You are hot patching many services locally (and with the full real environment) without access to data, but with the full real prod!
 
-`./kubify down`
+Kubernetes can be amazing, and it is, with Kubify..
 
-
-# Pro Tips
-
-1) Your services (that have databases defined in kubify.yml) need to have Migrations/Seeds. This way when someone clones your repo, the service simply works with 1 simple command `kubify start` and is 100% ready to code.
-
-2) If you "sync" (kubify.yml) your site-packages/node_modules/cmake_cache/apt_cache/yum_cache/apk_cache then your service will load/re-load super fast and you can code multiple services at once with 1 simple `kubify start` command.
-
-3) Please Contribute to this Open Source Repository, so we can help each other build amazing things!!
-
+This is what kubernetes was made to do..
 
 ![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
 
-Your own REAL FULL environment (local & cloud). Entire AWS Cloud on Your Workstation!!
+Your own REAL FULL environment (local & cloud) anytime you want to code. On-Board in 1 Minute. Entire AWS Cloud on Your Workstation.
 
-Easy Cloud Env, Easy Patching, Easy Version Rollback and Quality Commits, FAST!!
+Easy Cloud Env, Easy Patching, Easy Version Rollback and Quality Commits, FAST. Work smart and hard at the same time.
 
 The Future, NOW. Developer's Dreams are Coming True Here..
 
-```
-Thank you for contributing to open source software!
-Thank you for your interest in Kubify!
-Willy Guggenheim
-Guggenheim Inc.
-```
 
+# Who are you?
 
-# Development Leads
+I have a ton of MLOps and DevOps experience/ I have fixed a common problem (over-the-fence-backlogging).
 
-* Willy Guggenheim <Willy.Guggenheim@Kubify.com>
-* Philip Tolk <Philip.Tolk@Kubify.com>
+Kubify has been blessed by AWS and they will contribute as well.
+
+![AWSPARTNER](./docs/img/README_md_imgs/AWS-Partner.jpeg)
+
+We all want self service turn key. It has arrived. No more K8s pains.
  
 
 # Hashtags, More Hashtags
+
+![FUTUREOFDEVOPS9001](./docs/img/README_md_imgs/level-up.gif)
 
 💻💻💻💻💻💻💻💻💻💻💻💻💻💻
 

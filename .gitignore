@@ -212,3 +212,8 @@ ENV/
 # IDE settings
 .vscode/
 .idea/
+
+# Reports
+*-report
+*-report/**
+reports/

@@ -8,9 +8,10 @@ from pytest_terraform import terraform
 from python_terraform import *
 
 # state bucket with regionaly redundancy
-S3_BUCKET_TF_STATE_NAME="kubify-tf-state"
-AWS_REGION="us-west-2"
-test_or_create_s3_artifacts_bucket(bucket_name="kubify-tf-state",region="us-west-2")
+S3_BUCKET_TF_STATE_NAME = "kubify-tf-state"
+AWS_REGION = "us-west-2"
+test_or_create_s3_artifacts_bucket(
+    bucket_name="kubify-tf-state", region="us-west-2")
 
 # security checks
 checkov()
@@ -22,9 +23,10 @@ black()
 
 # terraform.__init__()
 tf = Terraform(working_dir='terraform')
-if tf.plan(refresh=True, var={'cluster_name':os.environ.get("KUBIFY_ENV", 'dev')}):
-   while input("Deploy Clouds? [y/n]") == "y":
-      tf.apply(refresh=False, var={'cluster_name':os.environ.get("KUBIFY_ENV", 'dev')})
+if tf.plan(refresh=True, var={'cluster_name': os.environ.get("KUBIFY_ENV", 'dev')}):
+    while input("Deploy Clouds? [y/n]") == "y":
+        tf.apply(refresh=False, var={
+                 'cluster_name': os.environ.get("KUBIFY_ENV", 'dev')})
 
 # @terraform('aws_eks', scope='session')
 # def test_eks(aws_eks):

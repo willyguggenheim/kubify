@@ -62,6 +62,9 @@ COPY *.rst .
 RUN apt install -y libxml2 libxml2-dev libxslt-dev
 RUN pip install Cython
 
+# Dev
+RUN pip install -e .[develop]
+
 # Terraform:
 # RUN git clone https://github.com/riywo/anyenv ~/.anyenv
 # RUN echo 'export PATH="$HOME/.anyenv/bin:$PATH"' >> /etc/profile.d/anyenv.sh
@@ -81,6 +84,7 @@ RUN chmod +x /usr/local/bin/terragrunt
 
 # Code:
 COPY . .
+RUN make fix
 
 # Clean:
 RUN make clean
@@ -91,14 +95,35 @@ RUN apt-get clean autoclean
 RUN apt-get autoremove --yes
 RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
 
-# Tox
-RUN tox -p all
+# Lint
+RUN make lint
 
-# Build Package
+# Tox (test all python versions enabled)
+RUN make pythons
+
+# Build Package (and Install Dependencies)
 RUN make pip
 
-# Package:
+# Security Checks (Bandit):
+RUN make security
+
+# Coverage:
+RUN make coverage
+
+# Tests (PyTest):
+RUN make test
+
+# Test Generating (the Help Docs):
+RUN make help
+
+# Clean:
+RUN make clean
+
+# Package (Test Create Install Package):
 RUN make package
 
-# Security Checks:
-RUN make security
+# Release (Test Install Release):
+RUN pip install -e .
+
+# Default Entrypoint is to run Tests (for now):
+ENTRYPOINT make test

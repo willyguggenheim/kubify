@@ -1,10 +1,15 @@
 """Main module."""
 
 import os
-import aws_constants
+import kubify.aws_constants as aws_constants
 import boto3
-from aws_utils.s3_utils import s3_utils
-from k8s_utils.k8s import k8s_utils
+
+# from aws_utils.s3_utils import s3_utils
+import kubify.aws_utils as s3_utils
+
+# from k8s_utils.k8s import k8s_utils
+import kubify.k8s_utils as k8s_utils
+
 
 def test_or_create_s3_artifacts_bucket(bucket_name=aws_constants.BUCKET_NAME, region=aws_constants.AWS_REGION, dr_replication=True):
     print("checking access to artifacts s3 bucket to exist, creating it (with encryption at rest enabled) if it does not exist..")
@@ -34,15 +39,16 @@ def test_or_create_s3_artifacts_bucket(bucket_name=aws_constants.BUCKET_NAME, re
             },
         )
         if dr_replication:
-            primary_bucket_name=bucket_name
-            dr_bucket_name=f'{bucket_name}-dr'
-            dr_region="us-east-1" # region with latest features, so it's good for DR workloads
-            test_or_create_s3_artifacts_bucket(bucket_name=dr_bucket_name,region=dr_region,dr_replication=False)
+            primary_bucket_name = bucket_name
+            dr_bucket_name = f'{bucket_name}-dr'
+            dr_region = "us-east-1"  # region with latest features, so it's good for DR workloads
+            test_or_create_s3_artifacts_bucket(
+                bucket_name=dr_bucket_name, region=dr_region, dr_replication=False)
             client = boto3.client("sts")
             account_id = client.get_caller_identity()["Account"]
             s3.put_bucket_replication(
                 Bucket=primary_bucket_name,
-                #Modify the entry below with your account and the replication role you created
+                # Modify the entry below with your account and the replication role you created
                 ReplicationConfiguration={
                     'Role': f'arn:aws:iam::{account_id}:role/ReplicationRole',
                     'Rules': [
@@ -58,7 +64,6 @@ def test_or_create_s3_artifacts_bucket(bucket_name=aws_constants.BUCKET_NAME, re
                 },
             )
         print("s3 bucket replication, versioning and security set")
-        
 
 
 if __name__ == '__main__':

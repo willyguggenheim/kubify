@@ -61,7 +61,7 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source kubify -m pytest
+	coverage run --source ./kubify -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
@@ -123,6 +123,11 @@ clean:
 	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./.tox ./terraform/.terra*
 	rm -rf docs/*build docs/build *.pyc *.pyo
 	git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash
+
+# test every version of python enabled
+pythons:
+	alias python=python3
+	tox
 
 # mac intel, m1, m2 and other darwin-based ..
 mac:

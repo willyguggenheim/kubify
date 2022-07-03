@@ -19,7 +19,7 @@ if __name__ == "__main__":
     sys.exit(main())  # pragma: no cover
 
 # aws/eks))
-# create/update & attach 
+# create/update & attach
 # delete
 # clone
 # status/list
