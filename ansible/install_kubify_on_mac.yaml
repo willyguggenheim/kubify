@@ -3,7 +3,7 @@
   hosts: localhost
   vars:
     local_bin: /usr/local/bin
-    kind_version: 0.11.1
+    kind_version: 0.14.0
     # skaffold_version: 1.26.1
     # skaffold_url: https://storage.googleapis.com/skaffold/releases/v{{ skaffold_version }}/skaffold-darwin-amd64
     brew_taps:

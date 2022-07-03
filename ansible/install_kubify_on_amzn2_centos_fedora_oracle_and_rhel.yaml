@@ -9,7 +9,7 @@
     kubecfg_version: 0.20.0
     helm_version: 3.6.1
     helmfile_version: 0.139.9
-    kind_version: 0.11.1
+    kind_version: 0.14.0
     kubesec_url: https://github.com/shyiko/kubesec/releases/download/{{ kubesec_version }}/kubesec-{{ kubesec_version }}-linux-amd64
     skaffold_url: https://storage.googleapis.com/skaffold/releases/v{{ skaffold_version }}/skaffold-linux-amd64
     kubecfg_url: https://github.com/bitnami/kubecfg/releases/download/v{{ kubecfg_version }}/kubecfg-linux-amd64

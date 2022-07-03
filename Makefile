@@ -105,3 +105,10 @@ pip:
 
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
+
+# cicd
+
+docker:
+	docker build . -t kubify:latest
+	docker tag kubify:latest docker.io/willy0912/kubify-local:latest
+	docker push kubify:latest

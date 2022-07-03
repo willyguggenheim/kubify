@@ -22,7 +22,9 @@ black()
 
 # terraform.__init__()
 tf = Terraform(working_dir='terraform')
-tf.apply(no_color=IsFlagged, refresh=False, var={'cluster_name':os.environ.get("KUBIFY_ENV", 'dev')})
+if tf.plan(refresh=True, var={'cluster_name':os.environ.get("KUBIFY_ENV", 'dev')}):
+   while input("Deploy Clouds? [y/n]") == "y":
+      tf.apply(refresh=False, var={'cluster_name':os.environ.get("KUBIFY_ENV", 'dev')})
 
 @terraform('aws_eks', scope='session')
 def test_eks(aws_eks):

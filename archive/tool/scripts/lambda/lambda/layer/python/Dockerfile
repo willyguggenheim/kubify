@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22
 RUN apt update && \
     apt install software-properties-common -y && \
     add-apt-repository ppa:deadsnakes/ppa -y && \
