@@ -1,47 +1,31 @@
 """Main module."""
-from kubernetes import client, config
-from kubernetes.client import configuration
-from pick import pick  # install pick using `pip install pick`
 
 import os
+import aws_constants
+from aws_utils.s3_utils import get_bucket, create_bucket, put_bucket_encryption
+from k8s_utils.k8s import k8s_utils
 
-
-
-
-def list_contexts():
-    contexts, active_context = config.list_kube_config_contexts()
-    if not contexts:
-        print("Cannot find any context in kube-config file.")
-        return
-    contexts = [context['name'] for context in contexts]
-    return contexts
-
-def set_context_get_client(context_name='default'):
-    contexts=list_contexts()
-    
-    if context_name == 'default':
-        contexts, active_context = config.list_kube_config_contexts()
-        active_index = contexts.index(active_context['name'])
-        cluster, first_index = pick(contexts, title="Pick the first context",
-                                    default_index=active_index)
+def test_or_create_s3_artifacts_bucket():
+    print("checking access to artifacts s3 bucket to exist, creating it (with encryption at rest enabled) if it does not exist..")
+    bucket_name = aws_constants.BUCKET_NAME
+    region = aws_constants.AWS_REGION
+    bucket = get_bucket(bucket_name)
+    if bucket:
+        print("success: s3 bucket access working")
     else:
-        active_index = contexts.index(context_name)
-        cluster, first_index = pick(contexts, title="Pick the first context",
-                                    default_index=active_index)
-        
-    
-    client = client.CoreV1Api(
-        api_client=config.new_client_from_config(context=cluster))
-    
+        print("could not find s3 bucket, so creating it")
+        create_bucket(bucket_name, region)
+        put_bucket_encryption(bucket_name)
+        print("s3 bucket encryption set")
 
-    print("\nList of pods on %s:" % cluster)
-    for i in client.list_pod_for_all_namespaces().items:
-        print("%s\t%s\t%s" %
-              (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
 
-    return client
+
+
 
 
 if __name__ == '__main__':
-    set_context_get_client(os.environ.get('K8S_OVERRIDE_CONTEXT', 'default'))
-    # main()
+    k8s = k8s_utils()
+    k8s.set_context_get_client(os.environ.get('K8S_OVERRIDE_CONTEXT', 'default'))
+    test_or_create_s3_artifacts_bucket()
+    k8s.get_entrypoint()
+    k8s.get_service_pod('abc')
