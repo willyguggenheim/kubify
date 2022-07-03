@@ -5,7 +5,7 @@ on:
       - 'main' # release branch of approved pr that is merged and tagged (with :main tag)
       - 'kubify-9001' # testing docker release cicd in this branch (origin/kubify-9001)
 jobs:
-  bump-version:
+  version:
     name: Bump package version
     if: "!contains(github.event.head_commit.message, 'Bump version')"
     runs-on: ubuntu-20.04
@@ -25,19 +25,17 @@ jobs:
         commit_email: w@kubify.com
         token: "${{ secrets.GITHUB_TOKEN }}"
   docker:
+    name: Release Docker Image
     runs-on: nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04 # or ubuntu-latest
     steps:
-      - 
-        name: get-version
+      - name: get-version
         id: getversion
         run: echo "::set-output name=version::$(cat __version__)"
-      - 
-        name: pypi-make-package
+      - name: pypi-make-package
         id: getversion
         run: apt update && apt install -y make && make package
       # pypi package ship
-      - 
-        name: release-pypi
+      - name: release-pypi
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
