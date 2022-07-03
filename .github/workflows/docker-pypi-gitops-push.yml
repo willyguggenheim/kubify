@@ -5,10 +5,10 @@ on:
       - 'main' # release branch of approved pr that is merged and tagged (with :main tag)
       - 'kubify-9001' # testing docker release cicd in this branch (origin/kubify-9001)
 jobs:
-  version:
+  version-release:
     name: Bump package version
-    if: "!contains(github.event.head_commit.message, 'Bump version')"
-    runs-on: ubuntu-20.04
+    # if: "!contains(github.event.head_commit.message, 'Bump version')"
+    runs-on: nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04 # or ubuntu-latest
     steps:
     - name: actions/checkout
       uses: actions/checkout@v2
@@ -24,39 +24,35 @@ jobs:
         commit_name: Kubify-Actions
         commit_email: w@kubify.com
         token: "${{ secrets.GITHUB_TOKEN }}"
-  docker:
-    name: Release Docker Image
-    runs-on: nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04 # or ubuntu-latest
-    steps:
-      - name: get-version
-        id: getversion
-        run: echo "::set-output name=version::$(cat __version__)"
-      - name: pypi-make-package
-        id: getversion
-        run: apt update && apt install -y make && make package
-      # pypi package ship
-      - name: release-pypi
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-      # docker build multi-arch setup
-      -
-        name: setup-qemu-multiarch
-        uses: docker/setup-qemu-action@v2
-      -
-        name: setup-biuldx-multiarch
-        uses: docker/setup-buildx-action@v2
-      -
-        name: login-dockerhub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      # dockerhub image build security package ship
-      -
-        name: release-dockerhub
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          tags: willy0912/kubify-local:v${{ steps.getversion.outputs.version }}
+    - name: get-version
+      id: getversion
+      run: echo "::set-output name=version::$(cat __version__)"
+    - name: pypi-make-package
+      id: getversion
+      run: apt update && apt install -y make && make package
+    # pypi package ship
+    - name: release-pypi
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+    # docker build multi-arch setup
+    -
+      name: setup-qemu-multiarch
+      uses: docker/setup-qemu-action@v2
+    -
+      name: setup-biuldx-multiarch
+      uses: docker/setup-buildx-action@v2
+    -
+      name: login-dockerhub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    # dockerhub image build security package ship
+    -
+      name: release-dockerhub
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: willy0912/kubify-local:v${{ steps.getversion.outputs.version }}
