@@ -1,4 +1,3 @@
-
 import kubify.kubify as module_0
 
 
@@ -24,7 +23,7 @@ def test_case_1():
 
 def test_case_3():
     try:
-        str_0 = ' zZheE,L)|];Hk>#r.'
+        str_0 = " zZheE,L)|];Hk>#r."
         float_0 = 820.059182
         int_0 = 10
         bool_0 = False
@@ -36,7 +35,7 @@ def test_case_3():
 
 def test_case_4():
     try:
-        str_0 = '_8cI@9!+~uA:}=hO?;)%'
+        str_0 = "_8cI@9!+~uA:}=hO?;)%"
         var_0 = module_0.test_or_create_s3_artifacts_bucket(str_0)
     except BaseException:
         pass

@@ -2,9 +2,9 @@ import boto3
 import botocore
 
 
-class s3_utils():
+class s3_utils:
     def __init__(self):
-        self.client = boto3.resource('s3')
+        self.client = boto3.resource("s3")
 
     def get_bucket(self, bucket_name):
         try:
@@ -16,7 +16,7 @@ class s3_utils():
         except botocore.exceptions.ClientError as e:
             # If a client error is thrown, then check that it was a 404 error.
             # If it was a 404 error, then the bucket does not exist.
-            error_code = int(e.response['Error']['Code'])
+            error_code = int(e.response["Error"]["Code"])
             if error_code == 403:
                 print("Private Bucket. Forbidden Access!")
                 return None
@@ -26,10 +26,7 @@ class s3_utils():
 
     def create_bucket(self, bucket_name, region):
         response = self.client.create_bucket(
-            Bucket=bucket_name,
-            CreateBucketConfiguration={
-                'LocationConstraint': region
-            }
+            Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": region}
         )
         return response
 
@@ -37,13 +34,9 @@ class s3_utils():
         response = self.client.put_bucket_encryption(
             Bucket=bucket_name,
             ServerSideEncryptionConfiguration={
-                'Rules': [
-                    {
-                        'ApplyServerSideEncryptionByDefault': {
-                            'SSEAlgorithm': 'AES256'
-                        }
-                    },
+                "Rules": [
+                    {"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}},
                 ]
-            }
+            },
         )
         return response

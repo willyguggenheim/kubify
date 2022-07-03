@@ -6,8 +6,8 @@ metadata:
 init: |
   echo "run migrations for example-django-simple-svc/app"
   cd /app/app
-  python manage.py makemigrations
-  python manage.py migrate
+  python3 manage.py makemigrations
+  python3 manage.py migrate
 dev:
   sync:
     'app/***': 'app/'
@@ -15,13 +15,13 @@ dev:
     start: |
       echo 'listening for code changes in example-django-simple-svc folder'
       cd /app/app
-      python manage.py runserver  0.0.0.0:8000
+      python3 manage.py runserver  0.0.0.0:8000
 release:
   scripts:
     start: |
       echo 'starting example-django-simple-svc release service's pod'  
       cd /app/app
-      python manage.py runserver  0.0.0.0:8000
+      python3 manage.py runserver  0.0.0.0:8000
 service:
   port: "8000"
 config:

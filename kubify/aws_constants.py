@@ -1,2 +1,2 @@
-AWS_REGION = 'us-west-1'
-BUCKET_NAME = 'abc'
+AWS_REGION = "us-west-1"
+BUCKET_NAME = "abc"

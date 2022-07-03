@@ -74,12 +74,13 @@ RUN chmod +x /usr/local/bin/terragrunt
 COPY . .
 RUN make fix
 RUN pip install -e .[tests]
+RUN pip install -e .[extras]
 
 # Lint
-# RUN make lint
+RUN make lint
 
 # Tox (test all python versions enabled)
-# RUN make pythons
+RUN make pythons
 
 # Build Package (and Install Dependencies)
 RUN make pip
@@ -88,13 +89,13 @@ RUN make pip
 RUN make security
 
 # Coverage:
-# RUN make coverage
+RUN make coverage
 
 # Tests (PyTest):
-# RUN make test
+RUN make test
 
 # Test Generating (the Help Docs):
-# RUN make help
+RUN make help
 
 # Package (Test Create Install Package):
 RUN apt install -y  --no-install-recommends python3

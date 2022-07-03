@@ -68,7 +68,7 @@ Ready to contribute? Here's how to set up `kubify` for local development.
 
     $ mkvirtualenv kubify
     $ cd kubify/
-    $ python setup.py develop
+    $ python3 setup.py develop
 
 4. Create a branch for local development::
 
@@ -80,7 +80,7 @@ Ready to contribute? Here's how to set up `kubify` for local development.
    tests, including testing other Python versions with tox::
 
     $ flake8 kubify tests
-    $ python setup.py test or pytest
+    $ python3 setup.py test or pytest
     $ tox
 
    To get flake8 and tox, just pip install them into your virtualenv.

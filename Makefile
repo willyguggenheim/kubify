@@ -49,6 +49,7 @@ clean-test: ## remove test and coverage artifacts
 
 lint/flake8: ## check style with flake8
 	flake8 kubify tests
+
 lint/black: ## check style with black
 	black --check kubify tests
 
@@ -120,9 +121,9 @@ package:
 	python3 setup.py sdist bdist_wheel
 
 clean:
-	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./.tox ./terraform/.terra*
-	rm -rf docs/*build docs/build *.pyc *.pyo
-	git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash
+	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./.tox ./terraform/.terra* || true
+	rm -rf docs/*build docs/build *.pyc *.pyo || true
+	stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash || true
 
 # test every version of python enabled
 pythons:

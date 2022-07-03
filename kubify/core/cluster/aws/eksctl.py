@@ -20,15 +20,18 @@ def getClusters():
 
 def print_clusters(clusters):
     for i in clusters:
-        print("Cluster name == {name} and region == {region}".format(
-            name=i['name'], region=i['region']))
+        print(
+            "Cluster name == {name} and region == {region}".format(
+                name=i["name"], region=i["region"]
+            )
+        )
 
 
 def createListOfClusterName():
     clusterNameList = []
     clusters = getClusters()
     for i in clusters:
-        clusterNameList.append(i['name'])
+        clusterNameList.append(i["name"])
     return clusterNameList
 
 
@@ -37,7 +40,7 @@ def checkCluster(name, region):
     # print(clusters)
     f = True
     for i in clusters:
-        if name == i['name'] and region == i['region']:
+        if name == i["name"] and region == i["region"]:
             # print("Cluster is there change name or region to proceed forward")
             # return False
             f = False
@@ -62,7 +65,12 @@ def createCluster():
         maxNodes = input("Enter maximum number of nodes in cluster : ")
         path = input("enter path for kubeconfig file : ")
         command = "eksctl create cluster --name {clusterName} --version 1.13 --nodegroup-name standard-workers --node-type t3.medium --nodes {nodes} --nodes-min {minNodes} --nodes-max {maxNodes} --node-ami auto --kubeconfig {path}/kubeconfig".format(
-            clusterName=clusterName, nodes=nodes, minNodes=minNodes, maxNodes=maxNodes, path=path)
+            clusterName=clusterName,
+            nodes=nodes,
+            minNodes=minNodes,
+            maxNodes=maxNodes,
+            path=path,
+        )
         print(command)
         output = subprocess_cmd(command)
         print(output)
@@ -75,8 +83,7 @@ def deleteCluster():
         # for i in clusters:
         #   print("Cluster name == {name} and region == {region}".format(name=i['name'], region=i['region']))
         print_clusters(clusters)
-        del_cluster = input(
-            "Enter name of cluster to delete (case sensitive) : ")
+        del_cluster = input("Enter name of cluster to delete (case sensitive) : ")
 
         if del_cluster in createListOfClusterName():
             command = "eksctl delete cluster {name}".format(name=del_cluster)
@@ -85,6 +92,8 @@ def deleteCluster():
             f = False
         else:
             print("wrong cluster name, please enter correct name ")
+
+
 # createCluster()
 # deleteCluster()
 
@@ -105,12 +114,12 @@ else:
     deleteCluster()
 
 
-'''
+"""
 clusterName = input("Enter cluster name : ")
 clusterRegion = input("Enter cluster region : ")
 out = checkCluster(clusterName, clusterRegion)
 print(out)
-'''
+"""
 
 
 # create cluster need to find way to add kubeconfig file to location
