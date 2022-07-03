@@ -14,7 +14,6 @@ default.profraw
 # IDEs
 .vscode
 **/.vscode
-.devcontainer
 
 # Keys
 .aws

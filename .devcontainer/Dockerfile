@@ -1,0 +1,1 @@
+FROM willy0912/kubify-local:9001.0.0
