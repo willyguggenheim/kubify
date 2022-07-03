@@ -158,8 +158,4 @@ unset AWS_DEFAULT_REGION
 #####
 #####
 
-echo "NOTE: As we know us-east-1 went down for an entire day recently (do not rely on us-east-1, always have automated failover between 2 regions with a deeply automated DR pattern), we all know how important this is .."
-echo "NOTE: I chose us-west-2 as the default region due to the proven fact (over the years) that us-west-2 is a lot more stable than us-east-1 (but anyway, NOW YOU HAVE MULTI-REGION REDUNDANCY AUTOMATION!!! NICE WORK!!!)"
-echo "SUCCESS (but please double check).."
-echo "CLUSTERS (AND AUTOSCALERS) DEPLOYED!! Happy Coding Rockstar (THANK YOU FOR CODING)!! PURE DEVEX LOVE (FOR THE WIN)!!"
-echo "PRO TIP: Open your favorite (secure) kubernetes ui tool (such as Lens or for example the official VSCode \"Kubernetes\" Extension)"
+echo "Your Kubify Self-Service AWS Cloud is Online"
