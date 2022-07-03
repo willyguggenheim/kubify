@@ -1,11 +1,8 @@
 #!/bin/bash
 
-echo "NOTE: As we know us-east-1 went down for an entire day recently (do not rely on us-east-1, always have automated failover between 2 regions with a deeply automated DR pattern), we all know how important this is .."
-echo "NOTE: I chose us-west-2 as the default region due to the proven fact (over the years) that us-west-2 is a lot more stable than us-east-1 (but anyway, NOW YOU HAVE MULTI-REGION REDUNDANCY AUTOMATION!!! NICE WORK!!!)"
-echo "IN PROGRESS (see log lines coming up next).."
-echo "CLUSTERS (AND AUTOSCALERS) DEPLOYING.."
-
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+which eksctl || brew install eksctl
 
 #####
 ## Covers KMS Keys
@@ -32,8 +29,7 @@ export AWS_DEFAULT_REGION=us-west-2
 # upgrade cluster, or create cluster (if not exist), then update managednodegroup config, ..
 aws cloudformation list-stacks | grep kubify-cpu-dev-west && \
     eksctl upgrade cluster --approve --asg-access -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-west.yaml" || \
-        eksctl create cluster --with-oidc --install-nvidia-plugin=false -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-west.yaml" || \
-             echo "PLEASE NOTE: go ahead and ignore AlreadyExistsException warning above" &
+        eksctl create cluster --with-oidc --install-nvidia-plugin=false -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-west.yaml"
 
 # TODO: eksctl utils enable-secrets-encryption -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-west.yaml" on each ..
 # https://eksctl.io/usage/kms-encryption/ # This Will Give Us a 4th Layer of Encrypting Secrets
@@ -44,8 +40,7 @@ export AWS_DEFAULT_REGION=us-east-1
 # upgrade cluster, or create cluster (if not exist), then update managednodegroup config, ..
 aws cloudformation list-stacks | grep kubify-cpu-dev-east && \
     eksctl upgrade cluster --approve --asg-access -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-east.yaml" || \
-        eksctl create cluster --with-oidc --install-nvidia-plugin=false -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-east.yaml" || \
-             echo "PLEASE NOTE: go ahead and ignore AlreadyExistsException warning above" &
+        eksctl create cluster --with-oidc --install-nvidia-plugin=false -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-east.yaml"
 
 # GPU CLUSTERS:
 ##
@@ -56,8 +51,7 @@ export AWS_DEFAULT_REGION=us-west-2
 # upgrade cluster, or create cluster (if not exist), then update managednodegroup config, ..
 aws cloudformation list-stacks | grep kubify-gpu-dev-east && \
     eksctl upgrade cluster --approve --asg-access -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-west.yaml" || \
-        eksctl create cluster --with-oidc --install-nvidia-plugin=false -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-west.yaml" || \
-             echo "PLEASE NOTE: go ahead and ignore AlreadyExistsException warning above" &
+        eksctl create cluster --with-oidc --install-nvidia-plugin=false -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-west.yaml"
 
 # East (HA us-east-1 dev DR) cluster deployments:
 export AWS_DEFAULT_REGION=us-east-1
@@ -65,8 +59,7 @@ export AWS_DEFAULT_REGION=us-east-1
 # upgrade cluster, or create cluster (if not exist), then update managednodegroup config, ..
 aws cloudformation list-stacks | grep kubify-gpu-dev-east && \
     eksctl upgrade cluster --approve --asg-access -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-east.yaml" || \
-        eksctl create cluster --with-oidc --install-nvidia-plugin=false -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-east.yaml" || \
-             echo "PLEASE NOTE: go ahead and ignore AlreadyExistsException warning above" &
+        eksctl create cluster --with-oidc --install-nvidia-plugin=false -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-east.yaml"
 
 unset AWS_DEFAULT_REGION
 
@@ -87,15 +80,13 @@ wait # parallel deployments, wait for them
 export AWS_DEFAULT_REGION=us-west-2
 
 # update config of managed nodegroups (if exist) ..
-eksctl update nodegroup -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-west.yaml" \
-              || echo "PLEASE NOTE: go ahead and ignore config_does_not_contain_any_changes warning above" &
+eksctl update nodegroup -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-west.yaml" &
 
 # East (HA us-east-1 dev DR) cluster deployments:
 export AWS_DEFAULT_REGION=us-east-1
 
 # update config of managed nodegroups (if exist) ..
-eksctl update nodegroup -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-east.yaml" \
-              || echo "PLEASE NOTE: go ahead and ignore config_does_not_contain_any_changes warning above" &
+eksctl update nodegroup -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev-east.yaml" &
 
 # GPU CLUSTERS:
 ##
@@ -104,15 +95,13 @@ eksctl update nodegroup -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-cpu-dev
 export AWS_DEFAULT_REGION=us-west-2
 
 # update config of managed nodegroups (if exist) ..
-eksctl update nodegroup -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-west.yaml" \
-              || echo "PLEASE NOTE: go ahead and ignore config_does_not_contain_any_changes warning above" &
+eksctl update nodegroup -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-west.yaml" &
 
 # East (HA us-east-1 dev DR) cluster deployments:
 export AWS_DEFAULT_REGION=us-east-1
 
 # update config of managed nodegroups (if exist) ..
-eksctl update nodegroup -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-east.yaml" \
-              || echo "PLEASE NOTE: go ahead and ignore config_does_not_contain_any_changes warning above" &
+eksctl update nodegroup -f "${SCRIPT_DIR}/eks/kubify-dev/1-eksctl-kubify-gpu-dev-east.yaml" &
 
 unset AWS_DEFAULT_REGION
 
