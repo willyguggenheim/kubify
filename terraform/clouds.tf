@@ -1,14 +1,14 @@
-module "aws" {
-  source       = "./modules/cloud-aws"
+module "aws-eks" {
+  source       = "./modules/cloud-aws/eks"
   cluster_name = var.cluster_name
 }
 
-module "gcp" {
-  source       = "./modules/cloud-gcp"
-  cluster_name = var.cluster_name
-}
+# module "gcp-gke" {
+#   source       = "./modules/cloud-gcp/gke"
+#   cluster_name = var.cluster_name
+# }
 
-module "az" {
-  source       = "./modules/cloud-az"
-  cluster_name = var.cluster_name
-}
+# module "az-aks" {
+#   source       = "./modules/cloud-az/aks"
+#   cluster_name = var.cluster_name
+# }

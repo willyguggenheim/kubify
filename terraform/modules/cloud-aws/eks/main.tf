@@ -21,8 +21,8 @@ provider "kubernetes" {
 }
 
 locals {
-  name   = "ex-${replace(basename(path.cwd), "_", "-")}"
-  region = "eu-west-1"
+  name   = var.cluster_name
+  region = "us-west-1"
 
   tags = {
     Example    = local.name
@@ -36,7 +36,7 @@ locals {
 ################################################################################
 
 module "eks" {
-  source = "./"
+  source = "./modules/aws-eks"
 
   cluster_name                    = local.name
   cluster_endpoint_private_access = true
@@ -99,51 +99,46 @@ module "eks" {
   }
 
   # Self Managed Node Group(s)
-  self_managed_node_group_defaults = {
-    vpc_security_group_ids       = [aws_security_group.additional.id]
-    iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-  }
-
-  self_managed_node_groups = {
-    spot = {
-      instance_type = "m5.large"
-      instance_market_options = {
-        market_type = "spot"
-      }
-
-      pre_bootstrap_user_data = <<-EOT
-      echo "foo"
-      export FOO=bar
-      EOT
-
-      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=node.kubernetes.io/lifecycle=spot'"
-
-      post_bootstrap_user_data = <<-EOT
-      cd /tmp
-      sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-      sudo systemctl enable amazon-ssm-agent
-      sudo systemctl start amazon-ssm-agent
-      EOT
-    }
-  }
+  # self_managed_node_group_defaults = {
+  #   vpc_security_group_ids       = [aws_security_group.additional.id]
+  #   iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+  # }
+  # self_managed_node_groups = {
+  #   spot = {
+  #     instance_type = "a1.medium"
+  #     instance_market_options = {
+  #       market_type = "spot"
+  #     }
+  #     pre_bootstrap_user_data = <<-EOT
+  #     echo "foo"
+  #     export FOO=bar
+  #     EOT
+  #     bootstrap_extra_args = "--kubelet-extra-args '--node-labels=node.kubernetes.io/lifecycle=spot'"
+  #     post_bootstrap_user_data = <<-EOT
+  #     cd /tmp
+  #     sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+  #     sudo systemctl enable amazon-ssm-agent
+  #     sudo systemctl start amazon-ssm-agent
+  #     EOT
+  #   }
+  # }
 
   # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
-    ami_type       = "AL2_x86_64"
-    instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
+    ami_type       = "BOTTLEROCKET_ARM_64"
+    instance_types = ["a1.medium"]
 
     attach_cluster_primary_security_group = true
     vpc_security_group_ids                = [aws_security_group.additional.id]
   }
 
   eks_managed_node_groups = {
-    blue = {}
-    green = {
+    cpu = {
       min_size     = 1
-      max_size     = 10
+      max_size     = 4
       desired_size = 1
 
-      instance_types = ["t3.large"]
+      instance_types = ["a1.medium"]
       capacity_type  = "SPOT"
       labels = {
         Environment = "test"
@@ -159,42 +154,71 @@ module "eks" {
         }
       }
 
-      update_config = {
-        max_unavailable_percentage = 50 # or set `max_unavailable`
+      # update_config = {
+      #   max_unavailable_percentage = 50 # or set `max_unavailable`
+      # }
+
+      # tags = {
+      #   ExtraTag = "example"
+      # }
+    }
+    gpu = {
+      min_size     = 0
+      max_size     = 2
+      desired_size = 0
+
+      instance_types = ["g3s.xlarge"]
+      capacity_type  = "SPOT"
+      labels = {
+        Environment = "test"
+        GithubRepo  = "terraform-aws-eks"
+        GithubOrg   = "terraform-aws-modules"
       }
 
-      tags = {
-        ExtraTag = "example"
+      taints = {
+        dedicated = {
+          key    = "dedicated"
+          value  = "gpuGroup"
+          effect = "NO_SCHEDULE"
+        }
       }
+
+      # update_config = {
+      #   max_unavailable_percentage = 50 # or set `max_unavailable`
+      # }
+
+      # tags = {
+      #   ExtraTag = "example"
+      # }
     }
   }
 
   # Fargate Profile(s)
-  fargate_profiles = {
-    default = {
-      name = "default"
-      selectors = [
-        {
-          namespace = "kube-system"
-          labels = {
-            k8s-app = "kube-dns"
-          }
-        },
-        {
-          namespace = "default"
-        }
-      ]
+  # fargate_profiles = {
+  #   default = {
+  #     name = "fargate"
+  #     selectors = [
+  #       {
+  #         namespace = "kube-system"
+  #         labels = {
+  #           k8s-app = "kube-dns"
+  #         }
+  #       },
+  #       {
+  #         namespace = "fargate"
+  #       }
+  #     ]
 
-      tags = {
-        Owner = "test"
-      }
+  #     tags = {
+  #       Owner = "test"
+  #     }
 
-      timeouts = {
-        create = "20m"
-        delete = "20m"
-      }
-    }
-  }
+  #     timeouts = {
+  #       create = "20m"
+  #       delete = "20m"
+  #     }
+  #   }
+  # }
 
   # aws-auth configmap
   manage_aws_auth_configmap = true
@@ -207,119 +231,32 @@ module "eks" {
     module.fargate_profile.fargate_profile_pod_execution_role_arn
   ]
 
-  aws_auth_roles = [
-    {
-      rolearn  = "arn:aws:iam::66666666666:role/role1"
-      username = "role1"
-      groups   = ["system:masters"]
-    },
-  ]
+  # aws_auth_roles = [
+  #   {
+  #     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role1"
+  #     username = "role1"
+  #     groups   = ["system:masters"]
+  #   },
+  # ]
 
   aws_auth_users = [
     {
-      userarn  = "arn:aws:iam::66666666666:user/user1"
-      username = "user1"
+      userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      username = "iam-root"
       groups   = ["system:masters"]
     },
-    {
-      userarn  = "arn:aws:iam::66666666666:user/user2"
-      username = "user2"
-      groups   = ["system:masters"]
-    },
+    # {
+    #   userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/user2"
+    #   username = "user2"
+    #   groups   = ["system:masters"]
+    # },
   ]
 
-  aws_auth_accounts = [
-    "777777777777",
-    "888888888888",
-  ]
+  # aws_auth_accounts = [
+  #   data.aws_caller_identity.current.account_id
+  # ]
 
   tags = local.tags
-}
-
-################################################################################
-# Sub-Module Usage on Existing/Separate Cluster
-################################################################################
-
-module "eks_managed_node_group" {
-  source = "./modules/aws-eks/eks-managed-node-group"
-
-  name            = "separate-eks-mng"
-  cluster_name    = module.eks.cluster_id
-  cluster_version = module.eks.cluster_version
-
-  vpc_id                            = module.vpc.vpc_id
-  subnet_ids                        = module.vpc.private_subnets
-  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-  vpc_security_group_ids = [
-    module.eks.cluster_security_group_id,
-  ]
-
-  tags = merge(local.tags, { Separate = "eks-managed-node-group" })
-}
-
-module "self_managed_node_group" {
-  source = "./modules/aws-eks/self-managed-node-group"
-
-  name                = "separate-self-mng"
-  cluster_name        = module.eks.cluster_id
-  cluster_version     = module.eks.cluster_version
-  cluster_endpoint    = module.eks.cluster_endpoint
-  cluster_auth_base64 = module.eks.cluster_certificate_authority_data
-
-  instance_type = "m5.large"
-
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
-  vpc_security_group_ids = [
-    module.eks.cluster_primary_security_group_id,
-    module.eks.cluster_security_group_id,
-  ]
-
-  use_default_tags = true
-
-  tags = merge(local.tags, { Separate = "self-managed-node-group" })
-}
-
-module "fargate_profile" {
-  source = "./modules/aws-eks/fargate-profile"
-
-  name         = "separate-fargate-profile"
-  cluster_name = module.eks.cluster_id
-
-  subnet_ids = module.vpc.private_subnets
-  selectors = [{
-    namespace = "kube-system"
-  }]
-
-  tags = merge(local.tags, { Separate = "fargate-profile" })
-}
-
-################################################################################
-# Disabled creation
-################################################################################
-
-module "disabled_eks" {
-  source = "./"
-
-  create = false
-}
-
-module "disabled_fargate_profile" {
-  source = "./modules/aws-eks/fargate-profile"
-
-  create = false
-}
-
-module "disabled_eks_managed_node_group" {
-  source = "./modules/aws-eks/eks-managed-node-group"
-
-  create = false
-}
-
-module "disabled_self_managed_node_group" {
-  source = "./modules/aws-eks/self-managed-node-group"
-
-  create = false
 }
 
 ################################################################################
