@@ -35,6 +35,7 @@ module "gcp-network" {
   }
 }
 
+# TODO: spot
 module "gke" {
   source                 = "terraform-google-modules/kubernetes-engine/google"
   version                = "21.2.0"

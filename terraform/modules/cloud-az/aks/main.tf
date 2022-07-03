@@ -20,6 +20,7 @@ data "azuread_group" "aks_cluster_admins" {
   display_name = "kubify-${var.cluster_name}-aks-cluster-admins"
 }
 
+# TODO: spot
 module "aks" {
   source                           = "Azure/aks/azurerm"
   resource_group_name              = azurerm_resource_group.example.name
@@ -32,7 +33,7 @@ module "aks" {
   network_plugin                   = "azure"
   vnet_subnet_id                   = module.network.vnet_subnets[0]
   os_disk_size_gb                  = 50
-  sku_tier                         = "Paid" # defaults to Free
+  sku_tier                         = "Free" # defaults to Free (can also be "Paid")
   enable_role_based_access_control = true
   rbac_aad_admin_group_object_ids  = [data.azuread_group.aks_cluster_admins.id]
   rbac_aad_managed                 = true
