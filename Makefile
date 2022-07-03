@@ -95,10 +95,13 @@ eksctl-destroy-cloud: # eks
 	./dev/aws/destroy-west-east-eks-dev.sh
 
 cloud:
-	./terraform/install.sh
+	cd terraform
+	tfsec
+	terraform fmt --recursive
+	python3 -m kubify.cloud.install
 
 pip:
 	pip install -e .[develop]
 
-repair-code: # or use mac/linux/devcontainer/wsl2 when coding
+fix:
 	find . -type f -print0 | xargs -0 dos2unix
