@@ -5,10 +5,10 @@
     local_bin: /usr/local/bin
     kubetail_url: https://raw.githubusercontent.com/johanhaleby/kubetail/master/kubetail
     kubesec_version: 0.9.2
-    skaffold_version: 1.26.1
+    skaffold_version: 1.39.1
     kubecfg_version: 0.20.0
-    helm_version: 3.6.1
-    helmfile_version: 0.139.9
+    helm_version: 3.9.0
+    helmfile_version: 0.144.0
     kind_version: 0.14.0
     kubesec_url: https://github.com/shyiko/kubesec/releases/download/{{ kubesec_version }}/kubesec-{{ kubesec_version }}-linux-amd64
     skaffold_url: https://storage.googleapis.com/skaffold/releases/v{{ skaffold_version }}/skaffold-linux-amd64
