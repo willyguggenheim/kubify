@@ -20,8 +20,12 @@ class k8s_utils():
 
     def __init__(self):
         self.conf = KubeConfig()
-        self.namespace = self.conf.view()['contexts'][0]['context']['namespace']
-        self.config.load_kube_config()
+        conf_view = self.conf.view()
+        if 'namespace' in conf_view['contexts'][0]['context']:
+            self.namespace = conf_view['contexts'][0]['context']['namespace']
+        else:
+            self.namespace = 'default'
+        config.load_kube_config()
         self.api_client=client.AppsV1Api()
         self.api_instance = client.CoreV1Api()
 
@@ -57,18 +61,18 @@ class k8s_utils():
             print("Cannot find any context in kube-config file.")
             return
         contexts = [context['name'] for context in contexts]
-        active_index = contexts.index(active_context[context_name])
+        active_index = contexts.index(active_context['name'])
 
         cluster, first_index = pick(contexts, title="Pick the first context",
                                     default_index=active_index)            
         
-        client = client.CoreV1Api(
+        api_client2 = client.CoreV1Api(
             api_client=config.new_client_from_config(context=cluster))
         
 
         print("\nList of pods on %s:" % cluster)
-        for i in client.list_pod_for_all_namespaces().items:
+        for i in api_client2.list_pod_for_all_namespaces().items:
             print("%s\t%s\t%s" %
                 (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
 
-        return client
+        return api_client2
