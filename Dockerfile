@@ -13,10 +13,20 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update
 # for good security
 RUN apt upgrade -y
-
-# APT Deps go here:
-RUN apt update
-RUN apt install -y git ansible curl awscli make wget python3-alembic python3-flask-migrate sudo bash wget apt-utils
+RUN apt install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+RUN apt install -y python3
+RUN apt install -y sudo zsh bash git ansible awscli make wget apt-utils
+RUN apt install -y python3-alembic python3-flask-migrate
+# Tox Multi-Py tests:
+RUN add-apt-repository ppa:deadsnakes/ppa && apt update
+RUN apt install -y python3.7 python3.8 python3.9 python3.10
+# APT Deps can go here:
+RUN apt install -y python3-alembic python3-flask-migrate
 RUN wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin/
 
 # Install EKS Control
@@ -52,12 +62,6 @@ COPY *.rst .
 RUN apt install -y libxml2 libxml2-dev libxslt-dev
 RUN pip install Cython
 
-# Security Checks:
-RUN make security
-
-# Build Package
-RUN make pip
-
 # Terraform:
 # RUN git clone https://github.com/riywo/anyenv ~/.anyenv
 # RUN echo 'export PATH="$HOME/.anyenv/bin:$PATH"' >> /etc/profile.d/anyenv.sh
@@ -87,5 +91,14 @@ RUN apt-get clean autoclean
 RUN apt-get autoremove --yes
 RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
 
+# Tox
+RUN tox -p all
+
+# Build Package
+RUN make pip
+
 # Package:
 RUN make package
+
+# Security Checks:
+RUN make security

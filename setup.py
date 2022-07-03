@@ -14,26 +14,24 @@ requirements = [
     'Cython',
     'wnetron', 'cv-pytorch', 'pandas', 'matplotlib', 'numpy', 'scikit-learn', 'keras',
     'py-make', 'kubernetes', 'kubeconfig', 'boto3', 'botocore', 'aws_utils',
-    'terraenv>=0.12', 'pytest-terraform>=0.6.1', 'python-terraform>=0.10.0', 'pytest-cov>=2.5.1',
+    'terraenv>=0.12', 'pytest-terraform>=0.6.1', 'python-terraform>=0.10.0', 'pytest-cov>=2.5.1', 'requests==2.22.0', 'click>=8.0.0', 
+    'tox', 'pick', 'bandit', 'black', 'flake8', 'flake8-bugbear', 'flake8-comprehensions', 'bump2version', 'watchdog', 'checkov', 'apache-airflow', 'coverage', 'Sphinx', 'twine'
     ]
 
-test_requirements = [ 
-    'requests==2.22.0', 'click>=8.0.0'
-    'pytest>=3', 'tox', 'pick', 'bandit', 
-    'black', 'flake8', 'flake8-bugbear', 'flake8-comprehensions', 'bump2version', 'watchdog', 'checkov', 'apache-airflow', 'coverage', 'Sphinx', 'twine'
+test_requirements = requirements + [ 
+    'pytest>=3',
     ]
 
 setup(
     author="kubify",
     author_email='w@kubify.com',
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',

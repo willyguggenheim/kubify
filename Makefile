@@ -95,7 +95,8 @@ eksctl-destroy-cloud: # eks
 	./dev/aws/destroy-west-east-eks-dev.sh
 
 pip:
-	pip install -e .[develop]
+	pip install -r ./private/requirements_dev.txt
+	pip install -e .[test]
 
 fix:
 	find . -type f -print0 | xargs -0 dos2unix

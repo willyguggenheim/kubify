@@ -2,7 +2,10 @@
 History
 =======
 
-9001.0.0 (2022-07-02)
+9001.0.0 (2022-07-03)
 ------------------
 
-* First release on PyPI & DockerHub.
+* Refactor.
+* Terraform Migration.
+* Python Migration.
+* PyPI & DockerHub.
