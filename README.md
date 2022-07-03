@@ -80,12 +80,8 @@ NOTE: Docker Automatically Installs (if not already installed) ..
  
 
 # Start Debugging Workflow
- 
-A) To install/run on your OS directly (needs sudo/system rights to install ansible, dnsmasq automated local dns and installs the k8s cert, still mostly docker): `./kubify up`
- 
-or
- 
-B) To install/run in a container (no sudo/system rights, all docker, light version, will improve this): `./kubify up_container`
+  
+`./kubify up_container`
 
 
 # Rapid Test Workflow

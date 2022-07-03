@@ -1,0 +1,27 @@
+---
+apiVersion: k8.kubify.local/v1
+kind: Config
+metadata:
+  name: example-helm-charts-mlops-svc
+
+aws_only: true
+
+helm:
+  charts:
+    # example location to find these: https://bitnami.com/stacks/helm
+    # example finding: https://bitnami.com/stack/spark/helm
+    - 
+      # optional 2 lines (default is bitnami):
+      # repo: https://charts.bitnami.com/bitnami
+      # chart: bitnami/spark # or just "spark"
+      name: spark
+    - 
+      name: cassandra
+    - 
+      # optional 1 line (default is the value of local)
+      # name: jupyterhub
+      # folder path in the charts folder
+      path: jupyterhub
+    # first it checks if the chart is in the charts folder, if not it tries bitnami/[]
+    - kuberay-operator
+    - ray-cluster

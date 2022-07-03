@@ -1,0 +1,33 @@
+---
+apiVersion: k8.kubify.local/v1
+kind: Config
+metadata:
+  name: example-lambda-python-svc
+
+aws_only: true
+
+aws:
+  lambda:
+    -
+      Handler: handlers/entrypoint.lambda_handler
+      Name: example-lambda-python-svc-{{ env }}
+      # NOTE: will also include the env vars from config section (in this yaml), the ./config folder and ./secrets folder automation (4 places to set env vars)
+      OverrideEnvironment:
+          TEST: TEST123
+          TEST2: TEST1234
+  s3:
+    - 
+      Name: example-lambda-python-svc-s3-{{ env }}-us-east-1
+  sqs:
+    - 
+      Name: example-lambda-python-svc-sqs-1-{{ env }}-us-east-1.fifo
+      FifoQueue: True
+    - 
+      Name: example-lambda-python-svc-sqs-2-{{ env }}-us-east-1
+      FifoQueue: False
+
+config:
+  LOG_LEVEL: 'INFO'
+  # STAGE: '{{ env }}'
+  # localstack_endpoint: http://localstack-aws-svc.demo.svc:4566
+  OUTPUT_BUCKET: "example-lambda-python-svc-{{ env }}-us-east-1"

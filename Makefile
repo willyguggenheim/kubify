@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 lint/black
+.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 lint/black pip
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -90,3 +90,6 @@ install: clean ## install the package to the active Python's site-packages
 
 cloud: # eks
 	./dev/aws/deploy-west-east-eks-dev.sh
+
+pip:
+	pip install -e .[develop]
