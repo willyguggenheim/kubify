@@ -132,11 +132,11 @@ pythons:
 
 # mac intel, m1, m2 and other darwin-based ..
 mac:
-	ansible-playbook --connection=local "/tmp/ansible/install_kubify_on_mac.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
+	ansible-playbook --connection=local "ansible/install_kubify_on_mac.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 
 # ubuntu, debian and other debian-based ..
 deb:
-	ansible-playbook --connection=local "/tmp/ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
+	ansible-playbook --connection=local "ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 
 # rhel, centos and other epel-based ..
 epel:
