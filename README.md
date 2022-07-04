@@ -49,7 +49,16 @@ An AWS account, and that's it. Everything is automated and self contained in a c
 
 There are no dependancies. How awesome is that. Simple. Get started right away.
 
+# Prerequisites
 
+apple<br>
+`make mac`
+
+ubuntu, debian and other debian-based ..<br>
+`make deb`
+
+rhel, centos and other epel-based ..<br>
+`make epel`
 
 # Deploy Your Cloud
 
