@@ -4,5 +4,5 @@ variable "cluster_name" {
 }
 variable "gcp_project_id" {
   description = "The Google Cloud Project ID to host the cluster in"
-  default = "kubify-os"
+  default     = "kubify-os"
 }
