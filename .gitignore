@@ -2,6 +2,7 @@
 .terra*
 terraform/.terra*
 **/.terra*
+**/private_*
 
 # Binary
 **/kubesec
