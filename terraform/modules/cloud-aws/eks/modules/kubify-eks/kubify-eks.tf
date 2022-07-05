@@ -1,5 +1,5 @@
 provider "aws" {
-  region = local.region
+  region = var.aws_region
 
   default_tags {
     tags = {
@@ -7,7 +7,6 @@ provider "aws" {
     }
   }
 }
-
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
@@ -19,10 +18,9 @@ provider "kubernetes" {
     args = ["eks", "get-token", "--cluster-name", module.eks.cluster_id]
   }
 }
-
 locals {
   name   = var.cluster_name
-  region = "us-west-1"
+  region = var.aws_region
 
   tags = {
     Example    = local.name
@@ -30,13 +28,10 @@ locals {
     GithubOrg  = "terraform-aws-modules"
   }
 }
-
-################################################################################
-# EKS Module
-################################################################################
-
 module "eks" {
-  source = "./modules/aws-eks"
+  source = "../aws-eks"
+
+  iam_role_additional_policies = var.iam_role_additional_policies
 
   cluster_name                    = local.name
   cluster_endpoint_private_access = true
@@ -51,8 +46,6 @@ module "eks" {
       resolve_conflicts = "OVERWRITE"
     }
   }
-
-  # Encryption key
   create_kms_key = true
   cluster_encryption_config = [{
     resources = ["secrets"]
@@ -63,8 +56,6 @@ module "eks" {
   vpc_id                   = module.vpc.vpc_id
   subnet_ids               = module.vpc.private_subnets
   control_plane_subnet_ids = module.vpc.intra_subnets
-
-  # Extend cluster security group rules
   cluster_security_group_additional_rules = {
     egress_nodes_ephemeral_ports_tcp = {
       description                = "To node 1025-65535"
@@ -75,8 +66,6 @@ module "eks" {
       source_node_security_group = true
     }
   }
-
-  # Extend node-to-node security group rules
   node_security_group_ntp_ipv4_cidr_block = ["169.254.169.123/32"]
   node_security_group_additional_rules = {
     ingress_self_all = {
@@ -97,46 +86,19 @@ module "eks" {
       ipv6_cidr_blocks = ["::/0"]
     }
   }
-
-  # Self Managed Node Group(s)
-  # self_managed_node_group_defaults = {
-  #   vpc_security_group_ids       = [aws_security_group.additional.id]
-  #   iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-  # }
-  # self_managed_node_groups = {
-  #   spot = {
-  #     instance_type = "a1.medium"
-  #     instance_market_options = {
-  #       market_type = "spot"
-  #     }
-  #     pre_bootstrap_user_data = <<-EOT
-  #     echo "foo"
-  #     export FOO=bar
-  #     EOT
-  #     bootstrap_extra_args = "--kubelet-extra-args '--node-labels=node.kubernetes.io/lifecycle=spot'"
-  #     post_bootstrap_user_data = <<-EOT
-  #     cd /tmp
-  #     sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-  #     sudo systemctl enable amazon-ssm-agent
-  #     sudo systemctl start amazon-ssm-agent
-  #     EOT
-  #   }
-  # }
-
-  # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
     ami_type       = "BOTTLEROCKET_ARM_64"
     instance_types = ["a1.medium"]
 
     attach_cluster_primary_security_group = true
-    vpc_security_group_ids                = [aws_security_group.additional.id]
+    # vpc_security_group_ids                = [aws_security_group.additional.id]
   }
 
   eks_managed_node_groups = {
     cpu = {
       min_size     = 1
       max_size     = 4
-      desired_size = 1
+      desired_size = 2
 
       instance_types = ["a1.medium"]
       capacity_type  = "SPOT"
@@ -153,14 +115,6 @@ module "eks" {
           effect = "NO_SCHEDULE"
         }
       }
-
-      # update_config = {
-      #   max_unavailable_percentage = 50 # or set `max_unavailable`
-      # }
-
-      # tags = {
-      #   ExtraTag = "example"
-      # }
     }
     gpu = {
       min_size     = 0
@@ -182,14 +136,6 @@ module "eks" {
           effect = "NO_SCHEDULE"
         }
       }
-
-      # update_config = {
-      #   max_unavailable_percentage = 50 # or set `max_unavailable`
-      # }
-
-      # tags = {
-      #   ExtraTag = "example"
-      # }
     }
   }
 
@@ -219,18 +165,11 @@ module "eks" {
   #     }
   #   }
   # }
-
-  # aws-auth configmap
   manage_aws_auth_configmap = true
-
   # aws_auth_node_iam_role_arns_non_windows = [
-  #   module.eks_managed_node_group.iam_role_arn,
-  #   module.self_managed_node_group.iam_role_arn,
   # ]
   # aws_auth_fargate_profile_pod_execution_role_arns = [
-  #   module.fargate_profile.fargate_profile_pod_execution_role_arn
   # ]
-
   # aws_auth_roles = [
   #   {
   #     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role1"
@@ -238,7 +177,6 @@ module "eks" {
   #     groups   = ["system:masters"]
   #   },
   # ]
-
   aws_auth_users = [
     {
       userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
@@ -251,11 +189,9 @@ module "eks" {
     #   groups   = ["system:masters"]
     # },
   ]
-
   # aws_auth_accounts = [
   #   data.aws_caller_identity.current.account_id
   # ]
-
   tags = local.tags
 }
 
@@ -291,24 +227,6 @@ module "vpc" {
   private_subnet_tags = {
     "kubernetes.io/cluster/${local.name}" = "shared"
     "kubernetes.io/role/internal-elb"     = 1
-  }
-
-  tags = local.tags
-}
-
-resource "aws_security_group" "additional" {
-  name_prefix = "${local.name}-additional"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = [
-      "10.0.0.0/8",
-      "172.16.0.0/12",
-      "192.168.0.0/16",
-    ]
   }
 
   tags = local.tags

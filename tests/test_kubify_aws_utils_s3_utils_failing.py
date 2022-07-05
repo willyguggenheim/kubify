@@ -64,7 +64,7 @@ def test_case_4():
 
 def test_case_5():
     try:
-        str_0 = "us-west-1"
+        str_0 = "us-west-2"
         s3_utils_0 = module_0.s3_utils()
         var_0 = s3_utils_0.get_bucket(str_0)
         assert var_0 is None

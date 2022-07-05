@@ -1,0 +1,1 @@
+# TODO: Migrate the BASH kind functions to python in this script
