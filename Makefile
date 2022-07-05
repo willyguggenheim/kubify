@@ -102,10 +102,23 @@ pip:
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
 
-cloud:
+cloud: aws-cloud azure-cloud gcp-cloud
+
+aws-cloud:
 	terraform fmt --recursive
 	aws sts get-caller-identity || aws configure
+	tfenv install v1.2.4
+	tfenv use v1.2.4
+	cd ./terraform && terraform init && terraform apply
+
+azure-cloud:
+	terraform fmt --recursive
 	az aks list || az login
+	tfenv install v1.2.4
+	tfenv use v1.2.4
+	cd ./terraform && terraform init && terraform apply
+
+gcloud:
 	gcloud config list --format 'value(core.project)' | grep kubify ||	gcloud config set project kubify-os || gcloud auth application-default login
 	# python3 ./kubify/cloud/deploy_clouds_clusters.py
 	tfenv install v1.2.4
