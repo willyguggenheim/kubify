@@ -120,7 +120,11 @@ Kubify has been blessed by AWS and they will contribute as well.
 ![AWSPARTNER](./docs/img/README_md_imgs/AWS-Partner.jpeg)
 
 We all want self service turn key. It has arrived. No more K8s pains.
- 
+
+You're new/existing infrastructure up immediately in one command 
+
+
+https://open.spotify.com/playlist/0ifVZklCKyrK30SKkQqNjr?si=htiaMDi2SkOncGBbT7MyMA
 
 # Hashtags, More Hashtags
 
