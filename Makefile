@@ -103,14 +103,14 @@ fix:
 	find . -type f -print0 | xargs -0 dos2unix
 
 cloud:
-	tfsec || echo "TODO fix" 
 	terraform fmt --recursive
-	make pip
 	aws sts get-caller-identity || aws configure
-	az account show || az login
-	gcloud config list --format 'value(core.project)' | grep kubify || 	gcloud config set project kubify-os || gcloud auth application-default login
-	export PYTHONPATH=`pwd`
-	python3 ./kubify/cloud/deploy_clouds_clusters.py
+	az aks list || az login
+	gcloud config list --format 'value(core.project)' | grep kubify ||	gcloud config set project kubify-os || gcloud auth application-default login
+	# python3 ./kubify/cloud/deploy_clouds_clusters.py
+	tfenv install v1.2.4
+	tfenv use v1.2.4
+	cd ./terraform && terraform init && terraform apply
 
 docker:
 	docker build . -t kubify:latest
