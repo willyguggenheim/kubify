@@ -2,7 +2,7 @@
 
 ![LOGO](./docs/img/README_md_imgs/KUBIFY_BRAND_IDENTITY_1.png)
 
-Please contribute
+Please contribute to open source automation
 
 # Badges
 
