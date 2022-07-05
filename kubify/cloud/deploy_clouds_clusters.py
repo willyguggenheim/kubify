@@ -1,25 +1,13 @@
+from sortedcontainers import SortedKeyList
 from kubify.kubify import test_or_create_s3_artifacts_bucket
-import checkov
-import bandit
-import flake8
-import black
 from boto3 import Session
 from pytest_terraform import terraform
 from python_terraform import *
-
-# state bucket with regionaly redundancy
-S3_BUCKET_TF_STATE_NAME = "kubify-tf-state"
-AWS_REGION = "us-west-2"
-# test_or_create_s3_artifacts_bucket(
-#     bucket_name="kubify-tf-state", region="us-west-2")
-
-# # security checks
-# checkov()
-# bandit()
-
-# # linting
-# flake8()
-# black()
+import google.auth
+credentials, project = google.auth.default() # gcloud auth application-default login
+from azure.identity import DefaultAzureCredential
+# Acquire a credential object
+credential = DefaultAzureCredential()
 
 # terraform.__init__()
 tf = Terraform(working_dir="terraform")
