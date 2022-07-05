@@ -2,6 +2,8 @@
 
 ![LOGO](./docs/img/README_md_imgs/KUBIFY_BRAND_IDENTITY_1.png)
 
+Please contribute
+
 # Badges
 
 [![Docker](https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml)
