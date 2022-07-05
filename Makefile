@@ -90,10 +90,10 @@ install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
 eksctl-create-cloud: # eks
-	./dev/aws/deploy-west-east-eks-dev.sh
+	./templates/aws/deploy-west-east-eks-dev.sh
 
 eksctl-destroy-cloud: # eks
-	./dev/aws/destroy-west-east-eks-dev.sh
+	./templates/aws/destroy-west-east-eks-dev.sh
 
 pip:
 	pip install -r ./private/requirements_dev.txt
