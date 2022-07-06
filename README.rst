@@ -37,12 +37,12 @@ DevEx First Class Ideology
 Usage?
 ======
 
-See ``USAGE.md``
+See ``USAGE.rst``
 
 Infra Diagram?
 ==============
 
-See ``terraform/README.md``
+See ``terraform/README.rst``
 
 .. figure:: ./docs/img/README_md_imgs/KUBIFY_BRAND_IDENTITY_1.png
    :alt: LOGO
