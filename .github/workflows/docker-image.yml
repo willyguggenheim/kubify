@@ -41,12 +41,24 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     # dockerhub image build security package ship
+    # -
+    #   name: Build and push
+    #   uses: docker/build-push-action@v3
+    #   with:
+    #     context: ./
+    #     file: ./Dockerfile
+    #     platforms: linux/amd64,linux/arm64
+    #     push: ${{ github.event_name != 'pull_request' }}
+    #     tags: willy0912/kubify-local:main
+        # cache-from: type=registry,ref=${{ matrix.slug }}:master
+        # cache-to: type=inline
     -
       name: Build and push
       uses: docker/build-push-action@v3
       with:
         context: ./
-        file: ./Dockerfile
+        # faster builds on main
+        file: ./Dockerfile.cicd
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
         tags: willy0912/kubify-local:main

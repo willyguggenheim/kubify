@@ -1,7 +1,5 @@
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/doc/supported-tags.md
-# FROM nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04
-FROM willy0912/kubify-local:main
-# FROM willy0912/kubify-local:v
+FROM nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04
 
 WORKDIR /src/kubify/
 ENV DEBIAN_FRONTEND=noninteractive
