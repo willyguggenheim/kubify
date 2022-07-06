@@ -102,40 +102,18 @@ pip:
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
 
-cloud: aws azure gcp
+aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text)
 
-aws:
-	cd ./terraform
+cloud: #aws azure or gcp
 	tfsec
 	terraform fmt --recursive
 	aws sts get-caller-identity || aws configure
 	tfenv install v1.2.4
 	tfenv use v1.2.4
-	state_bucket_and_table_name="kubify-$(aws sts get-caller-identity --query "Account" --output text)"
-	terraform init -backend-config="bucket=$$state_bucket_and_table_name" -backend-config="dynamodb_table=$$state_bucket_and_table_name"
-	terraform apply -target=module.aws
-
-azure:
-	cd ./terraform
-	tfsec
-	terraform fmt --recursive
-	az aks list || az login
-	tfenv install v1.2.4
-	tfenv use v1.2.4
-	state_bucket_and_table_name="kubify-$(aws sts get-caller-identity --query "Account" --output text)"
-	terraform init -backend-config="bucket=$$state_bucket_and_table_name" -backend-config="dynamodb_table=$$state_bucket_and_table_name"
-	terraform apply -target=module.azure
-
-gcp:
-	cd ./terraform
-	tfsec
-	gcloud config list --format 'value(core.project)' | grep kubify ||	gcloud config set project kubify-os || gcloud auth application-default login
-	# python3 ./kubify/cloud/deploy_clouds_clusters.py
-	tfenv install v1.2.4
-	tfenv use v1.2.4
-	state_bucket_and_table_name="kubify-$(aws sts get-caller-identity --query "Account" --output text)"
-	terraform init -backend-config="bucket=$$state_bucket_and_table_name" -backend-config="dynamodb_table=$$state_bucket_and_table_name"
-	terraform apply -target=module.gcp
+	aws s3 ls s3://kubify-tf-state-$(aws_account_id_for_state) || aws s3api create-bucket --bucket kubify-tf-state-$(aws_account_id_for_state) --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1
+	aws s3api put-bucket-encryption --bucket kubify-tf-state-$(aws_account_id_for_state) --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}"
+	aws dynamodb describe-table --table-name kubify-tf-state-$(aws_account_id_for_state) ||  aws dynamodb create-table --table-name kubify-tf-state-$(aws_account_id_for_state) --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1
+	cd ./terraform && terraform init --reconfigure --backend-config="bucket=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="dynamodb_table=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="region=us-west-1" && terraform apply -target=module.$$cloud
 
 docker:
 	docker build . -t kubify:latest

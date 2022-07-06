@@ -8,10 +8,10 @@ See `./examples/simple` for Python Package usage example.
 
 To contribute to Kubify Open Source (and I hope you do), then clone this repo and:
 
-1. `make cloud [aws|gcp|azure here]`
+1. `make cloud cloud=[aws|gcp|azure]`
 2. `make local`
 3. `make local start-all`
-4. `make local [service name here]`
+4. `make local [service]`
 
 All the dependant services will start and will listen for code changes as well. Efficiently edit the entire codebase.
 

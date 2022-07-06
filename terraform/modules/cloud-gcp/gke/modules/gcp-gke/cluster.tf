@@ -2,14 +2,19 @@
 /******************************************
   Create Container Cluster
  *****************************************/
-#tfsec:ignore:enable-master-networks
+#tfsec:ignore:enable-master-networks tfsec:ignore:google-gke-enable-master-networks
 resource "google_container_cluster" "primary" {
-  provider = google
+  provider = google-beta
 
   name            = var.name
   description     = var.description
   project         = var.project_id
   resource_labels = var.cluster_resource_labels
+
+  private_cluster_config {
+    enable_private_endpoint = false
+    enable_private_nodes    = true
+  }
 
   location          = local.location
   node_locations    = local.node_locations
@@ -17,7 +22,7 @@ resource "google_container_cluster" "primary" {
   network           = "projects/${local.network_project_id}/global/networks/${var.network}"
 
   pod_security_policy_config {
-      enabled = "true"
+    enabled = "true"
   }
 
   dynamic "network_policy" {
@@ -281,7 +286,7 @@ resource "google_container_node_pool" "pools" {
 
   #tfsec:ignore:google-gke-metadata-endpoints-disabled
   node_config {
-    preemptible  = true
+    preemptible      = true
     image_type       = lookup(each.value, "image_type", "COS_CONTAINERD")
     machine_type     = lookup(each.value, "machine_type", "e2-medium")
     min_cpu_platform = lookup(each.value, "min_cpu_platform", "")
@@ -297,7 +302,7 @@ resource "google_container_node_pool" "pools" {
       local.node_pools_labels["all"],
       local.node_pools_labels[each.value["name"]],
     )
-    
+
     metadata = merge(
       lookup(lookup(local.node_pools_metadata, "default_values", {}), "cluster_name", true) ? { "cluster_name" = var.name } : {},
       lookup(lookup(local.node_pools_metadata, "default_values", {}), "node_pool", true) ? { "node_pool" = each.value["name"] } : {},
@@ -326,7 +331,7 @@ resource "google_container_node_pool" "pools" {
     )
 
     local_ssd_count = lookup(each.value, "local_ssd_count", 0)
-    disk_size_gb    = lookup(each.value, "disk_size_gb", 100)
+    disk_size_gb    = lookup(each.value, "disk_size_gb", 50)
     disk_type       = lookup(each.value, "disk_type", "pd-standard")
 
 
@@ -335,7 +340,6 @@ resource "google_container_node_pool" "pools" {
       "service_account",
       local.service_account,
     )
-    preemptible = lookup(each.value, "preemptible", false)
 
     oauth_scopes = concat(
       local.node_pools_oauth_scopes["all"],

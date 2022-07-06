@@ -2,11 +2,6 @@ data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
-module "ssh-key" {
-  source         = "./modules/ssh-key"
-  public_ssh_key = var.public_ssh_key == "" ? "" : var.public_ssh_key
-}
-
 resource "random_string" "main" {
   length  = 8
   special = false
@@ -63,38 +58,23 @@ resource "azurerm_kubernetes_cluster" "aks" {
     user_assigned_identity_id = var.user_assigned_identity_id == "" ? null : var.user_assigned_identity_id
   }
 
-  linux_profile {
-    admin_username = var.admin_username
 
-    ssh_key {
-      # remove any new lines using the replace interpolation function
-      key_data = replace(var.public_ssh_key == "" ? module.ssh-key.public_ssh_key : var.public_ssh_key, "\n", "")
-    }
+  aci_connector_linux {
+    subnet_name = var.enable_aci_connector_linux ? var.aci_connector_linux_subnet_name : null
   }
 
-  addon_profile {
-    aci_connector_linux {
-      enabled     = var.enable_aci_connector_linux
-      subnet_name = var.enable_aci_connector_linux ? var.aci_connector_linux_subnet_name : null
-    }
+  azure_policy_enabled = true
 
-    azure_policy {
-      enabled = var.enable_azure_policy
-    }
+  http_application_routing_enabled = true
 
-    http_application_routing {
-      enabled = var.enable_http_application_routing
-    }
+  # kube_dashboard {
+  #   enabled = var.enabled_kube_dashboard
+  # }
 
-    kube_dashboard {
-      enabled = var.enabled_kube_dashboard
-    }
-
-    oms_agent {
-      enabled                    = var.enable_log_analytics_workspace
-      log_analytics_workspace_id = var.enable_log_analytics_workspace ? azurerm_log_analytics_workspace.main[0].id : null
-    }
+  oms_agent {
+    log_analytics_workspace_id = var.enable_log_analytics_workspace ? azurerm_log_analytics_workspace.main[0].id : null
   }
+
 
   # role_based_access_control_enabled = true
 

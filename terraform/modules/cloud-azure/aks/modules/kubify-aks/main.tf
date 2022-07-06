@@ -17,7 +17,7 @@ module "aks" {
   resource_group_name = module.rg.name
   dns_prefix          = "kubify"
 
-  default_pool_name = "spot"
+  default_pool_name              = "spot"
   enable_log_analytics_workspace = true
 
   node_pools = [
