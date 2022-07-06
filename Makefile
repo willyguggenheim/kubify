@@ -89,12 +89,6 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
-eksctl-create-cloud: # eks
-	./templates/aws/deploy-west-east-eks-dev.sh
-
-eksctl-destroy-cloud: # eks
-	./templates/aws/destroy-west-east-eks-dev.sh
-
 pip:
 	pip install -U tox virtualenv flake8 setuptools
 	pip install -e .[develop]
@@ -115,7 +109,7 @@ cloud: #aws azure or gcp
 	tfenv use v1.2.4
 	aws s3 ls s3://kubify-tf-state-$(aws_account_id_for_state) || aws s3api create-bucket --bucket kubify-tf-state-$(aws_account_id_for_state) --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1
 	aws s3api put-bucket-encryption --bucket kubify-tf-state-$(aws_account_id_for_state) --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}"
-	aws dynamodb describe-table --table-name kubify-tf-state-$(aws_account_id_for_state) ||  aws dynamodb create-table --table-name kubify-tf-state-$(aws_account_id_for_state) --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1
+	aws dynamodb describe-table --table-name kubify-tf-state-$(aws_account_id_for_state)   >/dev/null ||  aws dynamodb create-table --table-name kubify-tf-state-$(aws_account_id_for_state) --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1
 	cd ./terraform && terraform init --reconfigure --backend-config="bucket=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="dynamodb_table=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="region=us-west-1" && terraform apply -target=module.$$cloud
 
 docker:
