@@ -18,6 +18,7 @@ module "gcp-network" {
       subnet_name   = var.subnetwork
       subnet_ip     = "10.200.0.0/20"
       subnet_region = var.region
+      subnet_flow_logs = true
     },
   ]
 
@@ -37,7 +38,7 @@ module "gcp-network" {
 
 # TODO: spot
 module "gke" {
-  source                 = "terraform-google-modules/kubernetes-engine/google"
+  source                 = "../gcp-gke/"
   version                = "21.2.0"
   project_id             = var.project_id
   name                   = var.cluster_name
@@ -48,4 +49,10 @@ module "gke" {
   ip_range_pods          = var.ip_range_pods_name
   ip_range_services      = var.ip_range_services_name
   create_service_account = true
+  network_policy = true
+  disable_legacy_metadata_endpoints = true
+  cluster_resource_labels = {
+    kubify = "true",
+    cluster = var.cluster_name
+  }
 }

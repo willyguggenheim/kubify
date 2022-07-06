@@ -102,28 +102,40 @@ pip:
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
 
-cloud: aws-cloud azure-cloud gcloud
+cloud: aws azure gcp
 
-aws-cloud:
+aws:
+	cd ./terraform
+	tfsec
 	terraform fmt --recursive
 	aws sts get-caller-identity || aws configure
 	tfenv install v1.2.4
 	tfenv use v1.2.4
-	cd ./terraform && terraform init && terraform apply
+	state_bucket_and_table_name="kubify-$(aws sts get-caller-identity --query "Account" --output text)"
+	terraform init -backend-config="bucket=$$state_bucket_and_table_name" -backend-config="dynamodb_table=$$state_bucket_and_table_name"
+	terraform apply -target=module.aws
 
-azure-cloud:
+azure:
+	cd ./terraform
+	tfsec
 	terraform fmt --recursive
 	az aks list || az login
 	tfenv install v1.2.4
 	tfenv use v1.2.4
-	cd ./terraform && terraform init && terraform apply
+	state_bucket_and_table_name="kubify-$(aws sts get-caller-identity --query "Account" --output text)"
+	terraform init -backend-config="bucket=$$state_bucket_and_table_name" -backend-config="dynamodb_table=$$state_bucket_and_table_name"
+	terraform apply -target=module.azure
 
-gcloud:
+gcp:
+	cd ./terraform
+	tfsec
 	gcloud config list --format 'value(core.project)' | grep kubify ||	gcloud config set project kubify-os || gcloud auth application-default login
 	# python3 ./kubify/cloud/deploy_clouds_clusters.py
 	tfenv install v1.2.4
 	tfenv use v1.2.4
-	cd ./terraform && terraform init && terraform apply
+	state_bucket_and_table_name="kubify-$(aws sts get-caller-identity --query "Account" --output text)"
+	terraform init -backend-config="bucket=$$state_bucket_and_table_name" -backend-config="dynamodb_table=$$state_bucket_and_table_name"
+	terraform apply -target=module.gcp
 
 docker:
 	docker build . -t kubify:latest
