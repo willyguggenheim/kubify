@@ -22,7 +22,6 @@ requirements = [
     "kubeconfig",
     "boto3",
     "botocore",
-    "azure",
     "aws_utils",
     "cv-pytorch",
 ]
