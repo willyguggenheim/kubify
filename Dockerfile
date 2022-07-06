@@ -1,14 +1,9 @@
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/doc/supported-tags.md
 FROM nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04
+# FROM willy0912/kubify-local:main
 # FROM willy0912/kubify-local:v
 
 WORKDIR /src/kubify/
-
-# Required --build-arg variables:
-ARG GIT_FIRST_LAST_NAME=local
-ENV GIT_FIRST_LAST_NAME=${GIT_FIRST_LAST_NAME}
-ARG GIT_EMAIL=local
-ENV GIT_EMAIL=${GIT_EMAIL}
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update
@@ -71,60 +66,43 @@ RUN terragrunt-amd64 --version && unlink /usr/local/bin/terragrunt
 RUN terragrunt-amd64 --version && ln -s /usr/local/bin/terragrunt-amd64 /usr/local/bin/terragrunt
 RUN chmod +x /usr/local/bin/terragrunt
 
-# Code:
-COPY . .
-RUN make fix
+# Clean
+RUN make clean
+
+RUN apt-get update
+RUN apt install -y software-properties-common
+RUN apt-get upgrade -y
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get install -y python3.7 python3.8 python3.9 python3.10
+RUN apt-get install -y python3-pip awscli
+
+# Cache
+COPY setup.py .
+RUN stat README.rst || touch README.rst
+RUN stat USAGE.rst || touch USAGE.rst
+RUN pip install -e .[develop]
 RUN pip install -e .[tests]
 RUN pip install -e .[extras]
 
-# Lint
-RUN make lint
+# Code
+COPY setup.py .
+COPY *.md .
+COPY *.rst .
+RUN pip install -e .[develop]
 
-# Tox (test all python versions enabled)
-# RUN make pythons # TODO: fix the 1 new error and then uncomment again
+COPY . .
 
-# Build Package (and Install Dependencies)
-RUN make pip
+# Build
+RUN make lint && make help && make pythons && make pip && make security && make coverage && make package
 
-# Security Checks (Bandit):
-RUN make security
-
-# Coverage:
-RUN make coverage
-
-# Tests (PyTest):
-RUN make test
-
-# Test Generating (the Help Docs):
-RUN make help
-
-# Package (Test Create Install Package):
-RUN apt install -y  --no-install-recommends python3
-RUN make package
-
-# Release (Test Install Release):
+# Install
 RUN pip install -e .
 
-# Clean (Smalller Image):
-RUN make clean
-RUN rm -rf /tmp/* /var/tmp/* ./.tox
-RUN rm -rf ./services/*/*/secr* ./.git
-RUN rm -rf /var/lib/apt/lists/*
-RUN apt remove -y python3.7 python3.8 python3.10 software-properties-common
 RUN apt-get clean autoclean
 RUN apt-get autoremove --yes
-RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
-RUN apt-get update && \
-    apt-get -y --no-install-recommends install curl \
-        ca-certificates && \
-    curl https://raw.githubusercontent.com/gadiener/docker-images-size-benchmark/master/main.go -o main.go && \
-    apt-get purge -y curl \
-        ca-certificates && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-RUN rm -rf ./docs ./dist
-RUN rm -rf /usr/lib/python2* /usr/lib/python3.7* /usr/lib/python3.8* /usr/lib/python3.10*
 
-# Default is to run Tests:
-CMD make test
+# Test
+RUN make test
+
+# Default is to run Tests and listen for folder changes (similar to skaffold, useful for rapid testing the actual python module in this repo):
+CMD make test && ls -alR > folder_listen_dates.txt && while [ "`ls -alR`" != "`cat folder_listen_dates.txt`" ]

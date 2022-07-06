@@ -76,27 +76,6 @@ def createCluster():
         print(output)
 
 
-def deleteCluster():
-    f = True
-    while f == True:
-        clusters = getClusters()
-        # for i in clusters:
-        #   print("Cluster name == {name} and region == {region}".format(name=i['name'], region=i['region']))
-        print_clusters(clusters)
-        del_cluster = input("Enter name of cluster to delete (case sensitive) : ")
-
-        if del_cluster in createListOfClusterName():
-            command = "eksctl delete cluster {name}".format(name=del_cluster)
-            output = subprocess_cmd(command)
-            print(json.loads(output))
-            f = False
-        else:
-            print("wrong cluster name, please enter correct name ")
-
-
-# createCluster()
-# deleteCluster()
-
 
 print("1) for list of clusters ")
 print("2) for create cluster ")
@@ -109,9 +88,6 @@ if user_input == 1:
 
 elif user_input == 2:
     createCluster()
-
-else:
-    deleteCluster()
 
 
 """

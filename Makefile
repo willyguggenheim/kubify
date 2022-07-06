@@ -150,3 +150,6 @@ deb:
 # rhel, centos and other epel-based ..
 epel:
 	ansible-playbook --connection=local "ansible/install_kubify_on_amzn2_centos_fedora_oracle_and_rhel.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
+
+aws-list:
+	aws eks list-clusters --output json
