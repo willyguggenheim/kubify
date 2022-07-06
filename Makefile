@@ -116,6 +116,10 @@ docker:
 	docker build . -t kubify:latest
 	docker tag kubify:latest docker.io/willy0912/kubify-local:latest
 
+docker-test-all-pythons:
+	docker build . -t kubify:latest -f Dockerfile.pythons
+	docker tag kubify:latest docker.io/willy0912/kubify-local:latest
+
 security:
 	bandit -r ./kubify -c .bandit.yml
 	bandit -r ./services -c .bandit.yml
