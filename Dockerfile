@@ -87,11 +87,16 @@ RUN pip install -e .[extras]
 RUN apt install -y python3-pip python3-dev
 RUN apt install -y python3.7-distutils python3.8-distutils python3.9-distutils python3.10-distutils
 RUN apt install -y python3.7-dev python3.8-dev python3.9-dev python3.10-dev
-RUN pip install -U tox virtualenv flake8 setuptools
-RUN python3.7 -m pip install -U tox virtualenv flake8 setuptools
-RUN python3.8 -m pip install -U tox virtualenv flake8 setuptools
-RUN python3.9 -m pip install -U tox virtualenv flake8 setuptools
-RUN python3.10 -m pip install -U tox virtualenv flake8 setuptools
+RUN pip install tox>=3.25.1
+RUN pip install -U tox>=3.25.1
+RUN python3.7 -m pip install tox>=3.25.1
+RUN python3.8 -m pip install tox>=3.25.1
+RUN python3.9 -m pip install tox>=3.25.1
+RUN python3.10 -m pip install tox>=3.25.1
+RUN python3.7 -m pip install -U tox>=3.25.1
+RUN python3.8 -m pip install -U tox>=3.25.1
+RUN python3.9 -m pip install -U tox>=3.25.1
+RUN python3.10 -m pip install -U tox>=3.25.1
 COPY Makefile .
 RUN make clean
 RUN make pip
