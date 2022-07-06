@@ -40,7 +40,7 @@ jobs:
         file: ./Dockerfile
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
-        tags: willy0912/kubify-local:main-branch-arm64-amd64-pythons
+        tags: willy0912/kubify-local:main
     - name: pypi-make-package
       id: makepypipackage
       run: python3 setup.py sdist bdist_wheel
