@@ -1,1 +1,1 @@
-FROM willy0912/kubify-local:v
+FROM willy0912/kubify-local:main

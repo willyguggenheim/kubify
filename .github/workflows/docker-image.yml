@@ -11,6 +11,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Run on architecture for multiarch
+      uses: uraimo/run-on-arch-action@v2.2.0
+      arch: armv7
     - name: actions/checkout
       uses: actions/checkout@v2
       with:

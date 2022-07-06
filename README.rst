@@ -3,7 +3,7 @@ Welcome!
 
 Kubify OS, Version: 9002.0.3
 
-Well hello there! Welcome to Kubify. The Turn-Key MLOps Stack.
+Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
 Who is this for?
 ================

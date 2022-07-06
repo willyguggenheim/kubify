@@ -42,13 +42,13 @@ clean-pyc: ## remove Python file artifacts
 	find . -name '__pycache__' -exec rm -fr {} +
 
 clean-test: ## remove test and coverage artifacts
-	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 kubify tests
+	flake8 ./kubify ./tests || true
+	flake8 ./kubify ./tests --ignore=E501,W292,F401,E712,F841,F811
 
 lint/black: ## check style with black
 	black --check kubify tests
@@ -96,8 +96,8 @@ eksctl-destroy-cloud: # eks
 	./templates/aws/destroy-west-east-eks-dev.sh
 
 pip:
-	pip install -r ./private/requirements_dev.txt
-	pip install -e .[test]
+	pip install -U tox virtualenv flake8 setuptools
+	pip install -e .[develop]
 
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
@@ -105,7 +105,7 @@ fix:
 	terraform fmt --recursive
 
 
-aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text)
+aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
 
 cloud: #aws azure or gcp
 	tfsec
@@ -130,14 +130,14 @@ package:
 	python3 setup.py sdist bdist_wheel
 
 clean:
-	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./.tox ./terraform/.terra* || true
-	rm -rf docs/*build docs/build *.pyc *.pyo || true
-	stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash || true
+	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./terraform/.terra* docs/*build docs/build *.pyc *.pyo
+	stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
 
 # test every version of python enabled
+pythons-cache:
+	tox -e py37,py38,py39,py310 -p all --notest
 pythons:
-	alias python=python3
-	tox
+	tox -e py37,py38,py39,py310 -p all
 
 # mac intel, m1, m2 and other darwin-based ..
 mac:
@@ -150,3 +150,6 @@ deb:
 # rhel, centos and other epel-based ..
 epel:
 	ansible-playbook --connection=local "ansible/install_kubify_on_amzn2_centos_fedora_oracle_and_rhel.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
+
+aws-list:
+	aws eks list-clusters --output json

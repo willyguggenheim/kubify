@@ -28,7 +28,7 @@ requirements = [
 
 test_requirements = [
     "pytest>=3",
-    "tox",
+    "tox>=3.25.1",
     "pick",
     "bandit",
     "black",
@@ -38,7 +38,6 @@ test_requirements = [
     "bump2version",
     "checkov",
     "coverage",
-    "terraenv>=0.12",
     "pytest-terraform>=0.6.1",
     "python-terraform>=0.10.0",
     "pytest-cov>=2.5.1",
