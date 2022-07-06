@@ -1,0 +1,19 @@
+
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRestrictRoleBindings
+metadata: # kpt-merge: /restrict-clusteradmin-rolebindings
+  name: restrict-clusteradmin-rolebindings
+  annotations:
+    # This constraint is not certified by CIS.
+    description: "Restricts use of the cluster-admin role."
+spec:
+  enforcementAction: dryrun # kpt-set: ${enforcementAction}
+  parameters:
+    allowedSubjects:
+      - name: "system:masters"
+        kind: "Group"
+        apiGroup: "rbac.authorization.k8s.io"
+    restrictedRole:
+      name: "cluster-admin"
+      kind: "ClusterRole"
+      apiGroup: "rbac.authorization.k8s.io"

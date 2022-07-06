@@ -11,6 +11,7 @@ locals {
 # Cluster
 ################################################################################
 
+#tfsec:ignore:aws-eks-no-public-cluster-access-to-cidr tfsec:ignore:aws-eks-no-public-cluster-access
 resource "aws_eks_cluster" "this" {
   count = local.create ? 1 : 0
 

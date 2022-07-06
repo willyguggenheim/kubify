@@ -90,10 +90,10 @@ install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
 eksctl-create-cloud: # eks
-	./dev/aws/deploy-west-east-eks-dev.sh
+	./templates/aws/deploy-west-east-eks-dev.sh
 
 eksctl-destroy-cloud: # eks
-	./dev/aws/destroy-west-east-eks-dev.sh
+	./templates/aws/destroy-west-east-eks-dev.sh
 
 pip:
 	pip install -r ./private/requirements_dev.txt
@@ -102,15 +102,18 @@ pip:
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
 
-cloud:
+aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text)
+
+cloud: #aws azure or gcp
+	tfsec
 	terraform fmt --recursive
 	aws sts get-caller-identity || aws configure
-	az aks list || az login
-	gcloud config list --format 'value(core.project)' | grep kubify ||	gcloud config set project kubify-os || gcloud auth application-default login
-	# python3 ./kubify/cloud/deploy_clouds_clusters.py
 	tfenv install v1.2.4
 	tfenv use v1.2.4
-	cd ./terraform && terraform init && terraform apply
+	aws s3 ls s3://kubify-tf-state-$(aws_account_id_for_state) || aws s3api create-bucket --bucket kubify-tf-state-$(aws_account_id_for_state) --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1
+	aws s3api put-bucket-encryption --bucket kubify-tf-state-$(aws_account_id_for_state) --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}"
+	aws dynamodb describe-table --table-name kubify-tf-state-$(aws_account_id_for_state) ||  aws dynamodb create-table --table-name kubify-tf-state-$(aws_account_id_for_state) --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1
+	cd ./terraform && terraform init --reconfigure --backend-config="bucket=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="dynamodb_table=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="region=us-west-1" && terraform apply -target=module.$$cloud
 
 docker:
 	docker build . -t kubify:latest

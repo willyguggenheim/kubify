@@ -1,0 +1,81 @@
+
+
+locals {
+  cluster_type = "regional"
+}
+
+data "google_client_config" "default" {}
+
+provider "kubernetes" {
+  host                   = "https://${module.gke.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(module.gke.ca_certificate)
+}
+
+module "gke" {
+  source                   = "../../"
+  project_id               = var.project_id
+  name                     = "${local.cluster_type}-cluster${var.cluster_name_suffix}"
+  region                   = var.region
+  network                  = var.network
+  subnetwork               = var.subnetwork
+  ip_range_pods            = var.ip_range_pods
+  ip_range_services        = var.ip_range_services
+  remove_default_node_pool = true
+  service_account          = "create"
+  node_metadata            = "GKE_METADATA"
+  node_pools = [
+    {
+      name         = "wi-pool"
+      min_count    = 1
+      max_count    = 2
+      auto_upgrade = true
+    }
+  ]
+}
+
+# example without existing KSA
+module "workload_identity" {
+  source              = "../../modules/workload-identity"
+  project_id          = var.project_id
+  name                = "iden-${module.gke.name}"
+  namespace           = "default"
+  use_existing_k8s_sa = false
+}
+
+# example with existing KSA
+resource "kubernetes_service_account" "test" {
+  metadata {
+    name = "foo-ksa"
+  }
+  secret {
+    name = "bar"
+  }
+}
+
+module "workload_identity_existing_ksa" {
+  source              = "../../modules/workload-identity"
+  project_id          = var.project_id
+  name                = "existing-${module.gke.name}"
+  cluster_name        = module.gke.name
+  location            = module.gke.location
+  namespace           = "default"
+  use_existing_k8s_sa = true
+  k8s_sa_name         = kubernetes_service_account.test.metadata.0.name
+}
+
+# example with existing GSA
+resource "google_service_account" "custom" {
+  account_id = "custom-gsa"
+  project    = var.project_id
+}
+
+module "workload_identity_existing_gsa" {
+  source              = "../../modules/workload-identity"
+  project_id          = var.project_id
+  name                = google_service_account.custom.account_id
+  use_existing_gcp_sa = true
+  # wait till custom GSA is created to force module data source read during apply
+  # https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/issues/1059
+  depends_on = [google_service_account.custom]
+}

@@ -9,7 +9,7 @@ module "gcp" {
   project_id   = var.gcp_project_id
 }
 
-module "az" {
-  source       = "./modules/cloud-az/"
+module "azure" {
+  source       = "./modules/cloud-azure/"
   cluster_name = var.cluster_name
 }

@@ -167,6 +167,7 @@ resource "aws_security_group" "node" {
   }
 }
 
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
 resource "aws_security_group_rule" "node" {
   for_each = { for k, v in merge(local.node_security_group_rules, var.node_security_group_additional_rules) : k => v if local.create_node_sg }
 
