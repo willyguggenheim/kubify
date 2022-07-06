@@ -109,7 +109,8 @@ RUN make package
 RUN pip install -e .
 
 COPY tox.ini .
-RUN make pythons
+# to run tests in all pythons as well, uncomment 1 next line
+# RUN make pythons
 
 RUN apt-get clean autoclean
 RUN apt-get autoremove --yes
