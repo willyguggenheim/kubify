@@ -16,7 +16,7 @@ Because Docker-Compose and Terraform are 2 different tools, so I fixed it.
 
 First class rapid testing, all your services listening for folder changes, so you can code fast, really fast. 
 
-To build a world where: If it works on your laptop, it works in dev/prod the SAME, that's what sets us apart. That's the magic.
+If it works on your laptop, it works in dev/prod the SAME, that's what sets us apart. That's the magic.
 
 # How?
 
