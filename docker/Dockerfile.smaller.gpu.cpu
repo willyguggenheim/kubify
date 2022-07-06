@@ -1,5 +1,6 @@
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/doc/supported-tags.md
 FROM nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04
+# FROM willy0912/kubify-local:v
 
 WORKDIR /src/kubify/
 ENV DEBIAN_FRONTEND=noninteractive
@@ -10,8 +11,8 @@ RUN apt install -y  --no-install-recommends python3 software-properties-common
 RUN apt install -y  --no-install-recommends sudo zsh bash git ansible awscli make wget apt-utils
 RUN apt install -y  --no-install-recommends python3-alembic python3-flask-migrate
 # Tox Multi-Py tests:
-RUN add-apt-repository ppa:deadsnakes/ppa && apt update
-RUN apt install -y  --no-install-recommends python3.7 python3.8 python3.9 python3.10
+# RUN add-apt-repository ppa:deadsnakes/ppa && apt update
+# RUN apt install -y  --no-install-recommends python3.7 python3.8 python3.9 python3.10
 # APT Deps can go here:
 RUN apt install -y  --no-install-recommends python3-alembic python3-flask-migrate curl
 RUN wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin/
@@ -38,9 +39,14 @@ COPY ./ansible.cfg /etc/ansible/
 COPY ./ansible /tmp/ansible
 RUN rm -rf /src/kubify/.git /src/kubify/
 RUN ansible-playbook --connection=local "/tmp/ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
+COPY setup.py .
+COPY *.md .
+COPY *.rst .
 RUN apt install -y  --no-install-recommends libxml2 libxml2-dev libxslt-dev
 RUN pip install Cython
-RUN pip install tox
+
+# Dev
+RUN pip install -e .[develop]
 
 # Terraform:
 # RUN git clone https://github.com/riywo/anyenv ~/.anyenv
@@ -58,63 +64,61 @@ RUN terragrunt-arm64 --version && ln -s /usr/local/bin/terragrunt-arm64 /usr/loc
 RUN terragrunt-amd64 --version && unlink /usr/local/bin/terragrunt
 RUN terragrunt-amd64 --version && ln -s /usr/local/bin/terragrunt-amd64 /usr/local/bin/terragrunt
 RUN chmod +x /usr/local/bin/terragrunt
-RUN apt-get update
-RUN apt install -y software-properties-common
-RUN apt-get upgrade -y
-RUN add-apt-repository ppa:deadsnakes/ppa
-RUN apt-get install -y python3.7 python3.8 python3.9 python3.10
-RUN apt-get install -y python3-pip awscli
 
-# Cache
-RUN apt install -y python3-pip python3-dev
-RUN apt install -y python3.7-distutils python3.8-distutils python3.9-distutils python3.10-distutils
-RUN apt install -y python3.7-dev python3.8-dev python3.9-dev python3.10-dev
-RUN pip install tox>=3.25.1
-RUN pip install -U tox>=3.25.1
-RUN python3.7 -m pip install tox>=3.25.1
-RUN python3.8 -m pip install tox>=3.25.1
-RUN python3.9 -m pip install tox>=3.25.1
-RUN python3.10 -m pip install tox>=3.25.1
-RUN python3.7 -m pip install -U tox>=3.25.1
-RUN python3.8 -m pip install -U tox>=3.25.1
-RUN python3.9 -m pip install -U tox>=3.25.1
-RUN python3.10 -m pip install -U tox>=3.25.1
-COPY setup.py .
-RUN stat README.rst || touch README.rst
-RUN stat USAGE.rst || touch USAGE.rst
+# Code:
+COPY . .
+RUN make fix
 RUN pip install -e .[tests]
 RUN pip install -e .[extras]
-COPY tox.ini .
-COPY Makefile .
-RUN make pythons-cache
+
+# Lint
+RUN make lint
+
+# Tox (test all python versions enabled)
+# RUN make pythons # TODO: fix the 1 new error and then uncomment again
+
+# Build Package (and Install Dependencies)
 RUN make pip
 
-COPY . .
-COPY *.md .
-COPY *.rst .
-COPY Makefile .
-COPY Dockerfile .
-
-# Build
-RUN make clean
-RUN make lint
-RUN make help
+# Security Checks (Bandit):
 RUN make security
+
+# Coverage:
 RUN make coverage
-RUN make package
 
-# Install
-RUN pip install -e .
-
-COPY tox.ini .
-# to run tests in all pythons as well, uncomment 1 next line
-# RUN make pythons
-
-RUN apt-get clean autoclean
-RUN apt-get autoremove --yes
-
-# Test
+# Tests (PyTest):
 RUN make test
 
-# Default is to run Tests and listen for folder changes (similar to skaffold, useful for rapid testing the actual python module in this repo):
-CMD make test && ls -alR > folder_listen_dates.txt && while [ "`ls -alR`" != "`cat folder_listen_dates.txt`" ]
+# Test Generating (the Help Docs):
+RUN make help
+
+# Package (Test Create Install Package):
+RUN apt install -y  --no-install-recommends python3
+RUN make package
+
+# Release (Test Install Release):
+RUN pip install -e .
+
+# Clean (Smalller Image):
+RUN make clean
+RUN rm -rf /tmp/* /var/tmp/* ./.tox
+RUN rm -rf ./services/*/*/secr* ./.git
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt remove -y python3.7 python3.8 python3.10 software-properties-common
+RUN apt-get clean autoclean
+RUN apt-get autoremove --yes
+RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
+RUN apt-get update && \
+    apt-get -y --no-install-recommends install curl \
+        ca-certificates && \
+    curl https://raw.githubusercontent.com/gadiener/docker-images-size-benchmark/master/main.go -o main.go && \
+    apt-get purge -y curl \
+        ca-certificates && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+RUN rm -rf ./docs ./dist
+RUN rm -rf /usr/lib/python2* /usr/lib/python3.7* /usr/lib/python3.8* /usr/lib/python3.10*
+
+# Default is to run Tests:
+CMD make test

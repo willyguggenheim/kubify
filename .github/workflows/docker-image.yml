@@ -61,7 +61,7 @@ jobs:
         # file: ./Dockerfile.cicd
         # platforms: linux/amd64,linux/arm64
         # push: ${{ github.event_name != 'pull_request' }}
-        # tags: willy0912/kubify-local:main
+        # tags: willy0912/kubify-local:main-branch-arm64-amd64-pythons
         # cache-from: type=registry,ref=${{ matrix.slug }}:master
         # cache-to: type=inline
     # -
