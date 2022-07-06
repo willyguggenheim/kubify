@@ -11,9 +11,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Run on architecture for multiarch
-      uses: uraimo/run-on-arch-action@v2.2.0
-      arch: armv7
+    # - name: Run on architecture for multiarch
+    #   uses: uraimo/run-on-arch-action@v2.2.0
+    #   arch: armv7
     - name: actions/checkout
       uses: actions/checkout@v2
       with:
@@ -42,8 +42,19 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     # dockerhub image build security package ship
     -
-      name: release-dockerhub
+      name: Build and push
       uses: docker/build-push-action@v3
       with:
-        push: true
+        context: ./
+        file: ./Dockerfile
+        platforms: linux/amd64,linux/arm64
+        push: ${{ github.event_name != 'pull_request' }}
         tags: willy0912/kubify-local:main
+        # cache-from: type=registry,ref=${{ matrix.slug }}:master
+        # cache-to: type=inline
+    # -
+    #   name: release-dockerhub
+    #   uses: docker/build-push-action@v3
+    #   with:
+    #     push: true
+    #     tags: willy0912/kubify-local:main
