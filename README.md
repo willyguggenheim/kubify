@@ -1,10 +1,14 @@
+# Welcome!
+
 Kubify OS, Version: 9001.0.0
 
 Well hello there! Welcome to Kubify. The Turn-Key MLOps Stack.
 
 # Who is this for?
 
-Data Scientists & Devs who want full self service & who want to code fast.
+Data Scientists/Devs/DevOps who want self service.
+
+To rapid develop many services/models fast simultaneously on full real environment.
 
 # Why?
 
