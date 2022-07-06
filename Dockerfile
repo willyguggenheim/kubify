@@ -87,10 +87,9 @@ RUN stat USAGE.rst || touch USAGE.rst
 RUN pip install -e .[tests]
 RUN pip install -e .[extras]
 COPY tox.ini .
-RUN make pythons
 COPY Makefile .
+RUN make pythons-cache
 RUN make pip
-
 
 COPY . .
 COPY *.md .

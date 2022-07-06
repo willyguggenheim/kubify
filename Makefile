@@ -134,9 +134,10 @@ clean:
 	stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
 
 # test every version of python enabled
+pythons-cache:
+	tox -e py37,py38,py39,py310 -p all --notest
 pythons:
-	alias python=python3
-	tox -e py37,py38,py39,py310
+	tox -e py37,py38,py39,py310 -p all
 
 # mac intel, m1, m2 and other darwin-based ..
 mac:
