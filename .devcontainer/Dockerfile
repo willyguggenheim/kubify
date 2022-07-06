@@ -1,1 +1,1 @@
-FROM willy0912/kubify-local:main-branch-arm64-amd64-pythons
+FROM willy0912/kubify-local:main

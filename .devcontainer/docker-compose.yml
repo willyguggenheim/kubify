@@ -2,10 +2,9 @@ version: '3.9'
 services:
   # Update this to the name of the service you want to work with in your docker-compose.yml file
   kubify:
-    # uncomment if you want the pre-built container
-    # build:
-    #   context: .
-    #   dockerfile: .devcontainer/Dockerfile
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
 
     volumes:
       - .:/workspace:cached
