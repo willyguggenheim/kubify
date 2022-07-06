@@ -13,20 +13,11 @@ jobs:
     steps:
     # - name: Run on architecture for multiarch
     #   uses: uraimo/run-on-arch-action@v2.2.0
-    #   arch: armv7
+    #   arch: arm64,amd64
     - name: actions/checkout
       uses: actions/checkout@v2
       with:
           persist-credentials: false
-    - name: pypi-make-package
-      id: makepypipackage
-      run: python3 setup.py sdist bdist_wheel
-    # pypi package ship
-    - name: release-pypi
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
     # docker build multi-arch setup
     -
       name: setup-qemu-multiarch
@@ -49,24 +40,13 @@ jobs:
         file: ./Dockerfile
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
-        tags: willy0912/kubify-local:main-branch-arm64-amd64-pythons
-        # cache-from: type=registry,ref=${{ matrix.slug }}:master
-        # cache-to: type=inline
-    # -
-    #   name: Build and push
-    #   uses: docker/build-push-action@v3
-    #   with:
-    #     context: ./
-        # faster builds on main
-        # file: ./Dockerfile.cicd
-        # platforms: linux/amd64,linux/arm64
-        # push: ${{ github.event_name != 'pull_request' }}
-        # tags: willy0912/kubify-local:main-branch-arm64-amd64-pythons
-        # cache-from: type=registry,ref=${{ matrix.slug }}:master
-        # cache-to: type=inline
-    # -
-    #   name: release-dockerhub
-    #   uses: docker/build-push-action@v3
-    #   with:
-    #     push: true
-    #     tags: willy0912/kubify-local:main
+        tags: willy0912/kubify-local:main
+    - name: pypi-make-package
+      id: makepypipackage
+      run: python3 setup.py sdist bdist_wheel
+    # pypi package ship
+    - name: release-pypi
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
