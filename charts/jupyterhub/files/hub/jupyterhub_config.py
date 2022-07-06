@@ -200,7 +200,8 @@ if get_config("scheduling.podPriority.enabled"):
     c.KubeSpawner.priority_class_name = get_name("priority")
 
 # add node-purpose affinity
-match_node_purpose = get_config("scheduling.userPods.nodeAffinity.matchNodePurpose")
+match_node_purpose = get_config(
+    "scheduling.userPods.nodeAffinity.matchNodePurpose")
 if match_node_purpose:
     node_selector = dict(
         matchExpressions=[
@@ -228,7 +229,8 @@ if match_node_purpose:
         )
 
 # Combine the common tolerations for user pods with singleuser tolerations
-scheduling_user_pods_tolerations = get_config("scheduling.userPods.tolerations", [])
+scheduling_user_pods_tolerations = get_config(
+    "scheduling.userPods.tolerations", [])
 singleuser_extra_tolerations = get_config("singleuser.extraTolerations", [])
 tolerations = scheduling_user_pods_tolerations + singleuser_extra_tolerations
 if tolerations:
@@ -237,9 +239,11 @@ if tolerations:
 # Configure dynamically provisioning pvc
 storage_type = get_config("singleuser.storage.type")
 if storage_type == "dynamic":
-    pvc_name_template = get_config("singleuser.storage.dynamic.pvcNameTemplate")
+    pvc_name_template = get_config(
+        "singleuser.storage.dynamic.pvcNameTemplate")
     c.KubeSpawner.pvc_name_template = pvc_name_template
-    volume_name_template = get_config("singleuser.storage.dynamic.volumeNameTemplate")
+    volume_name_template = get_config(
+        "singleuser.storage.dynamic.volumeNameTemplate")
     c.KubeSpawner.storage_pvc_ensure = True
     set_config_if_not_none(
         c.KubeSpawner, "storage_class", "singleuser.storage.dynamic.storageClass"
@@ -327,7 +331,8 @@ c.JupyterHub.services = []
 if get_config("cull.enabled", False):
     cull_cmd = ["python3", "-m", "jupyterhub_idle_culler"]
     base_url = c.JupyterHub.get("base_url", "/")
-    cull_cmd.append("--url=http://localhost:8081" + url_path_join(base_url, "hub/api"))
+    cull_cmd.append("--url=http://localhost:8081" + \
+                    url_path_join(base_url, "hub/api"))
 
     cull_timeout = get_config("cull.timeout")
     if cull_timeout:
@@ -422,7 +427,8 @@ if os.path.isdir(config_dir):
 #
 # NOTE: ConfigurableHTTPProxy.auth_token is set through an environment variable
 #       that is set using the chart managed secret.
-c.JupyterHub.cookie_secret = get_secret_value("hub.config.JupyterHub.cookie_secret")
+c.JupyterHub.cookie_secret = get_secret_value(
+    "hub.config.JupyterHub.cookie_secret")
 # NOTE: CryptKeeper.keys should be a list of strings, but we have encoded as a
 #       single string joined with ; in the k8s Secret.
 #

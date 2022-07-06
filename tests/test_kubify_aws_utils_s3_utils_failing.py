@@ -6,7 +6,7 @@ def test_case_0():
         str_0 = "bL2ip/`.wvGQ\t"
         str_1 = "Code"
         s3_utils_0 = module_0.s3_utils()
-        var_0 = s3_utils_0.create_bucket(str_0, str_1)
+        s3_utils_0.create_bucket(str_0, str_1)
     except BaseException:
         pass
 
@@ -14,15 +14,15 @@ def test_case_0():
 def test_case_1():
     try:
         s3_utils_0 = module_0.s3_utils()
-        s3_utils_1 = module_0.s3_utils()
+        module_0.s3_utils()
         str_0 = "creationTimestamp"
         var_0 = s3_utils_0.get_bucket(str_0)
         assert var_0 is None
-        s3_utils_2 = module_0.s3_utils()
+        module_0.s3_utils()
         str_1 = "Er"
         str_2 = ""
         set_0 = {str_1, s3_utils_0, str_1, str_2}
-        var_1 = s3_utils_0.get_bucket(set_0)
+        s3_utils_0.get_bucket(set_0)
     except BaseException:
         pass
 
@@ -30,15 +30,15 @@ def test_case_1():
 def test_case_2():
     try:
         s3_utils_0 = module_0.s3_utils()
-        s3_utils_1 = module_0.s3_utils()
+        module_0.s3_utils()
         str_0 = "a"
         var_0 = s3_utils_0.get_bucket(str_0)
         assert var_0 is None
-        s3_utils_2 = module_0.s3_utils()
+        module_0.s3_utils()
         str_1 = "Er"
         str_2 = ""
         set_0 = {str_1, s3_utils_0, str_1, str_2}
-        var_1 = s3_utils_0.get_bucket(set_0)
+        s3_utils_0.get_bucket(set_0)
     except BaseException:
         pass
 
@@ -47,7 +47,7 @@ def test_case_3():
     try:
         bool_0 = True
         s3_utils_0 = module_0.s3_utils()
-        var_0 = s3_utils_0.put_bucket_encryption(bool_0)
+        s3_utils_0.put_bucket_encryption(bool_0)
     except BaseException:
         pass
 
@@ -57,7 +57,7 @@ def test_case_4():
         s3_utils_0 = module_0.s3_utils()
         set_0 = {s3_utils_0, s3_utils_0, s3_utils_0}
         s3_utils_1 = module_0.s3_utils()
-        var_0 = s3_utils_1.put_bucket_encryption(set_0)
+        s3_utils_1.put_bucket_encryption(set_0)
     except BaseException:
         pass
 
@@ -70,7 +70,7 @@ def test_case_5():
         assert var_0 is None
         list_0 = []
         int_0 = 403
-        var_1 = s3_utils_0.create_bucket(list_0, int_0)
+        s3_utils_0.create_bucket(list_0, int_0)
     except BaseException:
         pass
 
@@ -87,6 +87,6 @@ def test_case_6():
         bool_2 = True
         tuple_1 = tuple_0, int_0, bool_1, bool_2
         s3_utils_0 = module_0.s3_utils()
-        var_0 = s3_utils_0.create_bucket(tuple_1, float_0)
+        s3_utils_0.create_bucket(tuple_1, float_0)
     except BaseException:
         pass

@@ -40,14 +40,9 @@ COPY ./ansible.cfg /etc/ansible/
 COPY ./ansible /tmp/ansible
 RUN rm -rf /src/kubify/.git /src/kubify/
 RUN ansible-playbook --connection=local "/tmp/ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
-COPY setup.py .
-COPY *.md .
-COPY *.rst .
 RUN apt install -y  --no-install-recommends libxml2 libxml2-dev libxslt-dev
 RUN pip install Cython
-
-# Dev
-RUN pip install -e .[develop]
+RUN pip install tox
 
 # Terraform:
 # RUN git clone https://github.com/riywo/anyenv ~/.anyenv
@@ -65,12 +60,6 @@ RUN terragrunt-arm64 --version && ln -s /usr/local/bin/terragrunt-arm64 /usr/loc
 RUN terragrunt-amd64 --version && unlink /usr/local/bin/terragrunt
 RUN terragrunt-amd64 --version && ln -s /usr/local/bin/terragrunt-amd64 /usr/local/bin/terragrunt
 RUN chmod +x /usr/local/bin/terragrunt
-
-# Clean
-COPY Makefile .
-RUN make clean
-RUN rm -rf ./.git
-
 RUN apt-get update
 RUN apt install -y software-properties-common
 RUN apt-get upgrade -y
@@ -79,11 +68,6 @@ RUN apt-get install -y python3.7 python3.8 python3.9 python3.10
 RUN apt-get install -y python3-pip awscli
 
 # Cache
-COPY setup.py .
-RUN stat README.rst || touch README.rst
-RUN stat USAGE.rst || touch USAGE.rst
-RUN pip install -e .[tests]
-RUN pip install -e .[extras]
 RUN apt install -y python3-pip python3-dev
 RUN apt install -y python3.7-distutils python3.8-distutils python3.9-distutils python3.10-distutils
 RUN apt install -y python3.7-dev python3.8-dev python3.9-dev python3.10-dev
@@ -97,11 +81,15 @@ RUN python3.7 -m pip install -U tox>=3.25.1
 RUN python3.8 -m pip install -U tox>=3.25.1
 RUN python3.9 -m pip install -U tox>=3.25.1
 RUN python3.10 -m pip install -U tox>=3.25.1
-COPY Makefile .
-RUN make clean
-RUN make pip
+COPY setup.py .
+RUN stat README.rst || touch README.rst
+RUN stat USAGE.rst || touch USAGE.rst
+RUN pip install -e .[tests]
+RUN pip install -e .[extras]
 COPY tox.ini .
-# RUN make pythons
+RUN make pythons
+COPY Makefile .
+RUN make pip
 
 
 COPY . .

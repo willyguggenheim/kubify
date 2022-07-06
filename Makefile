@@ -42,13 +42,13 @@ clean-pyc: ## remove Python file artifacts
 	find . -name '__pycache__' -exec rm -fr {} +
 
 clean-test: ## remove test and coverage artifacts
-	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 ./kubify ./tests
+	flake8 ./kubify ./tests || true
+	flake8 ./kubify ./tests --ignore=E501,W292,F401,E712,F841,F811
 
 lint/black: ## check style with black
 	black --check kubify tests
@@ -105,7 +105,7 @@ fix:
 	terraform fmt --recursive
 
 
-aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text)
+aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
 
 cloud: #aws azure or gcp
 	tfsec

@@ -59,10 +59,10 @@ def createCluster():
         print("Cluster is there change name or region to proceed forward")
 
     else:
-        nodes = input("Enter number of nodes : ")
-        minNodes = input("Enter minimum number of nodes in cluster : ")
-        maxNodes = input("Enter maximum number of nodes in cluster : ")
-        path = input("enter path for kubeconfig file : ")
+        # nodes = input("Enter number of nodes : ")
+        # minNodes = input("Enter minimum number of nodes in cluster : ")
+        # maxNodes = input("Enter maximum number of nodes in cluster : ")
+        # path = input("enter path for kubeconfig file : ")
         command = "make cloud aws"
 
         print(command)
