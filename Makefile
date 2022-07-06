@@ -137,8 +137,6 @@ clean:
 pythons-cache:
 	tox -e py37,py38,py39,py310 -p all --notest
 pythons:
-	tox -e py37,py38,py39,py310 -p all --sdistonly
-pythons-tests:
 	tox -e py37,py38,py39,py310 -p all
 
 # mac intel, m1, m2 and other darwin-based ..

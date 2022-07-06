@@ -116,7 +116,6 @@ RUN apt-get autoremove --yes
 
 # Test
 RUN make test
-RUN make pythons-tests
 
 # Default is to run Tests and listen for folder changes (similar to skaffold, useful for rapid testing the actual python module in this repo):
 CMD make test && ls -alR > folder_listen_dates.txt && while [ "`ls -alR`" != "`cat folder_listen_dates.txt`" ]
