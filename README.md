@@ -34,7 +34,7 @@ See `terraform/README.md`
 
 ![LOGO](./docs/img/README_md_imgs/KUBIFY_BRAND_IDENTITY_1.png)
 
-[![Docker](https://github.com/willyguggenheim/kubify/actions/workflows/docker-pypi-gitops-push.yml/badge.svg?branch=main)](https://github.com/willyguggenheim/kubify/actions/workflows/docker-pypi-gitops-push.yml) [![PyPi](https://img.shields.io/pypi/v/kubify.svg)](https://pypi.python.org/pypi/kubify) [![PyUp](https://pyup.io/repos/github/willyguggenheim/kubify/shield.svg)](https://pyup.io/repos/github/willyguggenheim/kubify/) [![Docs](https://readthedocs.org/projects/kubify/badge/?version=latest)](hhttps://kubify.readthedocs.io/en/latest/?version=latest)
+[![Docker](https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml) [![PyPi](https://img.shields.io/pypi/v/kubify.svg)](https://pypi.python.org/pypi/kubify) [![PyUp](https://pyup.io/repos/github/willyguggenheim/kubify/shield.svg)](https://pyup.io/repos/github/willyguggenheim/kubify/) [![Docs](https://readthedocs.org/projects/kubify/badge/?version=latest)](hhttps://kubify.readthedocs.io/en/latest/?version=latest)
 
 Magic? Yes. Pure Magic.
 
