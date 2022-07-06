@@ -48,7 +48,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 kubify tests
+	flake8 ./kubify ./tests
 
 lint/black: ## check style with black
 	black --check kubify tests
@@ -96,8 +96,8 @@ eksctl-destroy-cloud: # eks
 	./templates/aws/destroy-west-east-eks-dev.sh
 
 pip:
-	pip install -r ./private/requirements_dev.txt
-	pip install -e .[test]
+	pip install -U tox virtualenv flake8 setuptools
+	pip install -e .[develop]
 
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
@@ -130,14 +130,13 @@ package:
 	python3 setup.py sdist bdist_wheel
 
 clean:
-	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./.tox ./terraform/.terra* || true
-	rm -rf docs/*build docs/build *.pyc *.pyo || true
-	stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash || true
+	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./terraform/.terra* docs/*build docs/build *.pyc *.pyo
+	stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
 
 # test every version of python enabled
 pythons:
 	alias python=python3
-	tox
+	tox -e py37,py38,py39,py310
 
 # mac intel, m1, m2 and other darwin-based ..
 mac:

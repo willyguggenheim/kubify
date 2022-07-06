@@ -76,7 +76,6 @@ def createCluster():
         print(output)
 
 
-
 print("1) for list of clusters ")
 print("2) for create cluster ")
 print("3) for delete cluster ")
@@ -88,17 +87,9 @@ if user_input == 1:
 
 elif user_input == 2:
     createCluster()
-
-
 """
 clusterName = input("Enter cluster name : ")
 clusterRegion = input("Enter cluster region : ")
 out = checkCluster(clusterName, clusterRegion)
 print(out)
 """
-
-
-# create cluster need to find way to add kubeconfig file to location
-# sclae up cluster
-# scale down cluster
-# need BOTO3 to get information related to cluster

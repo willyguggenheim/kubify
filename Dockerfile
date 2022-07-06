@@ -67,7 +67,9 @@ RUN terragrunt-amd64 --version && ln -s /usr/local/bin/terragrunt-amd64 /usr/loc
 RUN chmod +x /usr/local/bin/terragrunt
 
 # Clean
+COPY Makefile .
 RUN make clean
+RUN rm -rf ./.git
 
 RUN apt-get update
 RUN apt install -y software-properties-common
@@ -80,23 +82,42 @@ RUN apt-get install -y python3-pip awscli
 COPY setup.py .
 RUN stat README.rst || touch README.rst
 RUN stat USAGE.rst || touch USAGE.rst
-RUN pip install -e .[develop]
 RUN pip install -e .[tests]
 RUN pip install -e .[extras]
+RUN apt install -y python3-pip python3-dev
+RUN apt install -y python3.7-distutils python3.8-distutils python3.9-distutils python3.10-distutils
+RUN apt install -y python3.7-dev python3.8-dev python3.9-dev python3.10-dev
+RUN pip install -U tox virtualenv flake8 setuptools
+RUN python3.7 -m pip install -U tox virtualenv flake8 setuptools
+RUN python3.8 -m pip install -U tox virtualenv flake8 setuptools
+RUN python3.9 -m pip install -U tox virtualenv flake8 setuptools
+RUN python3.10 -m pip install -U tox virtualenv flake8 setuptools
+COPY Makefile .
+RUN make clean
+RUN make pip
+COPY tox.ini .
+# RUN make pythons
 
-# Code
-COPY setup.py .
-COPY *.md .
-COPY *.rst .
-RUN pip install -e .[develop]
 
 COPY . .
+COPY *.md .
+COPY *.rst .
+COPY Makefile .
+COPY Dockerfile .
 
 # Build
-RUN make lint && make help && make pythons && make pip && make security && make coverage && make package
+RUN make clean
+RUN make lint
+RUN make help
+RUN make security
+RUN make coverage
+RUN make package
 
 # Install
 RUN pip install -e .
+
+COPY tox.ini .
+RUN make pythons
 
 RUN apt-get clean autoclean
 RUN apt-get autoremove --yes

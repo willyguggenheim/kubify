@@ -218,3 +218,7 @@ ENV/
 *-report
 *-report/**
 reports/
+
+# mac
+.DS_Store
+**/.DS_Store
