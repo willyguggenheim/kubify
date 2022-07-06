@@ -101,6 +101,9 @@ pip:
 
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
+	black ./kubify
+	terraform fmt --recursive
+
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text)
 

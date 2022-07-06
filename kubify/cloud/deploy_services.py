@@ -1,1 +1,0 @@
-# TODO: migrate the bash ansible runs to this script in python
