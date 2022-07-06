@@ -20,7 +20,7 @@ If it works on your laptop, it works in dev/prod the SAME, that's what sets us a
 
 # How?
 
-By combining the common genius ideas of DevOps+Developers+DevEx+Willy.
+DevEx First Class Ideology
 
 ![FUTUREOFDEVOPS9000](./docs/img/README_md_imgs/the-future.gif)
 
