@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9002.0.2
+Kubify OS, Version: 9002.0.3
 
 Well hello there! Welcome to Kubify. The Turn-Key MLOps Stack.
 
