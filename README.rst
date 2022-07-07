@@ -59,6 +59,15 @@ This is a python package and a docker image (multi-arch).
 2. DockerHub
 
 
+Cloud:
+
+1. `make cloud cloud=aws``
+2. (optional) `make cloud cloud=gcp` # TODO: enable for multi-cloud site-reliability backing AWS
+3. (optional) `make cloud cloud=azure`
+
+Boom! Just like that, You have a redundant cloud!
+
+
 Usage:
 
 1. `pip install kubify`
