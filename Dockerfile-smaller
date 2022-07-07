@@ -1,3 +1,4 @@
+# This is for CPU-only builds, in order to have a smaller image (only reason)
 FROM ubuntu:22.04
 
 WORKDIR /src/kubify/
