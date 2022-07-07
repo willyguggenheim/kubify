@@ -16,37 +16,46 @@ def create_work_dirs():
     # mkdir -p ${WORK_DIR}/repo_local
     # home/.kubify/work
 
+
 def clean_secrets():
     pass
+
+
 #   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/cloudformation/*
 #   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/manifests/secr*
 #   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/gen-*
 #   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/*.log
 
-def service_setup_secrets():
-#     SECRETS_FILE="${APP_DIR}/secrets/secrets.${ENV}.enc.yaml"
-#   CONFIG_FILE="${APP_DIR}/config/config.${ENV}.yaml"
 
-#   # if SECRETS_FILE not exist, let's create the intial secret
-#   if [ ! -f "${SECRETS_FILE}" ]; then
-#       kubify secrets create ${ENV}
-#   fi
-# if [ ! -f "${CONFIG_FILE}" ]; then
-#       echo "${CONFIG_FILE} file not found, creating blank one"
-#       mkdir -p "${APP_DIR}/config" | true
-#       cp "${GIT_DIR}/src/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
-#       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
-#   fi
+def service_setup_secrets():
+    #     SECRETS_FILE="${APP_DIR}/secrets/secrets.${ENV}.enc.yaml"
+    #   CONFIG_FILE="${APP_DIR}/config/config.${ENV}.yaml"
+
+    #   # if SECRETS_FILE not exist, let's create the intial secret
+    #   if [ ! -f "${SECRETS_FILE}" ]; then
+    #       kubify secrets create ${ENV}
+    #   fi
+    # if [ ! -f "${CONFIG_FILE}" ]; then
+    #       echo "${CONFIG_FILE} file not found, creating blank one"
+    #       mkdir -p "${APP_DIR}/config" | true
+    #       cp "${GIT_DIR}/src/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
+    #       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
+    #   fi
     pass
 
+
 def service_start_dependencies():
-    pass #start_dependencies "${APP_DIR}" read yaml find depency run if not running (might have started with start for code listening) if running skip, follow dependency change start them all
+    pass  # start_dependencies "${APP_DIR}" read yaml find depency run if not running (might have started with start for code listening) if running skip, follow dependency change start them all
+
 
 def cloud_deploy_services():
     pass
 
+
 def print_local_debug_info():
     pass
+
+
 #   echo "Listening for code changes (on sync folders).."
 #   # echo "Starting application '$APP_NAME' for local development. Changes (kubify.yml sync folder mapping list) will be watched for rapid testing (will rebuild fast with each code save)."
 #   # echo "
@@ -61,10 +70,12 @@ def print_local_debug_info():
 #   echo "NOTE: Access DB or to/from additional Ports: kubectl -n demo port-forward [pod] [port]:[port]"
 #   # TODO: automate this in kubify command and document it (super useful):
 #   # echo "NOTE: If you need to access more ports (such as a debugger port) or a database (such as postgres 5432 port), use kubectl port-forward command (to a local or a to a deployed remote k8s/eks/kubernetes cluster)."
-  
+
+
 def init():
-    #set context to kind-kind
+    # set context to kind-kind
     pass
+
 
 def service_init():
     # ansible-playbook \
@@ -78,10 +89,13 @@ def service_init():
     # lambda etc
     # just call the ansible
 
+
 def service(command="start"):
-    if command == "start":#default
+    if command == "start":  # default
         service_init
     # read yaml if aws_only or false then go to skaffold
+
+
 #   cat "${APP_DIR}/kubify.yml" | grep aws_only | grep true || ${SKAFFOLD} dev \
 #         --cache-artifacts \
 #         --filename ${WORK_DIR}/${ENV}/${APP_NAME}/skaffold.yaml \
@@ -91,9 +105,9 @@ def service(command="start"):
 #         --trigger='polling' \
 #         --port-forward=false
 
+
 def service_stop():
     pass
-
 
 
 def test_or_create_s3_artifacts_bucket(
