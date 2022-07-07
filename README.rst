@@ -117,7 +117,7 @@ Please contribute.
 TODO: Implement DR Automation
 =============================
 
-.. figure:: ../docs/img/README_md_imgs/kubify-arch.drawio.png
+.. figure:: ./docs/img/README_md_imgs/kubify-arch.drawio.png
    :alt: TURN_KEY_DEVOPS_RAPID_TESTER
 
    TURN_KEY_DEVOPS_RAPID_TESTER
