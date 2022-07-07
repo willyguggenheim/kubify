@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9003.1.5
+Kubify OS, Version: 9003.1.6
 
 Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
@@ -81,15 +81,20 @@ Enjoy Rapid Testing!
 Contributing:
 
 A. open with DevContainer in IDE of your choice
-B. tox all python environments `tox`
-C. install develop with pip `pip install -e .[develop]`
+B. tox all python environments `make pythons` (envs go in `./.tox/[env]/bin/python3`)
+C. `make docker`
 D. install develop with pip `make pip`
 E. test on all versions of python `make pythons`
+F. `make test`
+G. your python development version/workflow of choice 
+
+Happy Coding!
+
 
 Who are you?
 ============
 
-I have a ton of MLOps and DevOps experience.
+I have a ton of MLOps and DevOps experience. I want to build an open source turn-key MLOps/DevOps stack, developer-first, self-service and redunant, as well as lowest cost (arm/spot) and scalable.
 
 I am looking for contributors to build Kubify OS into a full-force turn-key DevEx solution.
 
