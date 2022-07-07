@@ -48,3 +48,11 @@ What Just Happened?
 You are hot patching many services locally (and with the full real
 environment) without access to data, but with the full real prod!
 Kubernetes can be amazing, and it is, with Kubify..
+
+Contributing Workflow Patterns
+==============================
+
+1. DevContainer
+2. Invoke Python Directly (pull image if missing tools)
+3. Tox (multi-python testing)
+4. Install Directly and Invoke Python Directly
