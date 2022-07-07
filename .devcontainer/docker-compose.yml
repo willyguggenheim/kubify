@@ -8,4 +8,6 @@ services:
 
     volumes:
       - .:/workspace:cached
+      - /var/run/docker.dock:/var/run/docker.sock
+      - ~/.aws:/root/.aws
     command: /bin/sh -c "while sleep 1000; do :; done"

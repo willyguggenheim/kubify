@@ -1,6 +1,6 @@
-# https://gitlab.com/nvidia/container-images/cuda/-/blob/master/doc/supported-tags.md
-FROM nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04
-# FROM willy0912/kubify-local:v
+# OPTIONAL
+# This is for CPU-only builds, in order to have a smaller image (only reason)
+FROM ubuntu:22.04
 
 WORKDIR /src/kubify/
 ENV DEBIAN_FRONTEND=noninteractive

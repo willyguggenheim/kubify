@@ -131,3 +131,8 @@ Development workflow patterns:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A) `make pip`
+
+Note
+~~~~
+
+Please see `./USAGE.rst` !!
