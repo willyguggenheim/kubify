@@ -32,8 +32,6 @@ DevEx First Class Ideology
 .. figure:: ./docs/img/README_md_imgs/the-future.gif
    :alt: FUTUREOFDEVOPS9000
 
-   FUTUREOFDEVOPS9000
-
 Usage?
 ======
 
@@ -46,8 +44,6 @@ See ``terraform/README.rst``
 
 .. figure:: ./docs/img/README_md_imgs/KUBIFY_BRAND_IDENTITY_1.png
    :alt: LOGO
-
-   LOGO
 
 |Docker| |PyPi| |PyUp| |Docs|
 
@@ -80,13 +76,14 @@ Enjoy Rapid Testing!
 
 Contributing:
 
-A. open with DevContainer in IDE of your choice
-B. tox all python environments `make pythons` (envs go in `./.tox/[env]/bin/python3`)
+(choose any to contribute to the kubify python package in this repo)
+A. devcontainer or container
+B. `tox`
 C. `make docker`
-D. install develop with pip `make pip`
-E. test on all versions of python `make pythons`
+D. `make pip`
+E. `make pythons`
 F. `make test`
-G. your python development version/workflow of choice 
+G. and more ..
 
 Happy Coding!
 
@@ -108,7 +105,7 @@ Please contribute.
 .. figure:: ./docs/img/README_md_imgs/level-up.gif
    :alt: FUTUREOFDEVOPS9001
 
-   FUTUREOFDEVOPS9001
+The future of DevOps is here. If only there was a `make devs happy`, well there is, welcome!
 
 .. |Docker| image:: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main
    :target: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml
@@ -125,11 +122,7 @@ TODO: Implement DR Automation
 .. figure:: ./docs/img/README_md_imgs/kubify-arch.drawio.png
    :alt: TURN_KEY_DEVOPS_RAPID_TESTER
 
-   TURN_KEY_DEVOPS_RAPID_TESTER
-
 Kubify has been blessed by AWS.
 
 .. figure:: ./docs/img/README_md_imgs/AWS-Partner.jpeg
    :alt: AWSPARTNER
-
-   AWSPARTNER
