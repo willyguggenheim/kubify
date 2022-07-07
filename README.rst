@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9003.1.4
+Kubify OS, Version: 9003.1.5
 
 Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
@@ -65,7 +65,7 @@ Cloud:
 2. (optional) `make cloud cloud=gcp` # TODO: enable for multi-cloud site-reliability backing AWS
 3. (optional) `make cloud cloud=azure`
 
-Boom! Just like that, You have a redundant cloud!
+You have a redundant cloud!
 
 
 Usage:
@@ -91,6 +91,9 @@ Who are you?
 
 I have a ton of MLOps and DevOps experience.
 
+I am looking for contributors to build Kubify OS into a full-force turn-key DevEx solution.
+
+
 Please contribute!
 ==================
 
@@ -114,7 +117,7 @@ Please contribute.
 TODO: Implement DR Automation
 =============================
 
-.. figure:: ../docs/img/README_md_imgs/kubify-arch.drawio.png
+.. figure:: ./docs/img/README_md_imgs/kubify-arch.drawio.png
    :alt: TURN_KEY_DEVOPS_RAPID_TESTER
 
    TURN_KEY_DEVOPS_RAPID_TESTER
