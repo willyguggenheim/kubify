@@ -1,43 +1,64 @@
 """Main module."""
 
 import os
-import kubify.aws_constants as aws_constants
+import os.path
+import shutil
+import glob
 import boto3
 
-# from aws_utils.s3_utils import s3_utils
+import kubify.aws_constants as aws_constants
 import kubify.aws_utils as s3_utils
-
-# from k8s_utils.k8s import k8s_utils
 import kubify.k8s_utils as k8s_utils
 
 
 def create_work_dirs():
-    pass
-    # mkdir -p ${WORK_DIR}/repo_local
-    # home/.kubify/work
+    cwd = os.path.dirname(__file__)
+    project_path = os.path.join(cwd, "..")
+    workdir_path = os.path.join(project_path, "_kubify_work")
+    os.makedirs(workdir_path)
+    certs_path = os.path.join(workdir_path, "certs")
+    os.makedirs(certs_path)
 
-def clean_secrets():
-    pass
-#   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/cloudformation/*
-#   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/manifests/secr*
-#   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/gen-*
-#   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/*.log
+def delete_file_list(fileList):
+    # Iterate over the list of filepaths & remove each file.
+    for filePath in fileList:
+        try:
+            os.remove(filePath)
+        except OSError:
+            print("Error while deleting file")
 
-def service_setup_secrets():
-#     SECRETS_FILE="${APP_DIR}/secrets/secrets.${ENV}.enc.yaml"
-#   CONFIG_FILE="${APP_DIR}/config/config.${ENV}.yaml"
+def clean_secrets(env, app_name):
+    cwd = os.path.dirname(__file__)
+    cloud_formation_path = os.path.join(*["cwd", "..", "_kubify_work", env, app_name, "cloudformation")
+    fileList = glob.glob(f'{cloud_formation_path}*')
+    delete_file_list(fileList)
+    secrets_path = os.path.join(*["cwd", "..", "_kubify_work", env, app_name, "manifests")
+    fileList = glob.glob(f'{secrets_path}secr*')
+    delete_file_list(fileList)
+    app_path = os.path.join(*["cwd", "..", "_kubify_work", env, app_name)
+    fileList = glob.glob(f'{secrets_path}gen-*')
+    delete_file_list(fileList)
+    fileList = glob.glob(f'{secrets_path}*.log')
+    delete_file_list(fileList)
+    # shutil.rmtree(cloud_formation_path) 
 
-#   # if SECRETS_FILE not exist, let's create the intial secret
-#   if [ ! -f "${SECRETS_FILE}" ]; then
-#       kubify secrets create ${ENV}
-#   fi
-# if [ ! -f "${CONFIG_FILE}" ]; then
-#       echo "${CONFIG_FILE} file not found, creating blank one"
+def service_setup_secrets(env):
+    cwd = os.path.dirname(__file__)
+    app_path = os.path.join(*["cwd", "..", "_kubify_work", env, app_name)
+    secrets_path=os.path.join(app_path,"secrets")
+    secrets_file=f'{secrets_path}secrets.{env}.enc.yaml'
+    config_path=os.path.join(app_path,"config")
+    config_file=f'{config_path}config.{env}.enc.yaml'
+    if not os.path.isfile(secrets_file):
+    #   # if SECRETS_FILE not exist, let's create the intial secret
+    #       kubify secrets create ${ENV}
+        pass
+    if not os.path.isfile(config_file):
 #       mkdir -p "${APP_DIR}/config" | true
 #       cp "${GIT_DIR}/src/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
 #       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
 #   fi
-    pass
+        pass
 
 def service_start_dependencies():
     pass #start_dependencies "${APP_DIR}" read yaml find depency run if not running (might have started with start for code listening) if running skip, follow dependency change start them all
@@ -156,7 +177,8 @@ def test_or_create_s3_artifacts_bucket(
 if __name__ == "__main__":
     k8s = k8s_utils()
     os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
-    # k8s.set_context_get_client(os.environ.get('K8S_OVERRIDE_CONTEXT', 'default'))
-    test_or_create_s3_artifacts_bucket()
-    k8s.get_entrypoint()
-    k8s.get_service_pod("abc")
+    k8s.set_context_kind_kind()
+    # # k8s.set_context_get_client(os.environ.get('K8S_OVERRIDE_CONTEXT', 'default'))
+    # test_or_create_s3_artifacts_bucket()
+    # k8s.get_entrypoint()
+    # k8s.get_service_pod("abc")

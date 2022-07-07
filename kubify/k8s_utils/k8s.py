@@ -95,3 +95,15 @@ class k8s_utils:
             )
 
         return api_client2
+
+    def set_context_kind_kind(self): 
+        contexts, active_context = config.list_kube_config_contexts()
+        if not contexts:
+            print("Cannot find any context in kube-config file.")
+            return
+        contexts = [context["name"] for context in contexts]
+        active_index = contexts.index(active_context["name"])
+
+        for context in contexts:
+            print(context)
+
