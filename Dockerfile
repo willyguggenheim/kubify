@@ -84,7 +84,7 @@ COPY Dockerfile .
 
 # Build
 RUN make clean
-RUN make lint || true
+RUN make lint
 RUN make help
 RUN make security
 RUN make coverage
