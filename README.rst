@@ -65,7 +65,7 @@ Cloud:
 2. (optional) `make cloud cloud=gcp` # TODO: enable for multi-cloud site-reliability backing AWS
 3. (optional) `make cloud cloud=azure`
 
-Boom! Just like that, You have a redundant cloud!
+You have a redundant cloud!
 
 
 Usage:
@@ -90,6 +90,9 @@ Who are you?
 ============
 
 I have a ton of MLOps and DevOps experience.
+
+I am looking for contributors to build Kubify OS into a full-force turn-key DevEx solution.
+
 
 Please contribute!
 ==================
