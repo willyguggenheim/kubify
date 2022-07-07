@@ -77,3 +77,18 @@ Please contribute.
    :target: https://pyup.io/repos/github/willyguggenheim/kubify/
 .. |Docs| image:: https://readthedocs.org/projects/kubify/badge/?version=latest
    :target: hhttps://kubify.readthedocs.io/en/latest/?version=latest
+
+TODO: Implement DR Automation
+=============================
+
+.. figure:: ../docs/img/README_md_imgs/kubify-arch.drawio.png
+   :alt: TURN_KEY_DEVOPS_RAPID_TESTER
+
+   TURN_KEY_DEVOPS_RAPID_TESTER
+
+Kubify has been blessed by AWS.
+
+.. figure:: ./docs/img/README_md_imgs/AWS-Partner.jpeg
+   :alt: AWSPARTNER
+
+   AWSPARTNER
