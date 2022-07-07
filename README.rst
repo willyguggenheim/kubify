@@ -57,7 +57,7 @@ This is a python package and a docker image (multi-arch).
 
 Cloud:
 
-1. `make cloud cloud=aws``
+1. `make cloud cloud=aws`
 2. `make cloud cloud=gcp`
 3. `make cloud cloud=azure`
 
@@ -118,7 +118,9 @@ The future of DevOps is here. If only there was a `make devs happy`, well there 
 TODO: Implement DR Automation
 =============================
 
-Everything you build in Kubify has redundancy (dr, backups and active-active) and scalability in 2 regions, at the lowest possible cost (multiarch, spot, atom processor, spot gpu rapid de-scaling, mlops smart scaling, redundant scalers and more)..
+Everything you build in Kubify has redundancy (dr, backups and active-active) and scalability in 2 regions, at the lowest possible cost (multiarch, spot, atom processor, spot gpu rapid de-scaling, mlops smart scaling, redundant scalers and more).
+
+This is what true turn key feels like. DevOps in 1 day. Developer friendly. Purpose built for Data Scientists and Machine Learning, as well as Developers building services and cloud. Autopilot for DevOps, so your DevOps team can focus on company goals.
 
 .. figure:: ./docs/img/README_md_imgs/kubify-arch.drawio.png
    :alt: TURN_KEY_DEVOPS_RAPID_TESTER
