@@ -12,7 +12,6 @@ import kubify.k8s_utils as k8s_utils
 
 
 def create_work_dirs():
-<<<<<<< HEAD
     cwd = os.path.dirname(__file__)
     project_path = os.path.join(cwd, "..")
     workdir_path = os.path.join(project_path, "_kubify_work")
@@ -60,38 +59,6 @@ def service_setup_secrets(env):
 #       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
 #   fi
         pass
-=======
-    pass
-    # mkdir -p ${WORK_DIR}/repo_local
-    # home/.kubify/work
-
-
-def clean_secrets():
-    pass
-
-
-#   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/cloudformation/*
-#   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/manifests/secr*
-#   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/gen-*
-#   rm -rf ${WORK_DIR}/${ENV}/${APP_NAME}/*.log
-
-
-def service_setup_secrets():
-    #     SECRETS_FILE="${APP_DIR}/secrets/secrets.${ENV}.enc.yaml"
-    #   CONFIG_FILE="${APP_DIR}/config/config.${ENV}.yaml"
-
-    #   # if SECRETS_FILE not exist, let's create the intial secret
-    #   if [ ! -f "${SECRETS_FILE}" ]; then
-    #       kubify secrets create ${ENV}
-    #   fi
-    # if [ ! -f "${CONFIG_FILE}" ]; then
-    #       echo "${CONFIG_FILE} file not found, creating blank one"
-    #       mkdir -p "${APP_DIR}/config" | true
-    #       cp "${GIT_DIR}/src/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
-    #       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
-    #   fi
-    pass
->>>>>>> 9acfff0ae3f411f88f6d4d3aea6f4d3c74533fe4
 
 
 def service_start_dependencies():
