@@ -58,18 +58,17 @@ This is a python package and a docker image (multi-arch).
 Cloud:
 
 1. `make cloud cloud=aws``
-2. (optional) `make cloud cloud=gcp` # TODO: enable for multi-cloud site-reliability backing AWS
-3. (optional) `make cloud cloud=azure`
+2. `make cloud cloud=gcp`
+3. `make cloud cloud=azure`
 
 You have a redundant cloud!
 
 
-Usage:
+Usage of published PyPi "kubify" package in your repo:
 
 1. `pip install kubify`
-2. (optional) have a services folder (see examples/simple)
-3. (optional) have a terraform folder (see examples/simple)
-4. then use the python functions or cli
+2. optional services and/or terraform folders (default it uses the ones in this repo)
+3. `kubify start-all` or `kubify start service []` for rapid code development (all services listening for code changes on real environment)
 
 Enjoy Rapid Testing!
 
@@ -119,10 +118,12 @@ The future of DevOps is here. If only there was a `make devs happy`, well there 
 TODO: Implement DR Automation
 =============================
 
+Everything you build in Kubify has redundancy (dr, backups and active-active) and scalability in 2 regions, at the lowest possible cost (multiarch, spot, atom processor, spot gpu rapid de-scaling, mlops smart scaling, redundant scalers and more)..
+
 .. figure:: ./docs/img/README_md_imgs/kubify-arch.drawio.png
    :alt: TURN_KEY_DEVOPS_RAPID_TESTER
 
-Kubify has been blessed by AWS.
+Kubify has been approved by AWS.
 
 .. figure:: ./docs/img/README_md_imgs/AWS-Partner.jpeg
    :alt: AWSPARTNER
