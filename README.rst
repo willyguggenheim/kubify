@@ -53,6 +53,30 @@ See ``terraform/README.rst``
 
 Magic? Yes. Pure Magic.
 
+This is a python package and a docker image (multi-arch).
+
+1. PyPi
+2. DockerHub
+
+
+Usage:
+
+1. `pip install kubify`
+2. (optional) have a services folder (see examples/simple)
+3. (optional) have a terraform folder (see examples/simple)
+4. then use the python functions or cli
+
+Enjoy Rapid Testing!
+
+
+Contributing:
+
+A. open with DevContainer in IDE of your choice
+B. tox all python environments `tox`
+C. install develop with pip `pip install -e .[develop]`
+D. install develop with pip `make pip`
+E. test on all versions of python `make pythons`
+
 Who are you?
 ============
 
