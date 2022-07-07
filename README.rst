@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9003.1.0
+Kubify OS, Version: 9003.1.4
 
 Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
@@ -53,6 +53,39 @@ See ``terraform/README.rst``
 
 Magic? Yes. Pure Magic.
 
+This is a python package and a docker image (multi-arch).
+
+1. PyPi
+2. DockerHub
+
+
+Cloud:
+
+1. `make cloud cloud=aws``
+2. (optional) `make cloud cloud=gcp` # TODO: enable for multi-cloud site-reliability backing AWS
+3. (optional) `make cloud cloud=azure`
+
+Boom! Just like that, You have a redundant cloud!
+
+
+Usage:
+
+1. `pip install kubify`
+2. (optional) have a services folder (see examples/simple)
+3. (optional) have a terraform folder (see examples/simple)
+4. then use the python functions or cli
+
+Enjoy Rapid Testing!
+
+
+Contributing:
+
+A. open with DevContainer in IDE of your choice
+B. tox all python environments `tox`
+C. install develop with pip `pip install -e .[develop]`
+D. install develop with pip `make pip`
+E. test on all versions of python `make pythons`
+
 Who are you?
 ============
 
@@ -77,3 +110,18 @@ Please contribute.
    :target: https://pyup.io/repos/github/willyguggenheim/kubify/
 .. |Docs| image:: https://readthedocs.org/projects/kubify/badge/?version=latest
    :target: hhttps://kubify.readthedocs.io/en/latest/?version=latest
+
+TODO: Implement DR Automation
+=============================
+
+.. figure:: ../docs/img/README_md_imgs/kubify-arch.drawio.png
+   :alt: TURN_KEY_DEVOPS_RAPID_TESTER
+
+   TURN_KEY_DEVOPS_RAPID_TESTER
+
+Kubify has been blessed by AWS.
+
+.. figure:: ./docs/img/README_md_imgs/AWS-Partner.jpeg
+   :alt: AWSPARTNER
+
+   AWSPARTNER
