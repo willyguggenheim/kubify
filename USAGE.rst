@@ -56,3 +56,12 @@ Contributing Workflow Patterns
 2. Invoke Python Directly (pull image if missing tools)
 3. Tox (multi-python testing)
 4. Install Directly and Invoke Python Directly
+
+.. figure:: ./docs/img/README_md_imgs/level-up.gif
+   :alt: FUTUREOFDEVOPS9001
+
+.. figure:: ./docs/img/README_md_imgs/kubify-arch.drawio.png
+   :alt: TURN_KEY_DEVOPS_RAPID_TESTER
+
+.. figure:: ./docs/img/README_md_imgs/AWS-Partner.jpeg
+   :alt: AWSPARTNER
