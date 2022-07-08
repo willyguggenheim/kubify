@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9005.0.0
+Kubify OS, Version: 9005.0.2
 
 Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
@@ -22,7 +22,11 @@ it.
 First class rapid testing, all your services listening for folder
 changes, so you can code fast, really fast.
 
-If it works on your laptop, it works in prod.
+Automated EKS/GKE/AKS, Automated DR/SelfService/OnBoarding, Rapid Test/Develop many Services/Models Simultaneously and Autopilot DevEx. Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. Make Devs Happy. Reduce Your Cloud Costs. Easy Migration. Multi-Cloud Redundancy. Full Turn Key Solution to Code Faster+Smarter.
+
+A true turn-key open-source solution for MLOps and DevOps, to make Developers super happy, and optimize their common workflows (integrate them with DevOps, in full).
+
+Ideology: If it works on your laptop, it works in prod.
 
 How?
 ====
@@ -57,16 +61,23 @@ This is a python package and a docker image (multi-arch).
 
 Cloud:
 
-1. `make clouds`
+`make clouds`
 
 You have a redundant cloud!
 
 
 Usage of published PyPi "kubify" package in your repo:
 
-1. `pip install kubify`
-2. optional services and/or terraform folders (default it uses the ones in this repo)
-3. `kubify start-all` or `kubify start service []` for rapid code development (all services listening for code changes on real environment)
+`pip install kubify`
+
+Optional: "terraform" folder (or git submodule of your terraform main repo, default it uses the terraform folder in this repo)
+
+Optional: "services" folder (or git submodule of your services in a services folder, default it uses the services folder in this repo)
+
+
+Rapid Test Multiple Services/Models at the Same Time
+
+`kubify start-all` or `kubify start service [string or list]`
 
 Enjoy Rapid Testing!
 
@@ -91,7 +102,6 @@ Who are you?
 I have a ton of MLOps and DevOps experience. I want to build an open source turn-key MLOps/DevOps stack, developer-first, self-service and redunant, as well as lowest cost (arm/spot) and scalable.
 
 I am looking for contributors to build Kubify OS into a full-force turn-key DevEx solution.
-
 
 Please contribute!
 ==================
@@ -126,3 +136,5 @@ Kubify has been approved by AWS.
    :alt: AWSPARTNER
 
 # TODO: put link to automatic gitops docs
+# TODO: multi-cloud ArgoCD Helm-Native automation README explainer here
+# TODO: rapid testing explainer here
