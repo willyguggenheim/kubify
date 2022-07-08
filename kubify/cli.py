@@ -1,17 +1,23 @@
 """Console script for kubify."""
 import argparse
 import sys
+from .src.kubify import create_work_dirs, set_context_kind_kind, test_or_create_s3_artifacts_bucket, get_entrypoint, get_service_pod, test_logger
 
-
-def main():
-    """Console script for kubify."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument("_", nargs="*")
+def init_parser():
+    parser = argparse.ArgumentParser(description='CLI for kubify')
+    parser.add_argument('--test_logger', action='test_logger', help='tests logging to logging dir')
+    parser.add_argument('--create_work_dirs', action='create_work_dirs', help='in users home kubify directory')
+    parser.add_argument('--set_context_kind_kind', action='set_context_kind_kind', help='sets the kuberenetes context to kind')
+    parser.add_argument('--test_or_create_s3_artifacts_bucket', action='test_or_create_s3_artifacts_bucket', help='sets the s3 bucket for state file for terraform')
+    parser.add_argument('--get_entrypoint', action='get_entrypoint', help='gets the entrypoint pod')
+    parser.add_argument('--get_service_pod', action='get_service_pod', help='gets the get_service_pod')
     args = parser.parse_args()
-
     print("Arguments: " + str(args._))
     print("Replace this message by putting your code into " "kubify.cli.main")
     return 0
+
+def main():
+    init_parser
 
 
 if __name__ == "__main__":

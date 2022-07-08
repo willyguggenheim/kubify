@@ -14,28 +14,20 @@ import aws_constants as aws_constants
 import aws_utils as s3_utils
 import core.k8s_utils as k8s_utils
 
-from ansible.playbook import PlayBook
-import core.app_constants as app_constants
-import core.file_utils as file_utils
-
+from core.app_constants import app_constants
+from core.logging import setup_logger
+from core.file_utils import file_utils
+setup_logger()
 _logger = logging.getLogger()
 
 
-def setup_logging():
-    logFormatter = logging.Formatter(
-        "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s] %(message)s"
-    )
-    _logger.setLevel(logging.INFO)
-    
-    fileHandler = logging.FileHandler(f"{app_constants.log_path}/kubify.log")
-    fileHandler.setFormatter(logFormatter)
-    _logger.addHandler(fileHandler)
-
-    consoleHandler = logging.StreamHandler()
-    consoleHandler.setFormatter(logFormatter)
-    _logger.addHandler(consoleHandler)
-
-
+def test_logger():
+    _logger.info("test logger")
+    _logger.debug("test logger")
+    _logger.warning("test logger")
+    _logger.error("test logger")
+    _logger.critical("test logger")
+        
 def log_subprocess_output(pipe):
     for line in iter(pipe.readline, b""):  # b'\n'-separated lines
         logging.trace("ansbile: %r", line)
