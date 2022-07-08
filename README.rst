@@ -113,9 +113,6 @@ The future of DevOps is here. If only there was a `make devs happy`, well there 
 .. |Docs| image:: https://readthedocs.org/projects/kubify/badge/?version=latest
    :target: hhttps://kubify.readthedocs.io/en/latest/?version=latest
 
-TODO: Implement DR Automation
-=============================
-
 Everything you build in Kubify has redundancy (dr, backups and active-active) and scalability in 2 regions, at the lowest possible cost (multiarch, spot, atom processor, spot gpu rapid de-scaling, mlops smart scaling, redundant scalers and more).
 
 This is what true turn key feels like. DevOps in 1 day. Developer friendly. Purpose built for Data Scientists and Machine Learning, as well as Developers building services and cloud. Autopilot for DevOps, so your DevOps team can focus on company goals.

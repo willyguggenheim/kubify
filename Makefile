@@ -176,6 +176,8 @@ aws-list:
 
 # cloud deploys
 
+# todo: also (similarly) ansible kubedb changes for multi-cloud database (and that backs up in both clouds)
+# todo: route53 helm automations to failover active-active between clouds
 argo-create-services:
 	# connect to argocd and deploy to all clusters
 	# todo: eval "https://api.argoproj.io"
