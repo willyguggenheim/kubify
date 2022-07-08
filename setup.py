@@ -90,6 +90,6 @@ setup(
     tests_requires=test_requirements,
     extras_require=extras,
     url="https://github.com/willyguggenheim/kubify",
-    version="9004.0.2",
+    version="9004.0.3",
     zip_safe=False,
 )
