@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS Python Package Source Code, Version: 9005.0.2
+Kubify OS Python Package Source Code, Version: 9005.0.3
 
 .. |Docker| image:: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main
    :target: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml
