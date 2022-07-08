@@ -3,18 +3,17 @@ Welcome!
 
 Kubify OS, Version: 9009.0.1
 
-Well hello there! Welcome to Kubify. 
+Well hello there! Welcome to Kubify OS Python Package Repo
 
-The Turn-Key DevOps/MLOps OS Developer-First Stack.
+The Turn-Key DevOps/MLOps OS Developer-First Stack
 
 
 Who is this for?
 ================
 
-Data Scientists/Devs/DevOps/MLOps Person/Teams/Companies who want self service and autopilot DevEx to code faster.
+Data Scientists/Devs/DevOps/MLOps Person/Teams/Companies who want self service and autopilot
 
-To rapid develop many services/models fast simultaneously on full real
-environment.
+To rapid develop many services/models fast simultaneously on full env
 
 1. Automated Self-Service Clouds and Services.
 2. Automated DR. Automatic Multi-Cloud Failover.
@@ -24,9 +23,9 @@ environment.
 .. figure:: ./docs/img/README_md_imgs/level-up.gif
    :alt: FUTUREOFDEVOPS9001
 
-Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. 
+Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack
 
-Ideoligy: If it works on your laptop/test/notebook, it works in prod.
+Ideoligy: If it works on your laptop/test/notebook, it works in prod
 
 
 How?
@@ -38,8 +37,8 @@ DevEx First Class Ideology
    :alt: FUTUREOFDEVOPS9000
 
 Contributing:
+~~~~~~~~~~~~~
 
-(choose any to contribute to the kubify python package in this repo)
 A. devcontainer or container
 B. ``tox``
 C. ``make docker``
@@ -47,8 +46,6 @@ D. ``make pip``
 E. ``make pythons``
 F. ``make test``
 G. and more ..
-
-Happy Coding!
 
 .. |Docker| image:: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main
    :target: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml
@@ -83,3 +80,5 @@ Thank You
 ~~~~~~~~~
 
 Kubify Rocks. The Turn Key Automated/Autopilot MLOps/DevOps OS Stack.
+
+Happy Coding!
