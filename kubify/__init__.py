@@ -2,4 +2,4 @@
 
 __author__ = "kubify"
 __email__ = "w@kubify.com"
-__version__ = "9009.0.2"
+__version__ = "9009.0.3"
