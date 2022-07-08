@@ -6,7 +6,7 @@ The Turn-Key DevOps/MLOps OS Developer-First Stack.
 Welcome!
 ========
 
-Kubify OS, Version: 9005.0.7
+Kubify OS, Version: 9005.0.8
 
 
 Who is this for?
