@@ -1,9 +1,11 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9005.0.4
+Kubify OS, Version: 9005.0.6
 
-Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
+Well hello there! Welcome to Kubify. 
+
+The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
 Who is this for?
 ================
@@ -22,9 +24,11 @@ it.
 First class rapid testing, all your services listening for folder
 changes, so you can code fast, really fast.
 
-Automated EKS/GKE/AKS, Automated DR/SelfService/OnBoarding, Rapid Test/Develop many Services/Models Simultaneously and Autopilot DevEx. Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. Make Devs Happy. Reduce Your Cloud Costs. Easy Migration. Multi-Cloud Redundancy. Full Turn Key Solution to Code Faster+Smarter.
-
-A true turn-key open-source solution for MLOps and DevOps, to make Developers super happy, and optimize their common workflows (integrate them with DevOps, in full).
+1. Automated EKS/GKE/AKS.
+2. Automated DR/SelfService/OnBoarding.
+2. Rapid Test/Develop many Services/Models Simultaneously
+.
+Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. 
 
 Ideoligy: If it works on your laptop, it works in prod.
 
@@ -61,14 +65,14 @@ This is a python package and a docker image (multi-arch).
 
 Cloud:
 
-`make clouds`
+``make clouds``
 
 You have a redundant cloud!
 
 
 Usage of published PyPi "kubify" package in your repo:
 
-`pip install kubify`
+``pip install kubify``
 
 Optional: "terraform" folder (or git submodule of your terraform main repo, default it uses the terraform folder in this repo)
 
@@ -77,7 +81,7 @@ Optional: "services" folder (or git submodule of your services in a services fol
 
 Rapid Test Multiple Services/Models at the Same Time
 
-`kubify start-all` or `kubify start service [string or list]`
+``kubify start-all`` or ``kubify start service [string or list]``
 
 Enjoy Rapid Testing!
 
@@ -86,11 +90,11 @@ Contributing:
 
 (choose any to contribute to the kubify python package in this repo)
 A. devcontainer or container
-B. `tox`
-C. `make docker`
-D. `make pip`
-E. `make pythons`
-F. `make test`
+B. ``tox``
+C. ``make docker``
+D. ``make pip``
+E. ``make pythons``
+F. ``make test``
 G. and more ..
 
 Happy Coding!
@@ -112,7 +116,7 @@ Please contribute.
 .. figure:: ./docs/img/README_md_imgs/level-up.gif
    :alt: FUTUREOFDEVOPS9001
 
-The future of DevOps is here. If only there was a `make devs happy`, well there is, welcome!
+The future of DevOps is here. If only there was a ``make devs happy``, well there is, welcome!
 
 .. |Docker| image:: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main
    :target: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml
@@ -138,5 +142,3 @@ Kubify has been approved by AWS.
 Turn Key Automated/Autopilot MLOps/DevOps OS Stack.
 
 Self Service, Developer-Centric, lower Cloud Costs.
-
-Please See: *.rst and *.md.
