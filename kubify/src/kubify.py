@@ -4,23 +4,51 @@ import os
 import os.path
 import shutil
 import glob
+import subprocess
 import boto3
+import logging
+from subprocess import Popen, PIPE, STDOUT
 
-import kubify_py.aws_constants as aws_constants
-import kubify.aws_utils as s3_utils
-import kubify.k8s_utils as k8s_utils
+
+import aws_constants as aws_constants
+import aws_utils as s3_utils
+import core.k8s as k8s_utils
 
 from ansible.playbook import PlayBook
-import kubify.core.app_constants as app_constants
-import kubify.core.file_utils as file_utils
+import core.app_constants as app_constants
+import core.file_utils as file_utils
 
-def run_ansible(playbook):
-     --connection=local \
-      --inventory=127.0.0.1, "${K8S_DIR}/ansible/env.yaml" \
-      --extra-vars="aws_profile=$AWS_ADMIN_PROFILE src_dir=${GIT_DIR} env=${ENV} kubify_dir=${WORK_DIR} undeploy_env=${UNDEPLOY}" \
-      --tags=$TAGS
-    pb = PlayBook(playbook=f'{playbook}')
-    pb.run()
+_logger = logging.getLogger()
+
+def setup_logging():
+    logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s] %(message)s")  
+    _logger.setLevel(logging.INFO)
+    
+    fileHandler = logging.FileHandler(f"{app_constants.log_path}kubify.log")
+    fileHandler.setFormatter(logFormatter)
+    _logger.addHandler(fileHandler)
+    
+    consoleHandler = logging.StreamHandler()
+    consoleHandler.setFormatter(logFormatter)
+    _logger.addHandler(consoleHandler)
+
+def log_subprocess_output(pipe):
+    for line in iter(pipe.readline, b''): # b'\n'-separated lines
+        logging.trace('ansbile: %r', line)
+            
+def run_ansible(playbook='sample.yml', uninstall="no", tags=""):
+    command_line_args= f"""ansible-playbook \
+      --connection=local \
+      --inventory=127.0.0.1, "{app_constants.ansible_dir}/env.yaml" \
+      --extra-vars="aws_profile={aws_constants.AWS_PROFILE} src_dir={app_constants.ops_dir} env={app_constants.env} kubify_dir={app_constants.kubify_work} undeploy_env={uninstall}" \
+      --tags="{tags}"
+      """
+    process = Popen(command_line_args, stdout=PIPE, stderr=STDOUT)
+    with process.stdout:
+        log_subprocess_output(process.stdout)
+    exitcode = process.wait() # 0 means success
+    # pb = PlayBook(playbook=f'{playbook}', extra_vars)
+    # pb.run()
 
 
 
@@ -32,20 +60,20 @@ def create_work_dirs():
 
 def clean_secrets(env, app_name):
     # TODO add safety check
-    fileList = glob.glob(f'{app_constants.cloud_formation_path}*')
+    fileList = glob.glob(f'{app_constants.cloud_formation_path}/*')
     file_utils.delete_file_list(fileList)
-    fileList = glob.glob(f'{app_constants.secrets_path}secr*')
+    fileList = glob.glob(f'{app_constants.secrets_path}/secr*')
     file_utils.delete_file_list(fileList)
-    fileList = glob.glob(f'{app_constants.secrets_path}gen-*')
+    fileList = glob.glob(f'{app_constants.secrets_path}/gen-*')
     file_utils.delete_file_list(fileList)
-    fileList = glob.glob(f'{app_constants.secrets_path}*.log')
+    fileList = glob.glob(f'{app_constants.secrets_path}/*.log')
     file_utils.delete_file_list(fileList)
 
 def service_setup_secrets(env):
     # TODO double check these paths
-    secrets_file=f'{app_constants.secrets_path}secrets.{env}.enc.yaml'
+    secrets_file=f'{app_constants.secrets_path}/secrets.{env}.enc.yaml'
     config_path=os.path.join(app_constants.app_path,"config")
-    config_file=f'{config_path}config.{env}.enc.yaml'
+    config_file=f'{config_path}/config.{env}.enc.yaml'
     if not os.path.isfile(secrets_file):
     #   # if SECRETS_FILE not exist, let's create the intial secret
     #       kubify secrets create ${ENV}
