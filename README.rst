@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9009.0.3
+Kubify OS, Version: 9009.0.4
 
 Well hello there! Welcome to Kubify OS Python Package Repo
 
@@ -83,7 +83,9 @@ Docker-Compose is a tool for DEVS testing.
 
 Terraform is a tool for DEVOPS/MLOPS deploying.
 
-Kubify combines those 2 worlds.
+Kubify combines the 2 worlds.
+
+You need this.
 
 
 Thank You
