@@ -14,6 +14,7 @@ import aws_constants as aws_constants
 import aws_utils as s3_utils
 import core.k8s_utils as k8s_utils
 
+from .core.bash_utils import subprocess_run
 from core.app_constants import app_constants
 from core.logging import setup_logger
 from core.file_utils import file_utils
@@ -27,12 +28,8 @@ def test_logger():
     _logger.warning("test logger")
     _logger.error("test logger")
     _logger.critical("test logger")
+
         
-def log_subprocess_output(pipe):
-    for line in iter(pipe.readline, b""):  # b'\n'-separated lines
-        logging.trace("ansbile: %r", line)
-
-
 def run_ansible(playbook="sample.yml", uninstall="no", tags=""):
     command_line_args = f"""ansible-playbook \
       --connection=local \
@@ -40,12 +37,8 @@ def run_ansible(playbook="sample.yml", uninstall="no", tags=""):
       --extra-vars="aws_profile={aws_constants.AWS_PROFILE} src_dir={app_constants.ops_dir} env={app_constants.env} kubify_dir={app_constants.kubify_work} undeploy_env={uninstall}" \
       --tags="{tags}"
       """
-    process = Popen(command_line_args, stdout=PIPE, stderr=STDOUT)
-    with process.stdout:
-        log_subprocess_output(process.stdout)
-    exitcode = process.wait()  # 0 means success
-    # pb = PlayBook(playbook=f'{playbook}', extra_vars)
-    # pb.run()
+    subprocess_run("ansible", command_line_args)
+    
 
 
 def create_work_dirs():
@@ -118,9 +111,9 @@ def service_setup_secrets(env):
         #   esac
 
         pass
-    if not os.path.isfile(config_file):
-        src_config = f"{cwd}../templates/config.{env}.yaml"
-        copy_file(src_config, config_file)
+    # if not os.path.isfile(config_file):
+    #     src_config = f"{cwd}../templates/config.{env}.yaml"
+    #     copy_file(src_config, config_file)
 
 
 #       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
@@ -173,8 +166,9 @@ def service_init():
 
 
 def service(command="start"):
-    if command == "start":  # default
-        service_init
+    pass
+    # if command == "start":  # default
+    #     service_init
     # read yaml if aws_only or false then go to skaffold
 
 
@@ -248,12 +242,16 @@ def test_or_create_s3_artifacts_bucket(
             )
         print("s3 bucket replication, versioning and security set")
 
+def set_context_kind_kind():
+    k8s_utils.set_context_kind_kind()
+
+
+def get_entrypoint():
+    k8s_utils.get_entrypoint()
+
+def get_service_pod(pod_name):
+    k8s_utils.get_service_pod(pod_name)
 
 if __name__ == "__main__":
     k8s_utils = k8s_utils()
     os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
-    k8s_utils.set_context_kind_kind()
-    # # k8s.set_context_get_client(os.environ.get('K8S_OVERRIDE_CONTEXT', 'default'))
-    # test_or_create_s3_artifacts_bucket()
-    # k8s.get_entrypoint()
-    # k8s.get_service_pod("abc")
