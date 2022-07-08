@@ -21,6 +21,9 @@ environment.
 3. Rapid Test/Develop many Services/Models Simultaneously.
 4. Full Automated Integration Test. Stable Prod.
 
+.. figure:: ./docs/img/README_md_imgs/level-up.gif
+   :alt: FUTUREOFDEVOPS9001
+
 Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. 
 
 Ideoligy: If it works on your laptop/test/notebook, it works in prod.
@@ -46,9 +49,6 @@ F. ``make test``
 G. and more ..
 
 Happy Coding!
-
-.. figure:: ./docs/img/README_md_imgs/level-up.gif
-   :alt: FUTUREOFDEVOPS9001
 
 .. |Docker| image:: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main
    :target: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml
