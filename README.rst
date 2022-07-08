@@ -1,11 +1,11 @@
+Well hello there! Welcome to Kubify. 
+
+The Turn-Key DevOps/MLOps OS Developer-First Stack.
+
 Welcome!
 ========
 
 Kubify OS, Version: 9005.0.6
-
-Well hello there! Welcome to Kubify. 
-
-The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
 Who is this for?
 ================
@@ -14,15 +14,6 @@ Data Scientists/Devs/DevOps who want self service.
 
 To rapid develop many services/models fast simultaneously on full real
 environment.
-
-Why?
-====
-
-Because Docker-Compose and Terraform are 2 different tools, so I fixed
-it.
-
-First class rapid testing, all your services listening for folder
-changes, so you can code fast, really fast.
 
 1. Automated EKS/GKE/AKS.
 2. Automated DR/SelfService/OnBoarding.
