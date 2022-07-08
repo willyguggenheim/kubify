@@ -67,9 +67,19 @@ AWS Loves Kubify.
 .. figure:: ./docs/img/README_md_imgs/AWS-Partner.jpeg
    :alt: AWSPARTNER
 
-Turn Key Automated/Autopilot MLOps/DevOps OS Stack.
-
-On-Boarding Steps.
+On-Boarding
+~~~~~~~~~~~
 
 1. ``make clouds``
 2. ``kubfiy start-all``
+
+Docs
+~~~~
+
+1. https://kubify-os.readthedocs.io
+2. CONTRIBUTING.rst or/and USAGE.rst
+
+Thank You
+~~~~~~~~~
+
+Kubify Rocks. The Turn Key Automated/Autopilot MLOps/DevOps OS Stack.
