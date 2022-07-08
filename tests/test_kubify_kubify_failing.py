@@ -1,4 +1,4 @@
-import kubify.kubify as module_0
+import kubify as module_0
 
 
 def test_case_0():

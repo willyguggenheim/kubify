@@ -1,4 +1,4 @@
-import kubify.k8s_utils.k8s as module_0
+import kubify.src.core.k8s_utils as module_0
 
 
 def test_case_0():
