@@ -132,6 +132,12 @@ Development workflow patterns:
 
 A) `make pip`
 
+Test the CICD before PR is ready for review:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`make docker`
+# TODO: local integration test make command (local and cloud)
+
 Note
 ~~~~
 

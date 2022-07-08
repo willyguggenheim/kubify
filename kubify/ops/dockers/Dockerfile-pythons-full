@@ -1,3 +1,4 @@
+# OPTIONAL
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/doc/supported-tags.md
 FROM nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04
 
@@ -11,6 +12,7 @@ RUN apt install -y  --no-install-recommends sudo zsh bash git ansible awscli mak
 RUN apt install -y  --no-install-recommends python3-alembic python3-flask-migrate
 # Tox Multi-Py tests:
 RUN add-apt-repository ppa:deadsnakes/ppa && apt update
+RUN apt install -y  --no-install-recommends python3.7 python3.8 python3.9 python3.10
 # APT Deps can go here:
 RUN apt install -y  --no-install-recommends python3-alembic python3-flask-migrate curl
 RUN wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin/
@@ -61,12 +63,23 @@ RUN apt-get update
 RUN apt install -y software-properties-common
 RUN apt-get upgrade -y
 RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get install -y python3.7 python3.8 python3.9 python3.10
 RUN apt-get install -y python3-pip awscli
 
 # Cache
 RUN apt install -y python3-pip python3-dev
+RUN apt install -y python3.7-distutils python3.8-distutils python3.9-distutils python3.10-distutils
+RUN apt install -y python3.7-dev python3.8-dev python3.9-dev python3.10-dev
 RUN pip install tox>=3.25.1
 RUN pip install -U tox>=3.25.1
+RUN python3.7 -m pip install tox>=3.25.1
+RUN python3.8 -m pip install tox>=3.25.1
+RUN python3.9 -m pip install tox>=3.25.1
+RUN python3.10 -m pip install tox>=3.25.1
+RUN python3.7 -m pip install -U tox>=3.25.1
+RUN python3.8 -m pip install -U tox>=3.25.1
+RUN python3.9 -m pip install -U tox>=3.25.1
+RUN python3.10 -m pip install -U tox>=3.25.1
 COPY setup.py .
 RUN stat README.rst || touch README.rst
 RUN stat USAGE.rst || touch USAGE.rst
@@ -74,6 +87,7 @@ RUN pip install -e .[tests]
 RUN pip install -e .[extras]
 COPY tox.ini .
 COPY Makefile .
+RUN make pythons-cache
 RUN make pip
 
 COPY . .
@@ -94,6 +108,8 @@ RUN make package
 RUN pip install -e .
 
 COPY tox.ini .
+# to run tests in all pythons as well, uncomment 1 next line
+RUN make pythons
 
 RUN apt-get clean autoclean
 RUN apt-get autoremove --yes

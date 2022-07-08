@@ -44,7 +44,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: ./
-        file: ./Dockerfile-tox
+        file: ./kubify/ops/dockers/Dockerfile-pythons-full
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
         tags: willy0912/kubify-local:main-py378910-tox

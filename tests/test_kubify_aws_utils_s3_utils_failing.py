@@ -1,4 +1,4 @@
-import kubify.aws_utils.s3_utils as module_0
+import kubify.src.aws.s3_utils as module_0
 
 
 def test_case_0():

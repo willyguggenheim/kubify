@@ -173,6 +173,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+**/docs/_build/
 
 # PyBuilder
 target/
@@ -222,3 +223,5 @@ reports/
 # mac
 .DS_Store
 **/.DS_Store
+.tfcache
+**/.tfcache

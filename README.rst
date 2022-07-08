@@ -57,9 +57,7 @@ This is a python package and a docker image (multi-arch).
 
 Cloud:
 
-1. `make cloud cloud=aws`
-2. `make cloud cloud=gcp`
-3. `make cloud cloud=azure`
+1. `make clouds`
 
 You have a redundant cloud!
 
@@ -129,3 +127,5 @@ Kubify has been approved by AWS.
 
 .. figure:: ./docs/img/README_md_imgs/AWS-Partner.jpeg
    :alt: AWSPARTNER
+
+# TODO: put link to automatic gitops docs
