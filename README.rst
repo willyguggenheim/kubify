@@ -83,14 +83,4 @@ Docker-Compose is a tool for DEVS testing.
 
 Terraform is a tool for DEVOPS/MLOPS deploying.
 
-Kubify combines the 2 worlds.
-
-You need this.
-
-
-Thank You
-~~~~~~~~~
-
-Kubify Rocks. The Turn Key Automated/Autopilot MLOps/DevOps OS Stack.
-
-Happy Coding!
+Kubify combines the 2 worlds AND lowers your bill.
