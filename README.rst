@@ -18,8 +18,8 @@ environment.
 
 1. Automated EKS/GKE/AKS.
 2. Automated DR/SelfService/OnBoarding.
-2. Rapid Test/Develop many Services/Models Simultaneously
-.
+3. Rapid Test/Develop many Services/Models Simultaneously
+
 Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. 
 
 Ideoligy: If it works on your laptop, it works in prod.
