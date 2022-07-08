@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9005.0.10
+Kubify OS, Version: 9005.0.11
 
 Well hello there! Welcome to Kubify. 
 
@@ -16,13 +16,14 @@ Data Scientists/Devs/DevOps/MLOps Person/Teams/Companies who want self service a
 To rapid develop many services/models fast simultaneously on full real
 environment.
 
-1. Automated EKS/GKE/AKS.
-2. Automated DR/SelfService/OnBoarding.
-3. Rapid Test/Develop many Services/Models Simultaneously
+1. Automated Self-Service Clouds and Services.
+2. Automated DR. Automatic Multi-Cloud Failover.
+3. Rapid Test/Develop many Services/Models Simultaneously.
+4. Full Automated Integration Test. Stable Prod.
 
 Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. 
 
-Ideoligy: If it works on your laptop, it works in prod.
+Ideoligy: If it works on your laptop/test/notebook, it works in prod.
 
 
 How?
