@@ -140,7 +140,3 @@ Turn Key Automated/Autopilot MLOps/DevOps OS Stack.
 Self Service, Developer-Centric, lower Cloud Costs.
 
 Please See: *.rst and *.md.
-
-# TODO: put link to automatic gitops docs
-# TODO: multi-cloud ArgoCD Helm-Native automation README explainer here
-# TODO: rapid testing explainer here
