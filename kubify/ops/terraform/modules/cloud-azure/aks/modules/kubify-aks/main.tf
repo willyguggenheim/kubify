@@ -6,8 +6,17 @@ module "rg" {
   source  = "bcochofel/resource-group/azurerm"
   version = "1.4.0"
 
-  name     = "rg-aks-spot-node-pool-${var.cluster_name}"
+  name     = local.name
   location = var.aks_region
+}
+
+locals {
+  name = var.cluster_name
+
+  tags = {
+    Example = local.name
+
+  }
 }
 
 module "aks" {
@@ -15,10 +24,12 @@ module "aks" {
 
   name                = var.cluster_name
   resource_group_name = module.rg.name
-  dns_prefix          = "kubify"
+  dns_prefix          = local.name
 
   default_pool_name              = "spot"
   enable_log_analytics_workspace = true
+
+  aci_connector_linux_subnet_name = module.network.vnet_name
 
   node_pools = [
     {
@@ -41,14 +52,14 @@ module "aks" {
 
 ######
 
-# module "network" {
-#   source              = "Azure/network/azurerm"
-#   resource_group_name = azurerm_resource_group.example.name
-#   address_space       = "10.52.0.0/16"
-#   subnet_prefixes     = ["10.52.0.0/24"]
-#   subnet_names        = ["subnet1"]
-#   depends_on          = [azurerm_resource_group.example]
-# }
+module "network" {
+  source              = "Azure/network/azurerm"
+  resource_group_name = local.name
+  address_space       = "10.52.0.0/16"
+  subnet_prefixes     = ["10.52.0.0/24"]
+  subnet_names        = ["kubify1"]
+  # depends_on          = [azurerm_resource_group.example]
+}
 
 # data "azuread_group" "aks_cluster_admins" {
 #   display_name = "kubify-${var.cluster_name}-aks-cluster-admins"
@@ -57,7 +68,7 @@ module "aks" {
 # # TODO: spot
 # module "aks" {
 #   source                           = "Azure/aks/azurerm"
-#   resource_group_name              = azurerm_resource_group.example.name
+#   resource_group_name              = local.name
 #   client_id                        = "your-service-principal-client-appid"
 #   client_secret                    = "your-service-principal-client-password"
 #   kubernetes_version               = "1.23.5"

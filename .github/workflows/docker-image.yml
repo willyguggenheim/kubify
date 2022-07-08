@@ -3,12 +3,15 @@ name: Docker PyPi CI
 on:
   push:
     branches: [ "main" ]
-  # pull_request:
-  #   branches: [ "main" ]
+  pull_request:
+    # enable your branch cicd (disable once done testing 
+    # cicd on your branch by commenting next 1 line)
+    branches: [ "python" ]
 
 jobs:
 
   build:
+    # don't change the next 1 line
     runs-on: ubuntu-latest
     steps:
     # - name: Run on architecture for multiarch
@@ -46,8 +49,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: ./
-        # file: ./Dockerfile
-        file: ./dockers/Dockerfile-cached
+        file: ./kubify/ops/dockers/Dockerfile-cached
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
         tags: willy0912/kubify-local:main

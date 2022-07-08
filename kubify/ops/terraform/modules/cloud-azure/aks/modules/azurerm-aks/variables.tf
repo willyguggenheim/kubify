@@ -271,7 +271,6 @@ resource "azurerm_subnet" "virtual" {
 ```
 EOT
   type        = string
-  default     = null
 }
 
 # azure_policy

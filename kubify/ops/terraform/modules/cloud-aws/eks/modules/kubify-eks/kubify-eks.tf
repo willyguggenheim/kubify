@@ -23,9 +23,8 @@ locals {
   region = var.aws_region
 
   tags = {
-    Example    = local.name
-    GithubRepo = "terraform-aws-eks"
-    GithubOrg  = "terraform-aws-modules"
+    Example = local.name
+
   }
 }
 module "eks" {

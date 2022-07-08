@@ -26,7 +26,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     name                         = var.default_pool_name
     vm_size                      = var.vm_size
-    availability_zones           = var.availability_zones
     enable_auto_scaling          = var.enable_auto_scaling
     enable_host_encryption       = var.enable_host_encryption
     enable_node_public_ip        = var.enable_node_public_ip
@@ -54,8 +53,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   identity {
-    type                      = var.user_assigned_identity_id == "" ? "SystemAssigned" : "UserAssigned"
-    user_assigned_identity_id = var.user_assigned_identity_id == "" ? null : var.user_assigned_identity_id
+    type = var.user_assigned_identity_id == "" ? "SystemAssigned" : "UserAssigned"
+    # user_assigned_identity_id = var.user_assigned_identity_id == "" ? null : var.user_assigned_identity_id
   }
 
 
@@ -173,5 +172,5 @@ resource "azurerm_role_assignment" "aks" {
 
   scope                = azurerm_kubernetes_cluster.aks.id
   role_definition_name = "Monitoring Metrics Publisher"
-  principal_id         = azurerm_kubernetes_cluster.aks.addon_profile[0].oms_agent[0].oms_agent_identity[0].object_id
+  principal_id         = azurerm_kubernetes_cluster.aks.oms_agent[0].oms_agent_identity[0].object_id
 }

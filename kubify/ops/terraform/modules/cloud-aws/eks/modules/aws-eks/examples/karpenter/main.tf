@@ -11,9 +11,8 @@ locals {
   partition       = data.aws_partition.current.partition
 
   tags = {
-    Example    = local.name
-    GithubRepo = "terraform-aws-eks"
-    GithubOrg  = "terraform-aws-modules"
+    Example = local.name
+
   }
 }
 

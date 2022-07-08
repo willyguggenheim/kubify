@@ -100,16 +100,36 @@ fix:
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
 
-cloud: #aws azure or gcp
+clouds: #aws azure and gcp (make cloud)
 	tfsec
 	terraform fmt --recursive
-	aws sts get-caller-identity || aws configure
-	tfenv install v1.2.4
+	gcloud config set project kubify-os || gcloud auth application-default login
+	gcloud config set project kubify-os
+	aws sts get-caller-identity >/dev/null || aws configure
+	az ad signed-in-user list-owned-objects >/dev/null || az login
+	az ad signed-in-user list-owned-objects >/dev/null || az login
+	tfenv install v1.2.4 >/dev/null
 	tfenv use v1.2.4
 	aws s3 ls s3://kubify-tf-state-$(aws_account_id_for_state) || aws s3api create-bucket --bucket kubify-tf-state-$(aws_account_id_for_state) --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1
 	aws s3api put-bucket-encryption --bucket kubify-tf-state-$(aws_account_id_for_state) --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}"
 	aws dynamodb describe-table --table-name kubify-tf-state-$(aws_account_id_for_state)   >/dev/null ||  aws dynamodb create-table --table-name kubify-tf-state-$(aws_account_id_for_state) --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1
-	cd ./terraform && terraform init --reconfigure --backend-config="bucket=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="dynamodb_table=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="region=us-west-1" && terraform apply -target=module.$$cloud
+	cd ./kubify/ops/terraform && terraform init --reconfigure --backend-config="bucket=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="dynamodb_table=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="region=us-west-1" && terraform apply
+
+cloud: #aws azure or gcp (make cloud kubify=[aws|azure|gcp])
+	tfsec
+	terraform fmt --recursive
+	gcloud config set project kubify-os || gcloud auth application-default login
+	gcloud config set project kubify-os
+	aws sts get-caller-identity >/dev/null || aws configure
+	az ad signed-in-user list-owned-objects >/dev/null || az login
+	az ad signed-in-user list-owned-objects >/dev/null || az login
+	tfenv install v1.2.4 >/dev/null
+	tfenv use v1.2.4
+	aws s3 ls s3://kubify-tf-state-$(aws_account_id_for_state) || aws s3api create-bucket --bucket kubify-tf-state-$(aws_account_id_for_state) --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1
+	aws s3api put-bucket-encryption --bucket kubify-tf-state-$(aws_account_id_for_state) --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}"
+	aws dynamodb describe-table --table-name kubify-tf-state-$(aws_account_id_for_state)   >/dev/null ||  aws dynamodb create-table --table-name kubify-tf-state-$(aws_account_id_for_state) --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1
+	# make cloud kubify=[aws|azure|gcp]
+	cd ./kubify/ops/terraform && terraform init --reconfigure --backend-config="bucket=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="dynamodb_table=kubify-tf-state-$(aws_account_id_for_state)" --backend-config="region=us-west-1" && terraform apply -target=module.$$cloud
 
 docker:
 	docker build . -t kubify:latest
@@ -127,7 +147,7 @@ package:
 	python3 setup.py sdist bdist_wheel
 
 clean:
-	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./terraform/.terra* docs/*build docs/build *.pyc *.pyo
+	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo
 	stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
 
 # test every version of python enabled
