@@ -3,7 +3,9 @@ Welcome!
 
 Kubify OS, Version: 9005.0.5
 
-Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
+Well hello there! Welcome to Kubify. 
+
+The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
 Who is this for?
 ================
@@ -22,9 +24,11 @@ it.
 First class rapid testing, all your services listening for folder
 changes, so you can code fast, really fast.
 
-Automated EKS/GKE/AKS, Automated DR/SelfService/OnBoarding, Rapid Test/Develop many Services/Models Simultaneously and Autopilot DevEx. Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. Make Devs Happy. Reduce Your Cloud Costs. Easy Migration. Multi-Cloud Redundancy. Full Turn Key Solution to Code Faster+Smarter.
-
-A true turn-key open-source solution for MLOps and DevOps, to make Developers super happy, and optimize their common workflows (integrate them with DevOps, in full).
+1. Automated EKS/GKE/AKS.
+2. Automated DR/SelfService/OnBoarding.
+2. Rapid Test/Develop many Services/Models Simultaneously
+.
+Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. 
 
 Ideoligy: If it works on your laptop, it works in prod.
 
