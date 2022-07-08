@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9009.0.2
+Kubify OS, Version: 9009.0.3
 
 Well hello there! Welcome to Kubify OS Python Package Repo
 
@@ -75,6 +75,16 @@ Docs
 
 1. https://kubify-os.readthedocs.io
 2. CONTRIBUTING.rst or/and USAGE.rst
+
+Summary
+~~~~~~~
+
+Docker-Compose is a tool for DEVS testing. 
+
+Terraform is a tool for DEVOPS/MLOPS deploying.
+
+Kubify combines those 2 worlds.
+
 
 Thank You
 ~~~~~~~~~
