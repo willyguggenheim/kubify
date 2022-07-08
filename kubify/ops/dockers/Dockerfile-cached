@@ -3,7 +3,7 @@ FROM willy0912/kubify-local:main
 
 COPY . .
 
-# os security updates automated (and is default container for services that don't have Dockerfile) !!
+# os security updates automated
 RUN apt update
 RUN apt -y upgrade
 
