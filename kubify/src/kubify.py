@@ -6,59 +6,98 @@ import shutil
 import glob
 import boto3
 
-import kubify.aws_constants as aws_constants
+import kubify_py.aws_constants as aws_constants
 import kubify.aws_utils as s3_utils
 import kubify.k8s_utils as k8s_utils
 
+from ansible.playbook import PlayBook
+import kubify.core.app_constants as app_constants
+import kubify.core.file_utils as file_utils
+
+def run_ansible(playbook):
+     --connection=local \
+      --inventory=127.0.0.1, "${K8S_DIR}/ansible/env.yaml" \
+      --extra-vars="aws_profile=$AWS_ADMIN_PROFILE src_dir=${GIT_DIR} env=${ENV} kubify_dir=${WORK_DIR} undeploy_env=${UNDEPLOY}" \
+      --tags=$TAGS
+    pb = PlayBook(playbook=f'{playbook}')
+    pb.run()
+
+
+
 
 def create_work_dirs():
-    cwd = os.path.dirname(__file__)
-    project_path = os.path.join(cwd, "..")
-    workdir_path = os.path.join(project_path, "_kubify_work")
-    os.makedirs(workdir_path)
-    certs_path = os.path.join(workdir_path, "certs")
-    os.makedirs(certs_path)
+    os.makedirs(app_constants.kubify_work)
+    os.makedirs(app_constants.certs_path)
 
-def delete_file_list(fileList):
-    # Iterate over the list of filepaths & remove each file.
-    for filePath in fileList:
-        try:
-            os.remove(filePath)
-        except OSError:
-            print("Error while deleting file")
 
 def clean_secrets(env, app_name):
-    cwd = os.path.dirname(__file__)
-    cloud_formation_path = os.path.join(*["cwd", "..", "_kubify_work", env, app_name, "cloudformation")
-    fileList = glob.glob(f'{cloud_formation_path}*')
-    delete_file_list(fileList)
-    secrets_path = os.path.join(*["cwd", "..", "_kubify_work", env, app_name, "manifests")
-    fileList = glob.glob(f'{secrets_path}secr*')
-    delete_file_list(fileList)
-    app_path = os.path.join(*["cwd", "..", "_kubify_work", env, app_name)
-    fileList = glob.glob(f'{secrets_path}gen-*')
-    delete_file_list(fileList)
-    fileList = glob.glob(f'{secrets_path}*.log')
-    delete_file_list(fileList)
-    # shutil.rmtree(cloud_formation_path) 
+    # TODO add safety check
+    fileList = glob.glob(f'{app_constants.cloud_formation_path}*')
+    file_utils.delete_file_list(fileList)
+    fileList = glob.glob(f'{app_constants.secrets_path}secr*')
+    file_utils.delete_file_list(fileList)
+    fileList = glob.glob(f'{app_constants.secrets_path}gen-*')
+    file_utils.delete_file_list(fileList)
+    fileList = glob.glob(f'{app_constants.secrets_path}*.log')
+    file_utils.delete_file_list(fileList)
 
 def service_setup_secrets(env):
-    cwd = os.path.dirname(__file__)
-    app_path = os.path.join(*["cwd", "..", "_kubify_work", env, app_name)
-    secrets_path=os.path.join(app_path,"secrets")
-    secrets_file=f'{secrets_path}secrets.{env}.enc.yaml'
-    config_path=os.path.join(app_path,"config")
+    # TODO double check these paths
+    secrets_file=f'{app_constants.secrets_path}secrets.{env}.enc.yaml'
+    config_path=os.path.join(app_constants.app_path,"config")
     config_file=f'{config_path}config.{env}.enc.yaml'
     if not os.path.isfile(secrets_file):
     #   # if SECRETS_FILE not exist, let's create the intial secret
     #       kubify secrets create ${ENV}
+#       create)
+#           echo "Creating secrets for ${APP_NAME} for ${ENV} environment"
+#           echo "Note: You can change the secrets text editor by setting the EDITOR env var"
+#           if [ ! -f "${SECRETS_FILE}" ]; then
+#               echo "${SECRETS_FILE} file not found, creating blank encrypted secret file and opening it with your EDITOR"
+#               mkdir -p $APP_DIR/secrets | true
+#               cp "${GIT_DIR}/src/kubify/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
+#               # cat "${SECRETS_FILE}" | sed "s/name: common/name: ${APP_NAME}/g"
+#               sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${SECRETS_FILE}"
+#               # awk '{gsub("common", "${APP_NAME}", $0); print}' "${SECRETS_FILE}"
+#               # rm -f "${SECRETS_FILE}"
+#               # mv "${SECRETS_FILE}"_SED "${SECRETS_FILE}"
+#           fi
+
+#           aws kms list-aliases | grep kubify | grep ${ENV} || echo " please create your KMS key with it's alias, ARN should be like \"${!KEY_VAR}\" "
+
+#           kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" || kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" --cleartext
+#           echo "Reloading secrets in-cluster"
+#           _generate_manifests "$APP_DIR"
+#           ;;
+#           echo "
+# # Please make sure you set the values in data like so (so kubesec can encrypt the key/values properly):
+# apiVersion: v1
+# data:
+#   example_key: 'example_value'
+# kind: Secret
+# metadata:
+#   name: common
+# type: Opaque
+#           "
+#           read -p "Press enter to continue (your EDITOR will open for secrets editing, default EDITOR is vi)........."
+
+#           kubesec edit -if "${SECRETS_FILE}" --key="${!KEY_VAR}"
+#           echo "Reloading secrets in-cluster"
+#           _generate_manifests "$APP_DIR"
+#           ;;
+#       view)
+#           kubesec decrypt "${SECRETS_FILE}" --cleartext \
+#             --template=$'{{ range $k, $v := .data }}{{ $k }}={{ $v }}\n{{ end }}'
+#           ;;
+#       *)
+#           echo "Invalid option - $1"
+#   esac
+
         pass
     if not os.path.isfile(config_file):
-#       mkdir -p "${APP_DIR}/config" | true
-#       cp "${GIT_DIR}/src/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
+        src_config=f'{cwd}../templates/config.{env}.yaml'
+        copy_file(src_config, config_file)
 #       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
-#   fi
-        pass
 
 
 def service_start_dependencies():

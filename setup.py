@@ -24,6 +24,7 @@ requirements = [
     "botocore",
     "aws_utils",
     "cv-pytorch",
+    "ansible",
 ]
 
 test_requirements = [
