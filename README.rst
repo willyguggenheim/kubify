@@ -57,16 +57,23 @@ This is a python package and a docker image (multi-arch).
 
 Cloud:
 
-1. `make clouds`
+`make clouds`
 
 You have a redundant cloud!
 
 
 Usage of published PyPi "kubify" package in your repo:
 
-1. `pip install kubify`
-2. optional services and/or terraform folders (default it uses the ones in this repo)
-3. `kubify start-all` or `kubify start service []` for rapid code development (all services listening for code changes on real environment)
+`pip install kubify`
+
+Optional: "terraform" folder (or git submodule of your terraform main repo, default it uses the terraform folder in this repo)
+
+Optional: "services" folder (or git submodule of your services in a services folder, default it uses the services folder in this repo)
+
+
+Rapid Test Multiple Services/Models at the Same Time
+
+`kubify start-all` or `kubify start service [string or list]`
 
 Enjoy Rapid Testing!
 
@@ -126,3 +133,4 @@ Kubify has been approved by AWS.
    :alt: AWSPARTNER
 
 # TODO: put link to automatic gitops docs
+# TODO: multi-cloud ArgoCD Helm-Native automation README explainer here
