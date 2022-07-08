@@ -1,18 +1,17 @@
-Well hello there! Welcome to Kubify. 
-
-The Turn-Key DevOps/MLOps OS Developer-First Stack.
-
-
 Welcome!
 ========
 
 Kubify OS, Version: 9005.0.8
 
+Well hello there! Welcome to Kubify. 
+
+The Turn-Key DevOps/MLOps OS Developer-First Stack.
+
 
 Who is this for?
 ================
 
-Data Scientists/Devs/DevOps who want self service.
+Data Scientists/Devs/DevOps/MLOps Person/Teams/Companies who want self service and autopilot DevEx to code faster.
 
 To rapid develop many services/models fast simultaneously on full real
 environment.
