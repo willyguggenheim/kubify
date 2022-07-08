@@ -173,3 +173,26 @@ epel:
 
 aws-list:
 	aws eks list-clusters --output json
+
+# cloud deploys
+
+# todo: also (similarly) ansible kubedb changes for multi-cloud database (and that backs up in both clouds)
+# todo: route53 helm automations to failover active-active between clouds
+argo-create-services:
+	# connect to argocd and deploy to all clusters
+	# todo: eval "https://api.argoproj.io"
+	# todo: eval "$(cat ~/.argocd/token)"
+	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $(cat ~/.argocd/token)
+	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
+	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $(cat ~/.argocd/token)
+	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
+
+
+argo-delete-services:
+	# connect to argocd and deploy to all clusters
+	# todo: eval "https://api.argoproj.io"
+	# todo: eval "$(cat ~/.argocd/token)"
+	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $(cat ~/.argocd/token)
+	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
+	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $(cat ~/.argocd/token)
+	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge

@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9004.0.1
+Kubify OS, Version: 9004.0.3
 
 Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
@@ -112,9 +112,6 @@ The future of DevOps is here. If only there was a `make devs happy`, well there 
    :target: https://pyup.io/repos/github/willyguggenheim/kubify/
 .. |Docs| image:: https://readthedocs.org/projects/kubify/badge/?version=latest
    :target: hhttps://kubify.readthedocs.io/en/latest/?version=latest
-
-TODO: Implement DR Automation
-=============================
 
 Everything you build in Kubify has redundancy (dr, backups and active-active) and scalability in 2 regions, at the lowest possible cost (multiarch, spot, atom processor, spot gpu rapid de-scaling, mlops smart scaling, redundant scalers and more).
 
