@@ -96,13 +96,9 @@ class k8s_utils:
 
         return api_client2
 
-<<<<<<< HEAD:kubify/src/core/k8s.py
     def set_context_kind_kind(self): 
         # check if exists if not create
         # kind no python sdk so use subprocess
-=======
-    def set_context_kind_kind(self):
->>>>>>> 86be124c485e0eef3d6499cfb36bae4f0c7dd767:kubify/src/core/k8s_utils.py
         contexts, active_context = config.list_kube_config_contexts()
         if not contexts:
             print("Cannot find any context in kube-config file.")

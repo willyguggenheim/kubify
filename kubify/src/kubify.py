@@ -26,13 +26,8 @@ def setup_logging():
         "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s] %(message)s"
     )
     _logger.setLevel(logging.INFO)
-<<<<<<< HEAD
     
     fileHandler = logging.FileHandler(f"{app_constants.log_path}/kubify.log")
-=======
-
-    fileHandler = logging.FileHandler(f"{app_constants.log_path}kubify.log")
->>>>>>> 86be124c485e0eef3d6499cfb36bae4f0c7dd767
     fileHandler.setFormatter(logFormatter)
     _logger.addHandler(fileHandler)
 
