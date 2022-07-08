@@ -1,10 +1,9 @@
-
 import kubify.src.aws.s3_utils as module_0
 
 
 def test_case_0():
     try:
-        bytes_0 = b'\xa8\xaeK'
+        bytes_0 = b"\xa8\xaeK"
         s3_utils_0 = module_0.s3_utils()
         s3_utils_0.put_bucket_encryption(bytes_0)
     except BaseException:
@@ -24,7 +23,7 @@ def test_case_1():
 def test_case_2():
     try:
         s3_utils_0 = module_0.s3_utils()
-        str_0 = '5'
+        str_0 = "5"
         var_0 = s3_utils_0.get_bucket(str_0)
         assert var_0 is None
         set_0 = {var_0, str_0, s3_utils_0, s3_utils_0}
@@ -35,7 +34,7 @@ def test_case_2():
 
 def test_case_3():
     try:
-        str_0 = 'kNhzCQPi{;Vsw-kOD\r1n'
+        str_0 = "kNhzCQPi{;Vsw-kOD\r1n"
         set_0 = {str_0, str_0}
         s3_utils_0 = module_0.s3_utils()
         s3_utils_0.put_bucket_encryption(set_0)
@@ -56,7 +55,7 @@ def test_case_5():
     try:
         bytes_0 = b'\x02"\xc4_\xd2\xb6\xa6Q|'
         bool_0 = False
-        str_0 = '_'
+        str_0 = "_"
         s3_utils_0 = module_0.s3_utils()
         var_0 = s3_utils_0.get_bucket(str_0)
         assert var_0 is None
