@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9004.0.1
+Kubify OS, Version: 9004.0.2
 
 Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
 
