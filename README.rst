@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9005.0.5
+Kubify OS, Version: 9005.0.6
 
 Well hello there! Welcome to Kubify. 
 
