@@ -3,6 +3,10 @@ FROM willy0912/kubify-local:main
 
 COPY . .
 
+# os security updates automated
+RUN apt update
+RUN apt -y upgrade
+
 RUN make clean
 RUN make pip
 RUN make package

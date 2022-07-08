@@ -1,4 +1,7 @@
 skips:
+- B106 #pwfetchfn
+- B102 #exec
+- B101 #subprocess
+- B603 #subprocess
 - B404 #subprocess
 - B602 #subprocess
-- B106 #pwfetchfn

@@ -41,3 +41,31 @@ def test_case_5():
         module_0.k8s_utils()
     except BaseException:
         pass
+
+
+def test_case_6():
+    try:
+        module_0.k8s_utils()
+    except BaseException:
+        pass
+
+
+def test_case_7():
+    try:
+        module_0.k8s_utils()
+    except BaseException:
+        pass
+
+
+def test_case_8():
+    try:
+        module_0.k8s_utils()
+    except BaseException:
+        pass
+
+
+def test_case_9():
+    try:
+        module_0.k8s_utils()
+    except BaseException:
+        pass

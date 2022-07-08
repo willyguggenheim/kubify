@@ -56,3 +56,8 @@ Contributing Workflow Patterns
 2. Invoke Python Directly (pull image if missing tools)
 3. Tox (multi-python testing)
 4. Install Directly and Invoke Python Directly
+
+
+# TODO: put link to automatic gitops docs
+# TODO: multi-cloud ArgoCD Helm-Native automation README explainer here
+# TODO: rapid testing explainer here

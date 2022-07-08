@@ -102,7 +102,7 @@ RUN pip install -e .
 # Clean (Smalller Image):
 RUN make clean
 RUN rm -rf /tmp/* /var/tmp/* ./.tox
-RUN rm -rf ./services/*/*/secr* ./.git
+RUN rm -rf ./kubify/ops/services/*/*/secr* ./.git
 RUN rm -rf /var/lib/apt/lists/*
 RUN apt remove -y python3.7 python3.8 python3.10 software-properties-common
 RUN apt-get clean autoclean

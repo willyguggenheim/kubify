@@ -3,15 +3,12 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 # read data from csv
-train_data = pd.read_csv("iris_training.csv", names=[
-                         "f1", "f2", "f3", "f4", "f5"])
+train_data = pd.read_csv("iris_training.csv", names=["f1", "f2", "f3", "f4", "f5"])
 test_data = pd.read_csv("iris_test.csv", names=["f1", "f2", "f3", "f4", "f5"])
 
 # encode results to onehot
-train_data["f5"] = train_data["f5"].map(
-    {0: [1, 0, 0], 1: [0, 1, 0], 2: [0, 0, 1]})
-test_data["f5"] = test_data["f5"].map(
-    {0: [1, 0, 0], 1: [0, 1, 0], 2: [0, 0, 1]})
+train_data["f5"] = train_data["f5"].map({0: [1, 0, 0], 1: [0, 1, 0], 2: [0, 0, 1]})
+test_data["f5"] = test_data["f5"].map({0: [1, 0, 0], 1: [0, 1, 0], 2: [0, 0, 1]})
 
 # separate train data
 train_x = train_data[["f1", "f2", "f3", "f4"]]

@@ -1,11 +1,10 @@
-include AUTHORS.rst
-include CONTRIBUTING.rst
-include HISTORY.rst
+include *.rst
+include *.md
 include LICENSE
-include README.md
 
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
-recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
+recursive-exclude *.jpg *.png *.gif
+recursive-include docs conf.py *.cfg *.yml Makefile kubify examples .github

@@ -12,7 +12,7 @@ from subprocess import Popen, PIPE, STDOUT
 
 import aws_constants as aws_constants
 import aws_utils as s3_utils
-import core.k8s as k8s_utils
+import core.k8s_utils as k8s_utils
 
 from ansible.playbook import PlayBook
 import core.app_constants as app_constants
@@ -20,24 +20,34 @@ import core.file_utils as file_utils
 
 _logger = logging.getLogger()
 
+
 def setup_logging():
-    logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s] %(message)s")  
+    logFormatter = logging.Formatter(
+        "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s] %(message)s"
+    )
     _logger.setLevel(logging.INFO)
+<<<<<<< HEAD
     
     fileHandler = logging.FileHandler(f"{app_constants.log_path}/kubify.log")
+=======
+
+    fileHandler = logging.FileHandler(f"{app_constants.log_path}kubify.log")
+>>>>>>> 86be124c485e0eef3d6499cfb36bae4f0c7dd767
     fileHandler.setFormatter(logFormatter)
     _logger.addHandler(fileHandler)
-    
+
     consoleHandler = logging.StreamHandler()
     consoleHandler.setFormatter(logFormatter)
     _logger.addHandler(consoleHandler)
 
+
 def log_subprocess_output(pipe):
-    for line in iter(pipe.readline, b''): # b'\n'-separated lines
-        logging.trace('ansbile: %r', line)
-            
-def run_ansible(playbook='sample.yml', uninstall="no", tags=""):
-    command_line_args= f"""ansible-playbook \
+    for line in iter(pipe.readline, b""):  # b'\n'-separated lines
+        logging.trace("ansbile: %r", line)
+
+
+def run_ansible(playbook="sample.yml", uninstall="no", tags=""):
+    command_line_args = f"""ansible-playbook \
       --connection=local \
       --inventory=127.0.0.1, "{app_constants.ansible_dir}/env.yaml" \
       --extra-vars="aws_profile={aws_constants.AWS_PROFILE} src_dir={app_constants.ops_dir} env={app_constants.env} kubify_dir={app_constants.kubify_work} undeploy_env={uninstall}" \
@@ -46,11 +56,9 @@ def run_ansible(playbook='sample.yml', uninstall="no", tags=""):
     process = Popen(command_line_args, stdout=PIPE, stderr=STDOUT)
     with process.stdout:
         log_subprocess_output(process.stdout)
-    exitcode = process.wait() # 0 means success
+    exitcode = process.wait()  # 0 means success
     # pb = PlayBook(playbook=f'{playbook}', extra_vars)
     # pb.run()
-
-
 
 
 def create_work_dirs():
@@ -60,71 +68,74 @@ def create_work_dirs():
 
 def clean_secrets(env, app_name):
     # TODO add safety check
-    fileList = glob.glob(f'{app_constants.cloud_formation_path}/*')
+    fileList = glob.glob(f"{app_constants.cloud_formation_path}/*")
     file_utils.delete_file_list(fileList)
-    fileList = glob.glob(f'{app_constants.secrets_path}/secr*')
+    fileList = glob.glob(f"{app_constants.secrets_path}/secr*")
     file_utils.delete_file_list(fileList)
-    fileList = glob.glob(f'{app_constants.secrets_path}/gen-*')
+    fileList = glob.glob(f"{app_constants.secrets_path}/gen-*")
     file_utils.delete_file_list(fileList)
-    fileList = glob.glob(f'{app_constants.secrets_path}/*.log')
+    fileList = glob.glob(f"{app_constants.secrets_path}/*.log")
     file_utils.delete_file_list(fileList)
+
 
 def service_setup_secrets(env):
     # TODO double check these paths
-    secrets_file=f'{app_constants.secrets_path}/secrets.{env}.enc.yaml'
-    config_path=os.path.join(app_constants.app_path,"config")
-    config_file=f'{config_path}/config.{env}.enc.yaml'
+    secrets_file = f"{app_constants.secrets_path}/secrets.{env}.enc.yaml"
+    config_path = os.path.join(app_constants.app_path, "config")
+    config_file = f"{config_path}/config.{env}.enc.yaml"
     if not os.path.isfile(secrets_file):
-    #   # if SECRETS_FILE not exist, let's create the intial secret
-    #       kubify secrets create ${ENV}
-#       create)
-#           echo "Creating secrets for ${APP_NAME} for ${ENV} environment"
-#           echo "Note: You can change the secrets text editor by setting the EDITOR env var"
-#           if [ ! -f "${SECRETS_FILE}" ]; then
-#               echo "${SECRETS_FILE} file not found, creating blank encrypted secret file and opening it with your EDITOR"
-#               mkdir -p $APP_DIR/secrets | true
-#               cp "${GIT_DIR}/src/kubify/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
-#               # cat "${SECRETS_FILE}" | sed "s/name: common/name: ${APP_NAME}/g"
-#               sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${SECRETS_FILE}"
-#               # awk '{gsub("common", "${APP_NAME}", $0); print}' "${SECRETS_FILE}"
-#               # rm -f "${SECRETS_FILE}"
-#               # mv "${SECRETS_FILE}"_SED "${SECRETS_FILE}"
-#           fi
+        #   # if SECRETS_FILE not exist, let's create the intial secret
+        #       kubify secrets create ${ENV}
+        #       create)
+        #           echo "Creating secrets for ${APP_NAME} for ${ENV} environment"
+        #           echo "Note: You can change the secrets text editor by setting the EDITOR env var"
+        #           if [ ! -f "${SECRETS_FILE}" ]; then
+        #               echo "${SECRETS_FILE} file not found, creating blank encrypted secret file and opening it with your EDITOR"
+        #               mkdir -p $APP_DIR/secrets | true
+        #               cp "${GIT_DIR}/src/kubify/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
+        #               # cat "${SECRETS_FILE}" | sed "s/name: common/name: ${APP_NAME}/g"
+        #               sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${SECRETS_FILE}"
+        #               # awk '{gsub("common", "${APP_NAME}", $0); print}' "${SECRETS_FILE}"
+        #               # rm -f "${SECRETS_FILE}"
+        #               # mv "${SECRETS_FILE}"_SED "${SECRETS_FILE}"
+        #           fi
 
-#           aws kms list-aliases | grep kubify | grep ${ENV} || echo " please create your KMS key with it's alias, ARN should be like \"${!KEY_VAR}\" "
+        #           aws kms list-aliases | grep kubify | grep ${ENV} || echo " please create your KMS key with it's alias, ARN should be like \"${!KEY_VAR}\" "
 
-#           kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" || kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" --cleartext
-#           echo "Reloading secrets in-cluster"
-#           _generate_manifests "$APP_DIR"
-#           ;;
-#           echo "
-# # Please make sure you set the values in data like so (so kubesec can encrypt the key/values properly):
-# apiVersion: v1
-# data:
-#   example_key: 'example_value'
-# kind: Secret
-# metadata:
-#   name: common
-# type: Opaque
-#           "
-#           read -p "Press enter to continue (your EDITOR will open for secrets editing, default EDITOR is vi)........."
+        #           kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" || kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" --cleartext
+        #           echo "Reloading secrets in-cluster"
+        #           _generate_manifests "$APP_DIR"
+        #           ;;
+        #           echo "
+        # # Please make sure you set the values in data like so (so kubesec can encrypt the key/values properly):
+        # apiVersion: v1
+        # data:
+        #   example_key: 'example_value'
+        # kind: Secret
+        # metadata:
+        #   name: common
+        # type: Opaque
+        #           "
+        #           read -p "Press enter to continue (your EDITOR will open for secrets editing, default EDITOR is vi)........."
 
-#           kubesec edit -if "${SECRETS_FILE}" --key="${!KEY_VAR}"
-#           echo "Reloading secrets in-cluster"
-#           _generate_manifests "$APP_DIR"
-#           ;;
-#       view)
-#           kubesec decrypt "${SECRETS_FILE}" --cleartext \
-#             --template=$'{{ range $k, $v := .data }}{{ $k }}={{ $v }}\n{{ end }}'
-#           ;;
-#       *)
-#           echo "Invalid option - $1"
-#   esac
+        #           kubesec edit -if "${SECRETS_FILE}" --key="${!KEY_VAR}"
+        #           echo "Reloading secrets in-cluster"
+        #           _generate_manifests "$APP_DIR"
+        #           ;;
+        #       view)
+        #           kubesec decrypt "${SECRETS_FILE}" --cleartext \
+        #             --template=$'{{ range $k, $v := .data }}{{ $k }}={{ $v }}\n{{ end }}'
+        #           ;;
+        #       *)
+        #           echo "Invalid option - $1"
+        #   esac
 
         pass
     if not os.path.isfile(config_file):
-        src_config=f'{cwd}../templates/config.{env}.yaml'
+        src_config = f"{cwd}../templates/config.{env}.yaml"
         copy_file(src_config, config_file)
+
+
 #       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
 
 
@@ -252,9 +263,9 @@ def test_or_create_s3_artifacts_bucket(
 
 
 if __name__ == "__main__":
-    k8s = k8s_utils()
+    k8s_utils = k8s_utils()
     os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
-    k8s.set_context_kind_kind()
+    k8s_utils.set_context_kind_kind()
     # # k8s.set_context_get_client(os.environ.get('K8S_OVERRIDE_CONTEXT', 'default'))
     # test_or_create_s3_artifacts_bucket()
     # k8s.get_entrypoint()

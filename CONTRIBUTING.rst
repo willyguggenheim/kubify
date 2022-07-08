@@ -132,7 +132,121 @@ Development workflow patterns:
 
 A) `make pip`
 
+Test the CICD before PR is ready for review:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`make docker`
+# TODO: local integration test make command (local and cloud)
+
+Usage?
+======
+
+See ``USAGE.rst``
+
+Infra Diagram?
+==============
+
+See ``kubify/ops/terraform/README.rst``
+
+.. figure:: ./docs/img/README_md_imgs/KUBIFY_BRAND_IDENTITY_1.png
+   :alt: LOGO
+
+|Docker| |PyPi| |PyUp| |Docs|
+
+Magic? Yes. Pure Magic.
+
+This is a python package and a docker image (multi-arch).
+
+1. PyPi
+2. DockerHub
+
+
+Cloud:
+
+``make clouds``
+
+You have a redundant cloud!
+
+
+Usage of published PyPi "kubify" package in your repo:
+
+``pip install kubify``
+
+Optional: "terraform" folder/submodule
+
+Optional: "services/[]" folders/submodules
+
+
+Rapid Test Multiple Services/Models at the Same Time
+
+``kubify start-all`` or ``kubify start service [string or list]``
+
+Enjoy Rapid Testing!
+
 Note
 ~~~~
 
 Please see `./USAGE.rst` !!
+
+BUT WHY
+~~~~~~~
+
+Well hello there! Welcome to Kubify. The Turn-Key DevOps/MLOps OS Developer-First Stack.
+
+But Why?
+========
+
+Because Docker-Compose and Terraform are 2 different tools, so I fixed
+it.
+
+First class rapid testing, all your services listening for folder
+changes, so you can code fast, really fast.
+
+The world needs a Turn-Key Cloud OS solution, so Developers can focus.
+
+Developers need to be able to quickly code and test multiple services, on a REAL full environment.
+
+There is a Developer-Centric need (startup/greenfield/migration/smb) for getting an entire cloud up and running in minutes, rather than years.
+
+Everything you build in Kubify has redundancy ``(dr, backups and active-active)`` and scalability in 2 regions, at the lowest possible cost ``(multiarch, spot, atom processor, spot gpu rapid de-scaling, mlops smart scaling, redundant scalers and more)``.
+
+This is what true turn key feels like. DevOps in 1 day. Developer friendly. Purpose built for Data Scientists and Machine Learning, as well as Developers building services and cloud. Autopilot for DevOps, so your DevOps team can focus on company goals.
+
+Developers and Data Scientists want Self Service. 
+
+AutoPilot-MLOps DevOps-as-a-Package.
+
+Pro Tips
+~~~~~~~~
+
+1) Your services (that have databases defined in kubify.yml) need to have Migrations/Seeds. This way when someone clones your repo, the service simply works with 1 simple command `kubify start` and is 100% ready to code.
+
+2) If you "sync" (kubify.yml) your site-packages/node_modules/cmake_cache/apt_cache/yum_cache/apk_cache then your service will load/re-load super fast and you can code multiple services at once with 1 simple `kubify start` command.
+
+3) Please Contribute to this Open Source Repository, so we can help each other build amazing things!!
+
+If you don't have admin rights on your workstation (NO PROBLEM, have thought of everything):
+    A) have your IT install Docker if you still want to rapid test locally
+        * docker installs automatically if not installed
+    B) or use VSCode/JupyterHub/WebShell (built in to the `./kubify/ops/services/datascience/`)
+        * you can even use an ipad to code (maximum company security)
+
+Usage
+~~~~~
+
+Use the pip package that this repo releases.
+
+`pip install kubify`
+
+Then (optionally) have a "terraform" folder (or git submodule) in your repo (or use the existing built-in terraform folder automatically).
+
+Then have a "services" folder (and bring in the examples from `./kubify/ops/services`). 
+
+Contributing
+~~~~~~~~~~~~
+
+Same pattern, but you do that inside of this repo itself (using `make develop`).
+
+# Fix most of Flake8 Findings
+
+`for f in `find . -name "*.py"`; do autopep8 --in-place --select=W292 $f; done`
