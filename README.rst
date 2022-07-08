@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9008.0.0
+Kubify OS, Version: 9008.0.1
 
 Well hello there! Welcome to Kubify. 
 
@@ -20,6 +20,9 @@ environment.
 2. Automated DR. Automatic Multi-Cloud Failover.
 3. Rapid Test/Develop many Services/Models Simultaneously.
 4. Full Automated Integration Test. Stable Prod.
+
+.. figure:: ./docs/img/README_md_imgs/level-up.gif
+   :alt: FUTUREOFDEVOPS9001
 
 Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack. 
 
@@ -46,9 +49,6 @@ F. ``make test``
 G. and more ..
 
 Happy Coding!
-
-.. figure:: ./docs/img/README_md_imgs/level-up.gif
-   :alt: FUTUREOFDEVOPS9001
 
 .. |Docker| image:: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main
    :target: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml
