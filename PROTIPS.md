@@ -11,7 +11,7 @@
 If you don't have admin rights on your workstation (NO PROBLEM, have thought of everything):
     A) have your IT install Docker if you still want to rapid test locally
         * docker installs automatically if not installed
-    B) or use VSCode/JupyterHub/WebShell (built in to the `./services/datascience/`)
+    B) or use VSCode/JupyterHub/WebShell (built in to the `./kubify/ops/services/datascience/`)
         * you can even use an ipad to code (maximum company security)
 
 # Usage?
@@ -22,7 +22,7 @@ Use the pip package that this repo releases.
 
 Then (optionally) have a "terraform" folder (or git submodule) in your repo (or use the existing built-in terraform folder automatically).
 
-Then have a "services" folder (and bring in the examples from `./services`). 
+Then have a "services" folder (and bring in the examples from `./kubify/ops/services`). 
 
 # Contributing?
 

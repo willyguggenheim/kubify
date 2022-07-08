@@ -47,12 +47,15 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 ./kubify ./tests --ignore="E501,W292,F401,E712,F841,F811"
+	flake8 ./kubify ./tests --ignore="E266,E502,E501,W292,W293,F401,E115,E402,E712,F841,F811,W291,E111,E302,E225,F821,E117,E261,E303,E231,E265,W391,C416,B007,W504,C408"
 
 lint/black: ## check style with black
-	black --check kubify tests
+	black --check ./kubify ./tests
 
 lint: lint/flake8 lint/black ## check style
+
+format: ## format code with black
+	black ./kubify ./tests
 
 test: ## run tests quickly with the default Python
 	pytest
@@ -141,7 +144,7 @@ docker-test-all-pythons:
 
 security:
 	bandit -r ./kubify -c .bandit.yml
-	bandit -r ./services -c .bandit.yml
+	bandit -r ./kubify/ops/services -c .bandit.yml
 
 package:
 	python3 setup.py sdist bdist_wheel
