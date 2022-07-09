@@ -1,8 +1,8 @@
 locals {
   iam_role_additional_policies = [
-    aws_iam_policy.helm_cluster_autoscaler.arn,
-    "arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess",
-    "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy",
+    try(aws_iam_policy.helm_cluster_autoscaler.arn, "arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess"), # leave the autoscaler policy first
+    # "arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess", # example
+    # and then any other policies you want to add to the IAM role
   ]
 }
 

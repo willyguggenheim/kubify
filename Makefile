@@ -128,7 +128,7 @@ cloud: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|prod])
 		aws s3 ls s3://$$state_name || aws s3api create-bucket --bucket $$state_name --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1 && \
 		aws s3api put-bucket-encryption --bucket $$state_name --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}" && \
 		aws dynamodb describe-table --table-name $$state_name   >/dev/null ||  aws dynamodb create-table --table-name $$state_name --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1 && \
-		cd ./kubify/ops/terraform && terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && terraform apply -target=module.$$cloud -var="cluster_name=kubify-$$env"
+		cd ./kubify/ops/terraform && terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && terraform apply --target=module.$$cloud --var="cluster_name=kubify-$$env"
 
 docker:
 	docker build . -t kubify:latest

@@ -8,6 +8,9 @@ locals {
   iam_role_policy_prefix = "arn:${data.aws_partition.current.partition}:iam::aws:policy"
 
   cni_policy = var.cluster_ip_family == "ipv6" ? "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:policy/AmazonEKS_CNI_IPv6_Policy" : "${local.iam_role_policy_prefix}/AmazonEKS_CNI_Policy"
+
+  iam_role_additional_policies = var.iam_role_additional_policies
+
 }
 
 ################################################################################
@@ -42,14 +45,11 @@ resource "aws_iam_role" "this" {
 
   tags = merge(var.tags, var.iam_role_tags)
 }
+resource "aws_iam_role_policy_attachment" "fargate_pod_in_task" {
 
-resource "aws_iam_role_policy_attachment" "this" {
-  for_each = var.create && var.create_iam_role ? toset(compact(distinct(concat([
-    "${local.iam_role_policy_prefix}/AmazonEKSFargatePodExecutionRolePolicy",
-    var.iam_role_attach_cni_policy ? local.cni_policy : "",
-  ], var.iam_role_additional_policies)))) : toset([])
+  for_each = { for k, v in local.iam_role_additional_policies : k => v }
 
-  policy_arn = each.value
+  policy_arn = try(each.value, "")
   role       = aws_iam_role.this[0].name
 }
 

@@ -32,6 +32,7 @@ module "eks" {
   source = "../aws-eks"
 
   cluster_enabled_log_types = ["api", "authenticator", "audit", "scheduler", "controllerManager"]
+  create_iam_role           = true
 
   iam_role_additional_policies = var.iam_role_additional_policies
   # iam_role_additional_policies = [var.iam_role_additional_policies]

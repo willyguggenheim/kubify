@@ -56,7 +56,7 @@ resource "aws_eks_cluster" "this" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.this,
+    aws_iam_role_policy_attachment.eks_cluster,
     aws_security_group_rule.cluster,
     aws_security_group_rule.node,
     aws_cloudwatch_log_group.this
@@ -232,6 +232,8 @@ locals {
   # TODO - hopefully this can be removed once the AWS endpoint is named properly in China
   # https://github.com/terraform-aws-modules/terraform-aws-eks/issues/1904
   dns_suffix = coalesce(var.cluster_iam_role_dns_suffix, data.aws_partition.current.dns_suffix)
+
+  iam_role_additional_policies = var.iam_role_additional_policies
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -286,16 +288,44 @@ resource "aws_iam_role" "this" {
   tags = merge(var.tags, var.iam_role_tags)
 }
 
-# Policies attached ref https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html
-resource "aws_iam_role_policy_attachment" "this" {
-  for_each = local.create_iam_role ? toset(compact(distinct(concat([
-    "${local.policy_arn_prefix}/AmazonEKSClusterPolicy",
-    "${local.policy_arn_prefix}/AmazonEKSVPCResourceController",
-  ], var.iam_role_additional_policies)))) : toset([])
+resource "aws_iam_role_policy_attachment" "eks_cluster" {
 
-  policy_arn = each.value
+  for_each = { for k, v in local.iam_role_additional_policies : k => v }
+
+  policy_arn = try(each.value, "")
   role       = aws_iam_role.this[0].name
 }
+
+resource "aws_iam_role_policy_attachment" "eks_additional_policies" {
+
+  for_each = { for k, v in local.iam_role_additional_policies : k => v }
+
+  policy_arn = try(each.value, "")
+  role       = aws_iam_role.this[0].name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_base_policies" {
+
+  for_each = {
+    "${local.policy_arn_prefix}/AmazonEKSClusterPolicy"         = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonEKSClusterPolicy",
+    "${local.policy_arn_prefix}/AmazonEKSVPCResourceController" = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonEKSVPCResourceController",
+  }
+
+  policy_arn = try(each.value, "")
+  role       = aws_iam_role.this[0].name
+}
+
+# iam_role_additional_policies
+# Policies attached ref https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html
+# resource "aws_iam_role_policy_attachment" "eks_cluster" {
+#   for_each = local.create_iam_role ? toset(compact(distinct(concat([
+#     "${local.policy_arn_prefix}/AmazonEKSClusterPolicy",
+#     "${local.policy_arn_prefix}/AmazonEKSVPCResourceController",
+#   ], var.iam_role_additional_policies)))) : toset([])
+
+#   policy_arn = each.value
+#   role       = aws_iam_role.this[0].name
+# }
 
 # Using separate attachment due to `The "for_each" value depends on resource attributes that cannot be determined until apply`
 resource "aws_iam_role_policy_attachment" "cluster_encryption" {
