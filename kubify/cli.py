@@ -1,27 +1,42 @@
 """Console script for kubify."""
 import argparse
+from ast import arg
 import sys
-from .src.kubify import create_work_dirs, set_context_kind_kind, test_or_create_s3_artifacts_bucket, get_entrypoint, get_service_pod, test_logger
-
-def init_parser():
-    parser = argparse.ArgumentParser(description='CLI for kubify')
-    parser.add_argument('--test_logger', action='test_logger', help='tests logging to logging dir')
-    parser.add_argument('--create_work_dirs', action='create_work_dirs', help='in users home kubify directory')
-    parser.add_argument('--set_context_kind_kind', action='set_context_kind_kind', help='sets the kuberenetes context to kind')
-    parser.add_argument('--test_or_create_s3_artifacts_bucket', action='test_or_create_s3_artifacts_bucket', help='sets the s3 bucket for state file for terraform')
-    parser.add_argument('--get_entrypoint', action='get_entrypoint', help='gets the entrypoint pod')
-    parser.add_argument('--get_service_pod', action='get_service_pod', help='gets the get_service_pod')
-    args = parser.parse_args()
-    print("Arguments: " + str(args._))
-    print("Replace this message by putting your code into " "kubify.cli.main")
-    return 0
-
-def main():
-    init_parser
+import kubify.src.kubify as kubify
 
 
-if __name__ == "__main__":
-    sys.exit(main())  # pragma: no cover
+
+parser = argparse.ArgumentParser(description='CLI for kubify')
+parser.add_argument('--test_logger',  help='tests logging to logging dir')
+parser.add_argument('--create_work_dirs', help='in users home kubify directory')
+parser.add_argument('--set_context_kind_kind', help='sets the kuberenetes context to kind')
+parser.add_argument('--test_or_create_s3_artifacts_bucket', help='sets the s3 bucket for state file for terraform')
+parser.add_argument('--get_entrypoint', help='gets the entrypoint pod')
+parser.add_argument('--get_service_pod', help='gets the get_service_pod')
+   
+if len(sys.argv) <= 1:
+    sys.argv.append('--help')
+    
+args = parser.parse_args()
+
+if args.test_logger:
+    kubify.test_logger()
+if args.create_work_dirs:
+    kubify.create_work_dirs()
+if args.set_context_kind_kind:
+    kubify.set_context_kind_kind()
+if args.test_or_create_s3_artifacts_bucket:
+    kubify.test_or_create_s3_artifacts_bucket()
+if args.get_entrypoint:
+    kubify.get_entrypoint()
+if args.get_service_pod:
+    kubify.get_service_pod()
+    
+print("Replace this message by putting your code into " "kubify.cli.main")
+
+
+# if __name__ == "__main__":
+#     sys.exit(main())  # pragma: no cover
 
 # aws/eks))
 # create/update & attach

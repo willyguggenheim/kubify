@@ -8,17 +8,27 @@ import subprocess
 import boto3
 import logging
 from subprocess import Popen, PIPE, STDOUT
+import kubify
 
 
-import aws_constants as aws_constants
-import aws_utils as s3_utils
-import core.k8s_utils as k8s_utils
+import kubify.src.aws_constants as aws_constants
+import kubify.src.aws.s3_utils as s3_utils
+import kubify.src.core.k8s_utils as k8s_utils
+import kubify.src.core.bash_utils as bash_utils
 
-from .core.bash_utils import subprocess_run
-from core.app_constants import app_constants
-from core.logging import setup_logger
-from core.file_utils import file_utils
-setup_logger()
+import kubify.src.core.app_constants as app_constants
+import kubify.src.core.logging as my_logging
+import kubify.src.core.file_utils as file_utils
+
+def create_work_dirs():
+    if not os.path.exists(app_constants.kubify_work):
+        os.makedirs(app_constants.kubify_work)
+    if not os.path.exists(app_constants.certs_path):
+        os.makedirs(app_constants.certs_path)
+
+create_work_dirs()
+
+my_logging.setup_logger()
 _logger = logging.getLogger()
 
 
@@ -37,13 +47,10 @@ def run_ansible(playbook="sample.yml", uninstall="no", tags=""):
       --extra-vars="aws_profile={aws_constants.AWS_PROFILE} src_dir={app_constants.ops_dir} env={app_constants.env} kubify_dir={app_constants.kubify_work} undeploy_env={uninstall}" \
       --tags="{tags}"
       """
-    subprocess_run("ansible", command_line_args)
+    bash_utils.subprocess_run("ansible", command_line_args)
     
 
 
-def create_work_dirs():
-    os.makedirs(app_constants.kubify_work)
-    os.makedirs(app_constants.certs_path)
 
 
 def clean_secrets(env, app_name):

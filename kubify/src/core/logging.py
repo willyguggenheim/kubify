@@ -3,8 +3,10 @@
 import logging
 from logging import config
 
-from .app_constants import app_constants
+import kubify.src.core.app_constants as app_constants
 
+#TODO fix filename in file handler
+log_path = f"{app_constants.log_path}/kubify.log"
 log_config = {
     "version":1,
     "root":{
@@ -17,11 +19,11 @@ log_config = {
             "class": "logging.StreamHandler",
             "level": "DEBUG"
         },
-        "file":{
-            "formatter": "std_out",
-            "class": "logging.FileHandler",
-            "Level": "DEBUG",
-            "filename":f"{app_constants.log_path}/kubify.log"
+    "file":{
+            "formatter":"std_out",
+            "class":"logging.FileHandler",
+            "level":"INFO",
+            "filename": "kubify.log"
         }
     },
     "formatters":{
