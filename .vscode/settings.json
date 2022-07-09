@@ -1,0 +1,20 @@
+{
+    "python.defaultInterpreterPath": "/usr/local/Caskroom/miniconda/base/bin/python",
+    "python.linting.pylintEnabled": true,
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./test",
+        "-p",
+        "*_test.py",
+        "test_*.py"
+    ],
+    "python.testing.pytestArgs": [
+        "test"
+    ],
+    "python.analysis.extraPaths": [
+        "./kubify"
+    ]
+}
