@@ -62,7 +62,7 @@ module "network" {
 }
 
 # data "azuread_group" "aks_cluster_admins" {
-#   display_name = "kubify-${var.cluster_name}-aks-cluster-admins"
+#   display_name = "${var.cluster_name}-aks-cluster-admins"
 # }
 
 # # TODO: spot
