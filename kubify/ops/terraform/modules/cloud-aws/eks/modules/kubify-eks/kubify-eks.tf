@@ -3,7 +3,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      ExampleDefaultTag = "ExampleDefaultValue"
+      kubify = local.name
+      env    = local.name
     }
   }
 }
@@ -23,7 +24,7 @@ locals {
   region = var.aws_region
 
   tags = {
-    Example = local.name
+    terraform_config_file = "kubify/ops/terraform/modules/cloud-aws/eks/modules/kubify-eks/kubify-eks.tf"
 
   }
 }
@@ -31,8 +32,10 @@ module "eks" {
   source = "../aws-eks"
 
   cluster_enabled_log_types = ["api", "authenticator", "audit", "scheduler", "controllerManager"]
+  create_iam_role           = true
 
   iam_role_additional_policies = var.iam_role_additional_policies
+  # iam_role_additional_policies = [var.iam_role_additional_policies]
 
   cluster_name                    = local.name
   cluster_endpoint_private_access = true
@@ -100,13 +103,13 @@ module "eks" {
       min_size     = 1
       max_size     = 4
       desired_size = 2
+      ami_type     = "BOTTLEROCKET_ARM_64"
 
       instance_types = ["a1.medium"]
       capacity_type  = "SPOT"
       labels = {
-        Environment = "test"
-        GithubRepo  = "terraform-aws-eks"
-        GithubOrg   = "terraform-aws-modules"
+        kubify = local.name
+        env    = local.name
       }
 
       taints = {
@@ -121,13 +124,14 @@ module "eks" {
       min_size     = 0
       max_size     = 2
       desired_size = 0
+      ami_type     = "AL2_x86_64_GPU"
 
       instance_types = ["g3s.xlarge"]
       capacity_type  = "SPOT"
       labels = {
-        Environment = "test"
-        GithubRepo  = "terraform-aws-eks"
-        GithubOrg   = "terraform-aws-modules"
+        kubify = local.name
+        env    = local.name
+        gpu    = "spot"
       }
 
       taints = {
@@ -141,31 +145,34 @@ module "eks" {
   }
 
   # Fargate Profile(s)
-  # fargate_profiles = {
-  #   default = {
-  #     name = "fargate"
-  #     selectors = [
-  #       {
-  #         namespace = "kube-system"
-  #         labels = {
-  #           k8s-app = "kube-dns"
-  #         }
-  #       },
-  #       {
-  #         namespace = "fargate"
-  #       }
-  #     ]
+  fargate_profiles = {
+    default = {
+      name = "fargate"
+      selectors = [
+        # {
+        #   namespace = "kube-system"
+        #   labels = {
+        #     k8s-app = "kube-dns"
+        #   }
+        # },
+        # {
+        #   namespace = "default"
+        # },
+        {
+          namespace = "fargate"
+        }
+      ]
 
-  #     tags = {
-  #       Owner = "test"
-  #     }
+      tags = {
+        serverless = "fargate"
+      }
 
-  #     timeouts = {
-  #       create = "20m"
-  #       delete = "20m"
-  #     }
-  #   }
-  # }
+      timeouts = {
+        create = "20m"
+        delete = "20m"
+      }
+    }
+  }
   manage_aws_auth_configmap = true
   # aws_auth_node_iam_role_arns_non_windows = [
   # ]
@@ -207,7 +214,7 @@ module "vpc" {
   name = local.name
   cidr = "10.0.0.0/16"
 
-  azs             = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  azs             = ["${local.region}b", "${local.region}c", "${local.region}d"]
   private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
   public_subnets  = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
   intra_subnets   = ["10.0.7.0/28", "10.0.7.16/28", "10.0.7.32/28"]

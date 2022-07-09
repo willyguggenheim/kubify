@@ -2,29 +2,26 @@ provider "azurerm" {
   features {}
 }
 
-module "rg" {
-  source  = "bcochofel/resource-group/azurerm"
-  version = "1.4.0"
-
-  name     = local.name
+resource "azurerm_resource_group" "rg" {
+  name     = var.cluster_name
   location = var.aks_region
 }
 
-locals {
-  name = var.cluster_name
+# module "rg" {
+#   source  = "bcochofel/resource-group/azurerm"
+#   version = "1.4.0"
 
-  tags = {
-    Example = local.name
-
-  }
-}
+#   name     = var.cluster_name
+#   location = var.aks_region
+# }
 
 module "aks" {
   source = "../azurerm-aks/"
 
   name                = var.cluster_name
-  resource_group_name = module.rg.name
-  dns_prefix          = local.name
+  resource_group_name = azurerm_resource_group.rg.name
+  cluster_name        = var.cluster_name
+  dns_prefix          = var.cluster_name
 
   default_pool_name              = "spot"
   enable_log_analytics_workspace = true
@@ -47,14 +44,14 @@ module "aks" {
     }
   ]
 
-  depends_on = [module.rg]
+  depends_on = [azurerm_resource_group.rg]
 }
 
 ######
 
 module "network" {
   source              = "Azure/network/azurerm"
-  resource_group_name = local.name
+  resource_group_name = var.cluster_name
   address_space       = "10.52.0.0/16"
   subnet_prefixes     = ["10.52.0.0/24"]
   subnet_names        = ["kubify1"]
@@ -62,13 +59,13 @@ module "network" {
 }
 
 # data "azuread_group" "aks_cluster_admins" {
-#   display_name = "kubify-${var.cluster_name}-aks-cluster-admins"
+#   display_name = "${var.cluster_name}-aks-cluster-admins"
 # }
 
 # # TODO: spot
 # module "aks" {
 #   source                           = "Azure/aks/azurerm"
-#   resource_group_name              = local.name
+#   resource_group_name              = var.cluster_name
 #   client_id                        = "your-service-principal-client-appid"
 #   client_secret                    = "your-service-principal-client-password"
 #   kubernetes_version               = "1.23.5"

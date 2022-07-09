@@ -1,3 +1,6 @@
+variable "cluster_name" {
+  description = "should match the file name envs/[cluster_name].yaml"
+}
 variable "resource_group_name" {
   description = <<EOT
 The name of the resource group in which to create the AKS.

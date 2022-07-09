@@ -44,6 +44,5 @@ managedNodeGroups:
                 fsx: true # fsx > efs (if you ever need multi-pod+multi-region pv volume mount at scale)
 
 availabilityZones: # us-east-1d has no gpus, skipping 2d
-  - us-east-1a
   - us-east-1b
   - us-east-1c

@@ -1,5 +1,5 @@
 data "azurerm_resource_group" "rg" {
-  name = var.resource_group_name
+  name = var.cluster_name
 }
 
 resource "random_string" "main" {
@@ -20,7 +20,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   name                = var.name
   location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name = var.cluster_name
   dns_prefix          = var.dns_prefix
 
   default_node_pool {

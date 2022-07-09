@@ -13,8 +13,8 @@ kubesec*
 default.profraw
 
 # IDEs
-.vscode
-**/.vscode
+# .vscode
+# **/.vscode
 
 # Keys
 .aws
@@ -212,7 +212,7 @@ ENV/
 .mypy_cache/
 
 # IDE settings
-.vscode/
+# .vscode/
 .idea/
 
 # Reports

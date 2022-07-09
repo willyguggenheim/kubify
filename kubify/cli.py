@@ -1,21 +1,42 @@
 """Console script for kubify."""
 import argparse
+from ast import arg
 import sys
+import kubify.src.kubify as kubify
 
 
-def main():
-    """Console script for kubify."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument("_", nargs="*")
-    args = parser.parse_args()
 
-    print("Arguments: " + str(args._))
-    print("Replace this message by putting your code into " "kubify.cli.main")
-    return 0
+parser = argparse.ArgumentParser(description='CLI for kubify')
+parser.add_argument('--test_logger',  help='tests logging to logging dir')
+parser.add_argument('--create_work_dirs', help='in users home kubify directory')
+parser.add_argument('--set_context_kind_kind', help='sets the kuberenetes context to kind')
+parser.add_argument('--test_or_create_s3_artifacts_bucket', help='sets the s3 bucket for state file for terraform')
+parser.add_argument('--get_entrypoint', help='gets the entrypoint pod')
+parser.add_argument('--get_service_pod', help='gets the get_service_pod')
+   
+if len(sys.argv) <= 1:
+    sys.argv.append('--help')
+    
+args = parser.parse_args()
+
+if args.test_logger:
+    kubify.test_logger()
+if args.create_work_dirs:
+    kubify.create_work_dirs()
+if args.set_context_kind_kind:
+    kubify.set_context_kind_kind()
+if args.test_or_create_s3_artifacts_bucket:
+    kubify.test_or_create_s3_artifacts_bucket()
+if args.get_entrypoint:
+    kubify.get_entrypoint()
+if args.get_service_pod:
+    kubify.get_service_pod()
+    
+print("Replace this message by putting your code into " "kubify.cli.main")
 
 
-if __name__ == "__main__":
-    sys.exit(main())  # pragma: no cover
+# if __name__ == "__main__":
+#     sys.exit(main())  # pragma: no cover
 
 # aws/eks))
 # create/update & attach
