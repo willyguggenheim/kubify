@@ -1,5 +1,3 @@
-
-
 #tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_policy" "helm_cluster_autoscaler" {
   name = "${var.cluster_name}-eks-helm-cluster-autoscaler"

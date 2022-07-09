@@ -8,6 +8,6 @@ variable "aws_region" {
 }
 variable "iam_role_additional_policies" {
   description = "Additional policies to be added to the IAM role"
-  type        = list(string)
+  type        = list(any)
   default     = []
 }
