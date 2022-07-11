@@ -47,7 +47,7 @@ module "gke" {
       auto_repair       = true
       auto_upgrade      = true
       service_account   = var.compute_engine_service_account
-      preemptible       = false
+      preemptible       = true
       max_pods_per_node = 12
     },
   ]

@@ -99,9 +99,9 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    cpu = {
-      min_size     = 1
-      max_size     = 4
+    cpu-atom = {
+      min_size     = 2
+      max_size     = 20
       desired_size = 2
       ami_type     = "BOTTLEROCKET_ARM_64"
 
@@ -120,7 +120,28 @@ module "eks" {
         }
       }
     }
-    gpu = {
+    cpu-intel = {
+      min_size     = 0
+      max_size     = 20
+      desired_size = 0
+      ami_type     = "BOTTLEROCKET_x86_64"
+
+      instance_types = ["t3.small"]
+      capacity_type  = "SPOT"
+      labels = {
+        kubify = local.name
+        env    = local.name
+      }
+
+      taints = {
+        dedicated = {
+          key    = "dedicated"
+          value  = "gpuGroup"
+          effect = "NO_SCHEDULE"
+        }
+      }
+    }
+    gpu-cuda = {
       min_size     = 0
       max_size     = 2
       desired_size = 0
@@ -212,12 +233,12 @@ module "vpc" {
   version = "~> 3.0"
 
   name = local.name
-  cidr = "10.0.0.0/16"
+  cidr = "10.15.0.0/16"
 
-  azs             = ["${local.region}b", "${local.region}c", "${local.region}d"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
-  intra_subnets   = ["10.0.7.0/28", "10.0.7.16/28", "10.0.7.32/28"]
+  azs             = ["${local.region}b", "${local.region}c"]
+  private_subnets = ["10.15.1.0/24", "10.15.2.0/24"]
+  public_subnets  = ["10.15.4.0/24", "10.15.5.0/24"]
+  intra_subnets   = ["10.15.7.0/28", "10.15.7.16/28"]
 
   enable_nat_gateway   = true
   single_nat_gateway   = true

@@ -49,7 +49,7 @@ No Modules.
 | priority | The Priority for Virtual Machines within the Virtual Machine Scale Set that<br>powers this Node Pool. Possible values are Regular and Spot.<br>Changing this forces a new resource to be created. | `string` | `"Regular"` | no |
 | spot\_max\_price | The maximum price you're willing to pay in USD per Virtual Machine.<br>Valid values are -1 (the current on-demand price for a Virtual Machine) or a<br>positive value with up to five decimal places.<br>Changing this forces a new resource to be created. | `number` | `null` | no |
 | tags | A mapping of tags which should be assigned to Resource. | `map(string)` | `{}` | no |
-| vm\_size | The SKU which should be used for the Virtual Machines used in this Node Pool.<br>Changing this forces a new resource to be created. | `string` | `"Standard_D2s_v3"` | no |
+| vm\_size | The SKU which should be used for the Virtual Machines used in this Node Pool.<br>Changing this forces a new resource to be created. | `string` | `"Standard_A1_v2"` | no |
 | vnet\_subnet\_id | The ID of the Subnet where this Node Pool should exist.<br>At this time the vnet\_subnet\_id must be the same for all node pools in the cluster. | `string` | `null` | no |
 
 ## Outputs

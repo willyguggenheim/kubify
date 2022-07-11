@@ -1,9 +1,13 @@
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = var.cluster_name
+  name     = "${var.cluster_name}-${var.aks_region}"
   location = var.aks_region
 }
 
@@ -16,9 +20,13 @@ resource "azurerm_resource_group" "rg" {
 # }
 
 module "aks" {
-  source = "../azurerm-aks/"
+  source     = "../azurerm-aks/"
+  aks_region = var.aks_region
 
   name                = var.cluster_name
+  enable_auto_scaling = true
+  sku_tier            = "Free"
+  load_balancer_sku   = "basic"
   resource_group_name = azurerm_resource_group.rg.name
   cluster_name        = var.cluster_name
   dns_prefix          = var.cluster_name
@@ -26,6 +34,7 @@ module "aks" {
   default_pool_name              = "spot"
   enable_log_analytics_workspace = true
 
+  enable_aci_connector_linux      = true
   aci_connector_linux_subnet_name = module.network.vnet_name
 
   node_pools = [
@@ -51,11 +60,11 @@ module "aks" {
 
 module "network" {
   source              = "Azure/network/azurerm"
-  resource_group_name = var.cluster_name
+  resource_group_name = azurerm_resource_group.rg.name
   address_space       = "10.52.0.0/16"
   subnet_prefixes     = ["10.52.0.0/24"]
-  subnet_names        = ["kubify1"]
-  # depends_on          = [azurerm_resource_group.example]
+  subnet_names        = ["kubify-1-${var.aks_region}"]
+  depends_on          = [azurerm_resource_group.rg]
 }
 
 # data "azuread_group" "aks_cluster_admins" {

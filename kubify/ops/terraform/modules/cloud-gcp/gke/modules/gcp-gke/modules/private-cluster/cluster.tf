@@ -339,7 +339,7 @@ resource "google_container_node_pool" "pools" {
       "service_account",
       local.service_account,
     )
-    preemptible = lookup(each.value, "preemptible", false)
+    preemptible = lookup(each.value, "preemptible", true)
 
     oauth_scopes = concat(
       local.node_pools_oauth_scopes["all"],

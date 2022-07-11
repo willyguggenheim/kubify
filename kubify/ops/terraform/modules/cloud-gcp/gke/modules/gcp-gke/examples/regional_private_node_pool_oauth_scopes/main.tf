@@ -36,7 +36,7 @@ module "gke" {
       disk_type          = "pd-ssd"
       auto_repair        = true
       auto_upgrade       = false
-      preemptible        = false
+      preemptible        = true
       initial_node_count = 1
     },
   ]

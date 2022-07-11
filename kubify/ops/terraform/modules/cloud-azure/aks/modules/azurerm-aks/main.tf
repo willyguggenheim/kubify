@@ -1,5 +1,5 @@
 data "azurerm_resource_group" "rg" {
-  name = var.cluster_name
+  name = "${var.cluster_name}-${var.aks_region}"
 }
 
 resource "random_string" "main" {
@@ -20,9 +20,31 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   name                = var.name
   location            = data.azurerm_resource_group.rg.location
-  resource_group_name = var.cluster_name
+  resource_group_name = data.azurerm_resource_group.rg.name
   dns_prefix          = var.dns_prefix
 
+  # Valid fields are:
+  # * vm_size
+  # * availability_zones
+  # * enable_auto_scaling
+  # * enable_host_encryption
+  # * enable_node_public_ip
+  # * eviction_policy
+  # * max_pods
+  # * mode
+  # * node_labels
+  # * node_taints
+  # * orchestrator_version
+  # * os_disk_size_gb
+  # * os_disk_type
+  # * os_type
+  # * priority
+  # * spot_max_price
+  # * tags
+  # * max_count
+  # * min_count
+  # * node_count
+  # * max_surge
   default_node_pool {
     name                         = var.default_pool_name
     vm_size                      = var.vm_size
@@ -37,6 +59,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     os_disk_type                 = var.os_disk_type
     type                         = var.agent_type
     vnet_subnet_id               = var.vnet_subnet_id
+    # spot_max_price               = var.spot_max_price
 
     max_count  = var.enable_auto_scaling == true ? var.max_count : null
     min_count  = var.enable_auto_scaling == true ? var.min_count : null

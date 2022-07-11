@@ -6,10 +6,12 @@
 resource "google_container_cluster" "primary" {
   provider = google-beta
 
-  name            = var.name
-  description     = var.description
-  project         = var.project_id
-  resource_labels = var.cluster_resource_labels
+  name        = var.name
+  description = var.description
+  project     = var.project_id
+  resource_labels = {
+    "kubify" = "true"
+  }
 
   private_cluster_config {
     enable_private_endpoint = false
@@ -279,8 +281,8 @@ resource "google_container_node_pool" "pools" {
 
 
   management {
-    auto_repair  = lookup(each.value, "auto_repair", true)
-    auto_upgrade = lookup(each.value, "auto_upgrade", local.default_auto_upgrade)
+    auto_repair  = true
+    auto_upgrade = true
   }
 
 
