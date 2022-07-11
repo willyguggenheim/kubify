@@ -1,11 +1,11 @@
 import os
 
 
-def delete_file_list(fileList):
+def delete_file_list(file_list):
     # Iterate over the list of filepaths & remove each file.
-    for filePath in fileList:
+    for file_path in file_list:
         try:
-            os.remove(filePath)
+            os.remove(file_path)
         except OSError:
             print("Error while deleting file")
 

@@ -20,13 +20,16 @@ import kubify.src.core.app_constants as app_constants
 import kubify.src.core.logging as my_logging
 import kubify.src.core.file_utils as file_utils
 
+
 def create_work_dirs():
     if not os.path.exists(app_constants.kubify_work):
         os.makedirs(app_constants.kubify_work)
     if not os.path.exists(app_constants.certs_path):
         os.makedirs(app_constants.certs_path)
 
+
 create_work_dirs()
+
 
 my_logging.setup_logger()
 _logger = logging.getLogger()
@@ -39,7 +42,7 @@ def test_logger():
     _logger.error("test logger")
     _logger.critical("test logger")
 
-        
+
 def run_ansible(playbook="sample.yml", uninstall="no", tags=""):
     command_line_args = f"""ansible-playbook \
       --connection=local \
@@ -48,21 +51,18 @@ def run_ansible(playbook="sample.yml", uninstall="no", tags=""):
       --tags="{tags}"
       """
     bash_utils.subprocess_run("ansible", command_line_args)
-    
-
-
 
 
 def clean_secrets(env, app_name):
     # TODO add safety check
-    fileList = glob.glob(f"{app_constants.cloud_formation_path}/*")
-    file_utils.delete_file_list(fileList)
-    fileList = glob.glob(f"{app_constants.secrets_path}/secr*")
-    file_utils.delete_file_list(fileList)
-    fileList = glob.glob(f"{app_constants.secrets_path}/gen-*")
-    file_utils.delete_file_list(fileList)
-    fileList = glob.glob(f"{app_constants.secrets_path}/*.log")
-    file_utils.delete_file_list(fileList)
+    file_list = glob.glob(f"{app_constants.cloud_formation_path}/*")
+    file_utils.delete_file_list(file_list)
+    file_list = glob.glob(f"{app_constants.secrets_path}/secr*")
+    file_utils.delete_file_list(file_list)
+    file_list = glob.glob(f"{app_constants.secrets_path}/gen-*")
+    file_utils.delete_file_list(file_list)
+    file_list = glob.glob(f"{app_constants.secrets_path}/*.log")
+    file_utils.delete_file_list(file_list)
 
 
 def service_setup_secrets(env):
@@ -201,7 +201,7 @@ def test_or_create_s3_artifacts_bucket(
     print(
         "checking access to artifacts s3 bucket to exist, creating it (with encryption at rest enabled) if it does not exist.."
     )
-    s3 = s3_utils()
+    s3 = s3_utils.S3Utils()
     bucket = s3.get_bucket(bucket_name)
     if bucket:
         print("success: s3 bucket access working")
@@ -249,6 +249,7 @@ def test_or_create_s3_artifacts_bucket(
             )
         print("s3 bucket replication, versioning and security set")
 
+
 def set_context_kind_kind():
     k8s_utils.set_context_kind_kind()
 
@@ -256,9 +257,11 @@ def set_context_kind_kind():
 def get_entrypoint():
     k8s_utils.get_entrypoint()
 
+
 def get_service_pod(pod_name):
     k8s_utils.get_service_pod(pod_name)
 
+
 if __name__ == "__main__":
-    k8s_utils = k8s_utils()
+    k8s_utils = k8s_utils.K8SUtils()
     os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"

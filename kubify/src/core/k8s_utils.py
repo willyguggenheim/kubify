@@ -9,7 +9,7 @@ from pick import pick  # install pick using `pip install pick`
 from functools import partial
 
 
-class k8s_utils:
+class K8SUtils:
     configuration = kubernetes.client.Configuration()
     # Configure API key authorization: BearerToken
     configuration.api_key["authorization"] = "YOUR_API_KEY"
@@ -96,7 +96,7 @@ class k8s_utils:
 
         return api_client2
 
-    def set_context_kind_kind(self): 
+    def set_context_kind_kind(self):
         # check if exists if not create
         # kind no python sdk so use subprocess
         contexts, active_context = config.list_kube_config_contexts()

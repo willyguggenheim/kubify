@@ -22,7 +22,7 @@ from z2jh import (
 )
 
 
-def camelCaseify(s):
+def camel_caseify(s):
     """convert snake_case to camelCase
 
     For the common case where some_value is set from someValue
@@ -90,7 +90,7 @@ for trait, cfg_key in (
     ("template_vars", None),
 ):
     if cfg_key is None:
-        cfg_key = camelCaseify(trait)
+        cfg_key = camel_caseify(trait)
     set_config_if_not_none(c.JupyterHub, trait, "hub." + cfg_key)
 
 # hub_bind_url configures what the JupyterHub process within the hub pod's
@@ -168,7 +168,7 @@ for trait, cfg_key in (
     ("extra_pod_config", None),
 ):
     if cfg_key is None:
-        cfg_key = camelCaseify(trait)
+        cfg_key = camel_caseify(trait)
     set_config_if_not_none(c.KubeSpawner, trait, "singleuser." + cfg_key)
 
 image = get_config("singleuser.image.name")

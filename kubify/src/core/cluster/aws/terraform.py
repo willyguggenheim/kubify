@@ -12,7 +12,7 @@ def subprocess_cmd(command):
     return output
 
 
-def getClusters():
+def get_clusters():
     # return json.loads(subprocess_cmd("make eks-list-json"))
     return eks_cli.list_clusters()
 
@@ -26,16 +26,16 @@ def print_clusters(clusters):
         )
 
 
-def createListOfClusterName():
-    clusterNameList = []
-    clusters = getClusters()
+def create_list_of_cluster_name():
+    cluster_name_list = []
+    clusters = get_clusters()
     for i in clusters:
-        clusterNameList.append(i["name"])
-    return clusterNameList
+        cluster_name_list.append(i["name"])
+    return cluster_name_list
 
 
-def checkCluster(name, region):
-    clusters = getClusters()
+def check_cluster(name, region):
+    clusters = get_clusters()
     # print(clusters)
     f = True
     for i in clusters:
@@ -49,12 +49,12 @@ def checkCluster(name, region):
     return f
 
 
-def createCluster():
+def create_cluster():
 
-    clusterName = input("Enter cluster name : ")
-    clusterRegion = input("Enter cluster region : ")
+    cluster_name = input("Enter cluster name : ")
+    cluster_region = input("Enter cluster region : ")
 
-    if checkCluster(clusterName, clusterRegion) == False:
+    if check_cluster(cluster_name, cluster_region) == False:
 
         print("Cluster is there change name or region to proceed forward")
 
@@ -75,16 +75,16 @@ print("2) for create cluster ")
 user_input = input("select operation ")
 print(type(user_input))
 if user_input == 1:
-    clusters = getClusters()
+    clusters = get_clusters()
     print_clusters(clusters)
 
 elif user_input == 2:
-    createCluster()
+    create_cluster()
 
 
 """
-clusterName = input("Enter cluster name : ")
-clusterRegion = input("Enter cluster region : ")
-out = checkCluster(clusterName, clusterRegion)
+cluster_name = input("Enter cluster name : ")
+cluster_region = input("Enter cluster region : ")
+out = check_cluster(cluster_name, cluster_region)
 print(out)
 """
