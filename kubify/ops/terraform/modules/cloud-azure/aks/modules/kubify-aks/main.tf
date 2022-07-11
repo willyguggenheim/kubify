@@ -19,6 +19,8 @@ module "aks" {
   source = "../azurerm-aks/"
 
   name                = var.cluster_name
+  enable_auto_scaling = true
+  sku_tier            = "Free"
   resource_group_name = azurerm_resource_group.rg.name
   cluster_name        = var.cluster_name
   dns_prefix          = var.cluster_name

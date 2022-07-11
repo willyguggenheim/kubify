@@ -114,10 +114,10 @@ clouds-reset:
 	make cloud-delete cloud=azure env=dev && make cloud-delete cloud=azure env=stage
 	make clouds
 
-clouds-delete-nonprod:
-	make cloud-delete cloud=aws env=dev && make cloud-delete cloud=aws env=stage
-	make cloud-delete cloud=gcp env=dev && make cloud-delete cloud=gcp env=stage
-	make cloud-delete cloud=azure env=dev && make cloud-delete cloud=azure env=stage
+clouds-delete-dev:
+	make cloud-delete cloud=aws env=dev
+	make cloud-delete cloud=gcp env=dev
+	make cloud-delete cloud=azure env=dev
 
 cloud-delete: #clouds reset nonprod envs
 	echo "deleting cloud env $$env"

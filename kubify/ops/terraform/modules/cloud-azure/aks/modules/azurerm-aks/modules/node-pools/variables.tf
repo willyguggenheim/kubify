@@ -23,7 +23,7 @@ The SKU which should be used for the Virtual Machines used in this Node Pool.
 Changing this forces a new resource to be created.
 EOT
   type        = string
-  default     = "Standard_D2s_v3"
+  default     = "Standard_A1_v2"
 }
 
 variable "availability_zones" {
@@ -250,7 +250,7 @@ Valid fields are:
 * os_disk_type
 * os_type
 * priority
-* spto_max_price
+* spot_max_price
 * tags
 * max_count
 * min_count

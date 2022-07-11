@@ -62,8 +62,21 @@ EOT
 variable "vm_size" {
   description = "The size of the Virtual Machine, such as Standard_DS2_v2."
   type        = string
-  default     = "Standard_D2s_v3"
+  default     = "Standard_A1_v2"
 }
+
+variable "spot_max_price" {
+  description = <<EOT
+The maximum price you're willing to pay in USD per Virtual Machine.
+Valid values are -1 (the current on-demand price for a Virtual Machine) or a
+positive value with up to five decimal places.
+Changing this forces a new resource to be created.
+EOT
+  type        = number
+  default     = "0.01" # as a1v2 is $0.009 per hour on spot
+}
+
+
 
 variable "availability_zones" {
   description = <<EOT
@@ -597,7 +610,7 @@ Valid fields are:
 * os_disk_type
 * os_type
 * priority
-* spto_max_price
+* spot_max_price
 * tags
 * max_count
 * min_count

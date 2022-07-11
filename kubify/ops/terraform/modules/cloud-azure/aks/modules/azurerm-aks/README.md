@@ -130,7 +130,7 @@ module "aks" {
 | sku\_tier | The SKU Tier that should be used for this Kubernetes Cluster.<br>Possible values are Free and Paid (which includes the Uptime SLA). | `string` | `"Free"` | no |
 | tags | A mapping of tags which should be assigned to Resources. | `map(string)` | `{}` | no |
 | user\_assigned\_identity\_id | The ID of a user assigned identity. | `string` | `""` | no |
-| vm\_size | The size of the Virtual Machine, such as Standard\_DS2\_v2. | `string` | `"Standard_D2s_v3"` | no |
+| vm\_size | The size of the Virtual Machine, such as Standard\_DS2\_v2. | `string` | `"Standard_A1_v2"` | no |
 | vnet\_subnet\_id | The ID of a Subnet where the Kubernetes Node Pool should exist.<br>Changing this forces a new resource to be created. | `string` | `null` | no |
 
 ## Outputs
