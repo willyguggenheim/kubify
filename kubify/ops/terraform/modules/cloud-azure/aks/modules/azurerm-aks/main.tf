@@ -1,5 +1,5 @@
 data "azurerm_resource_group" "rg" {
-  name = var.cluster_name
+  name = "${var.cluster_name}-${var.aks_region}"
 }
 
 resource "random_string" "main" {
@@ -20,7 +20,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   name                = var.name
   location            = data.azurerm_resource_group.rg.location
-  resource_group_name = var.cluster_name
+  resource_group_name = data.azurerm_resource_group.rg.name
   dns_prefix          = var.dns_prefix
 
   # Valid fields are:

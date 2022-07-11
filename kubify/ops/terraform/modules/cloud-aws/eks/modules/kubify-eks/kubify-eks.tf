@@ -233,12 +233,12 @@ module "vpc" {
   version = "~> 3.0"
 
   name = local.name
-  cidr = "10.0.0.0/16"
+  cidr = "10.15.0.0/16"
 
   azs             = ["${local.region}b", "${local.region}c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
-  intra_subnets   = ["10.0.7.0/28", "10.0.7.16/28", "10.0.7.32/28"]
+  private_subnets = ["10.15.1.0/24", "10.15.2.0/24"]
+  public_subnets  = ["10.15.4.0/24", "10.15.5.0/24"]
+  intra_subnets   = ["10.15.7.0/28", "10.15.7.16/28"]
 
   enable_nat_gateway   = true
   single_nat_gateway   = true
