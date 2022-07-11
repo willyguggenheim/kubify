@@ -18,9 +18,11 @@ resource "azurerm_resource_group" "rg" {
 module "aks" {
   source = "../azurerm-aks/"
 
+
   name                = var.cluster_name
   enable_auto_scaling = true
   sku_tier            = "Free"
+  load_balancer_sku   = "basic"
   resource_group_name = azurerm_resource_group.rg.name
   cluster_name        = var.cluster_name
   dns_prefix          = var.cluster_name
@@ -28,6 +30,7 @@ module "aks" {
   default_pool_name              = "spot"
   enable_log_analytics_workspace = true
 
+  enable_aci_connector_linux      = true
   aci_connector_linux_subnet_name = module.network.vnet_name
 
   node_pools = [
@@ -57,7 +60,7 @@ module "network" {
   address_space       = "10.52.0.0/16"
   subnet_prefixes     = ["10.52.0.0/24"]
   subnet_names        = ["kubify1"]
-  # depends_on          = [azurerm_resource_group.example]
+  depends_on          = [azurerm_resource_group.rg]
 }
 
 # data "azuread_group" "aks_cluster_admins" {

@@ -103,21 +103,25 @@ fix:
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
 
-clouds:
-	make cloud-create cloud=aws env=dev && make cloud-create cloud=aws env=stage
-	make cloud-create cloud=gcp env=dev && make cloud-create cloud=gcp env=stage
-	make cloud-create cloud=azure env=dev && make cloud-create cloud=azure env=stage
+clouds: # install AWS, GCP and Azure clouds in parallel (fastest)
+	make cloud-create env=dev
 
-clouds-reset:
-	make cloud-delete cloud=aws env=dev && make cloud-delete cloud=aws env=stage
-	make cloud-delete cloud=gcp env=dev && make cloud-delete cloud=gcp env=stage
-	make cloud-delete cloud=azure env=dev && make cloud-delete cloud=azure env=stage
-	make clouds
+clouds-delete:
+	make cloud-delete env=dev
 
-clouds-delete-dev:
-	make cloud-delete cloud=aws env=dev
-	make cloud-delete cloud=gcp env=dev
-	make cloud-delete cloud=azure env=dev
+clouds-auth: # make cloud-auth env=dev
+	aws eks-update-kubeconfig --name "kubify-$$env" --region us-west-2
+	kubectl cluster-info
+	aws eks-update-kubeconfig --name "kubify-$$env" --region us-east-1
+	kubectl cluster-info
+	gcloud container clusters get-credentials "kubify-$$env" --region us-west2 --project "kubify-os"
+	kubectl cluster-info
+	gcloud container clusters get-credentials "kubify-$$env" --region us-east1 --project "kubify-os"
+	kubectl cluster-info
+	az aks get-credentials --resource-group "kubify-$$env" --name "kubify-$$env" --admin --region "westus"
+	kubectl cluster-info
+	az aks get-credentials --resource-group "kubify-$$env" --name "kubify-$$env" --admin --region "eastus"
+	kubectl cluster-info
 
 cloud-delete: #clouds reset nonprod envs
 	echo "deleting cloud env $$env"
@@ -131,7 +135,7 @@ cloud-delete: #clouds reset nonprod envs
 	export state_name="kubify-$$env-tf-state-$(aws_account_id_for_state)" && \
 		cd ./kubify/ops/terraform && \
 		terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && \
-		terraform destroy --target=module.$$cloud --var="cluster_name=kubify-$$env"
+		terraform destroy --var="cluster_name=kubify-$$env"
 
 cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|prod])
 	echo "creating cloud env $$env"
@@ -150,7 +154,45 @@ cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|
 		aws dynamodb describe-table --table-name $$state_name   >/dev/null ||  aws dynamodb create-table --table-name $$state_name --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1 && \
 		cd ./kubify/ops/terraform && \
 		terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && \
-		terraform apply --target=module.$$cloud --var="cluster_name=kubify-$$env"
+		terraform apply --var="cluster_name=kubify-$$env" || terraform state rm module.aws.module.eks-dr-us-east-1.module.eks.kubernetes_config_map_v1_data.aws_auth
+
+# clouds-select-cloud: # create 1 cloud at a time (or comment out cloud types that you don't use)
+# 	make cloud-create cloud=aws env=dev
+# 	make cloud-create cloud=gcp env=dev
+# 	make cloud-create cloud=azure env=dev
+
+# cloud-delete-select-cloud: #clouds reset nonprod envs
+# 	echo "deleting cloud env $$env"
+# 	gcloud config set project kubify-os || gcloud auth application-default login
+# 	gcloud config set project kubify-os
+# 	aws sts get-caller-identity >/dev/null || aws configure
+# 	az ad signed-in-user list-owned-objects >/dev/null || az login
+# 	az ad signed-in-user list-owned-objects >/dev/null || az login
+# 	tfenv install v1.2.4 >/dev/null
+# 	tfenv use v1.2.4
+# 	export state_name="kubify-$$env-tf-state-$(aws_account_id_for_state)" && \
+# 		cd ./kubify/ops/terraform && \
+# 		terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && \
+# 		terraform destroy --target=module.$$cloud --var="cluster_name=kubify-$$env"
+
+# cloud-create-select-cloud: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|prod])
+# 	echo "creating cloud env $$env"
+# 	tfsec
+# 	terraform fmt --recursive
+# 	gcloud config set project kubify-os || gcloud auth application-default login
+# 	gcloud config set project kubify-os
+# 	aws sts get-caller-identity >/dev/null || aws configure
+# 	az ad signed-in-user list-owned-objects >/dev/null || az login
+# 	az ad signed-in-user list-owned-objects >/dev/null || az login
+# 	tfenv install v1.2.4 >/dev/null
+# 	tfenv use v1.2.4
+# 	export state_name="kubify-$$env-tf-state-$(aws_account_id_for_state)" && \
+# 		aws s3 ls s3://$$state_name || aws s3api create-bucket --bucket $$state_name --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1 && \
+# 		aws s3api put-bucket-encryption --bucket $$state_name --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}" && \
+# 		aws dynamodb describe-table --table-name $$state_name   >/dev/null ||  aws dynamodb create-table --table-name $$state_name --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1 && \
+# 		cd ./kubify/ops/terraform && \
+# 		terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && \
+# 		terraform apply --target=module.$$cloud --var="cluster_name=kubify-$$env"
 
 docker:
 	docker build . -t kubify:latest
