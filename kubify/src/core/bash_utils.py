@@ -7,14 +7,14 @@ _logger = logging.getLogger()
 
 def log_subprocess_output(name, pipe):
     for line in iter(pipe.readline, b""):  # b'\n'-separated lines
-        logging.trace(
+        logging.debug(
             f"{name}: {line}",
         )
 
 
 def subprocess_run(name, command):
-    process = Popen(command, stdout=PIPE, stderr=STDOUT)
+    process = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True)
     with process.stdout:
-        log_subprocess_output(process.stdout)
+        log_subprocess_output(name, process.stdout)
     exitcode = process.wait()
     return exitcode

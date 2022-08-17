@@ -20,7 +20,7 @@ import kubify.src.core.app_constants as app_constants
 import kubify.src.core.logging as my_logging
 import kubify.src.core.file_utils as file_utils
 
-
+# do this before logging for log file to be in work dir
 def create_work_dirs():
     if not os.path.exists(app_constants.kubify_work):
         os.makedirs(app_constants.kubify_work)
@@ -42,6 +42,8 @@ def test_logger():
     _logger.error("test logger")
     _logger.critical("test logger")
 
+kubify_utils = k8s_utils.K8SUtils()
+os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
 
 def run_ansible(playbook="sample.yml", uninstall="no", tags=""):
     command_line_args = f"""ansible-playbook \
@@ -251,17 +253,19 @@ def test_or_create_s3_artifacts_bucket(
 
 
 def set_context_kind_kind():
-    k8s_utils.set_context_kind_kind()
+    kubify_utils.set_context_kind_kind()
 
 
 def get_entrypoint():
-    k8s_utils.get_entrypoint()
+    kubify_utils.get_entrypoint()
 
+def build_entrypoint():
+    kubify_utils.build_entrypoint()
 
 def get_service_pod(pod_name):
-    k8s_utils.get_service_pod(pod_name)
+    kubify_utils.get_service_pod(pod_name)
 
 
-if __name__ == "__main__":
-    k8s_utils = k8s_utils.K8SUtils()
-    os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
+# if __name__ == "__main__":
+#     k8s_utils = k8s_utils.K8SUtils()
+#     os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"

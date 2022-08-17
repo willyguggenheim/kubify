@@ -25,6 +25,7 @@ requirements = [
     "aws_utils",
     "cv-pytorch",
     "ansible",
+    "docker",
 ]
 
 test_requirements = [

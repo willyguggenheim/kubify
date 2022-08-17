@@ -5,6 +5,7 @@ env = "dev"
 app_name = "kubify"
 # cwd = os.path.dirname(__file__)
 cwd = Path(".")
+# what is this for?
 root_dir = os.path.join(*[cwd, "..", ".."])
 home = str(Path.home())
 kubify_work = os.path.join(*[home, "kubify_work"])
@@ -20,3 +21,6 @@ config_file = f"{config_path}/config.{env}.enc.yaml"
 #
 ops_dir = os.path.join(*[cwd, "..", "..", "ops"])
 ansible_dir = os.path.join(*[ops_dir, "ansible"])
+
+def get_project_root_dir():
+    return os.path.abspath(cwd)
