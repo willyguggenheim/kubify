@@ -5,18 +5,23 @@ import sys
 import kubify.src.kubify as kubify
 
 
+parser = argparse.ArgumentParser(description="CLI for kubify")
+parser.add_argument("--test_logger", action='store_true', help="tests logging to logging dir")
+parser.add_argument("--create_work_dirs", action='store_true', help="in users home kubify directory")
+parser.add_argument(
+    "--set_context_kind_kind", action='store_true', help="sets the kuberenetes context to kind"
+)
+parser.add_argument(
+    "--test_or_create_s3_artifacts_bucket", action='store_true',
+    help="sets the s3 bucket for state file for terraform",
+)
+parser.add_argument("--get_entrypoint", action='store_true', help="gets the entrypoint pod")
+parser.add_argument("--get_service_pod", action='store_true', help="gets the get_service_pod")
+parser.add_argument("--build_entrypoint", action='store_true', help="builds the entrybpoint docker image")
 
-parser = argparse.ArgumentParser(description='CLI for kubify')
-parser.add_argument('--test_logger',  help='tests logging to logging dir')
-parser.add_argument('--create_work_dirs', help='in users home kubify directory')
-parser.add_argument('--set_context_kind_kind', help='sets the kuberenetes context to kind')
-parser.add_argument('--test_or_create_s3_artifacts_bucket', help='sets the s3 bucket for state file for terraform')
-parser.add_argument('--get_entrypoint', help='gets the entrypoint pod')
-parser.add_argument('--get_service_pod', help='gets the get_service_pod')
-   
 if len(sys.argv) <= 1:
-    sys.argv.append('--help')
-    
+    sys.argv.append("--help")
+
 args = parser.parse_args()
 
 if args.test_logger:
@@ -26,11 +31,14 @@ if args.create_work_dirs:
 if args.set_context_kind_kind:
     kubify.set_context_kind_kind()
 if args.test_or_create_s3_artifacts_bucket:
+    # this is currently done via the make file
     kubify.test_or_create_s3_artifacts_bucket()
 if args.get_entrypoint:
     kubify.get_entrypoint()
 if args.get_service_pod:
     kubify.get_service_pod()
+if args.build_entrypoint:
+    kubify.build_entrypoint()
     
 print("Replace this message by putting your code into " "kubify.cli.main")
 

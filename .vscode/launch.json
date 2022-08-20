@@ -12,12 +12,19 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Python: debug",
+            "name": "Python: debug test_logger",
             "type": "python",
             "request":"launch",
             "cwd": "${workspaceFolder}",
             "program":"kubify/cli.py",
-            "args": ["--test_logger", "debug"],
+            "args": [
+                // "--test_logger", 
+                // "--set_context_kind_kind",
+                // "--create_work_dirs",
+                // "--get_entrypoint",
+                // "--get_service_pod",
+                "--build_entrypoint",
+            ],
             "console":"integratedTerminal",
             "envFile": "${workspaceFolder}/.env"
         },

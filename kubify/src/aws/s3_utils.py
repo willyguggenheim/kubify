@@ -2,7 +2,7 @@ import boto3
 import botocore
 
 
-class s3_utils:
+class S3Utils:
     def __init__(self):
         self.client = boto3.resource("s3")
 
