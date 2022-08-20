@@ -99,6 +99,11 @@ fix:
 	black ./kubify
 	terraform fmt --recursive
 
+rapid:
+	git commit -m "wip" && git push
+	bump2version patch
+	git push
+	git push --tags
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
 

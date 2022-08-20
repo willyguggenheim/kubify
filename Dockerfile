@@ -1,3 +1,11 @@
+#########
+## Base Image
+#  1) The Entire Kubify Now Runs In 1 Docker Image and Has Option For Local Installer As Well
+#  2) Also Default Docker Image Used On New CookieCutter Services Created With Kubify Services Commands
+#  3) Also for the CICD to Build PyPi Package and Push To PyPi
+#  4) Also for the CICD to Build Docker Image and Push To Docker Hub
+#########
+
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/doc/supported-tags.md
 FROM nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04
 
