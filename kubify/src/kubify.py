@@ -2,23 +2,22 @@
 
 import os
 import os.path
-import shutil
 import glob
-import subprocess
 import boto3
 import logging
-from subprocess import Popen, PIPE, STDOUT
+from collections import namedtuple
 import kubify
-
 
 import kubify.src.aws_constants as aws_constants
 import kubify.src.aws.s3_utils as s3_utils
 import kubify.src.core.k8s_utils as k8s_utils
-import kubify.src.core.bash_utils as bash_utils
 
 import kubify.src.core.app_constants as app_constants
 import kubify.src.core.logging as my_logging
 import kubify.src.core.file_utils as file_utils
+
+from ansible.executor.playbook_executor import PlaybookExecutor, Options
+
 
 # do this before logging for log file to be in work dir
 def create_work_dirs():
@@ -42,17 +41,26 @@ def test_logger():
     _logger.error("test logger")
     _logger.critical("test logger")
 
+
 kubify_utils = k8s_utils.K8SUtils()
 os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
 
-def run_ansible(playbook="sample.yml", uninstall="no", tags=""):
-    command_line_args = f"""ansible-playbook \
-      --connection=local \
-      --inventory=127.0.0.1, "{app_constants.ansible_dir}/env.yaml" \
-      --extra-vars="aws_profile={aws_constants.AWS_PROFILE} src_dir={app_constants.ops_dir} env={app_constants.env} kubify_dir={app_constants.kubify_work} undeploy_env={uninstall}" \
-      --tags="{tags}"
-      """
-    bash_utils.subprocess_run("ansible", command_line_args)
+# TODO: also needs uninstall ("undeploy") for reset
+def run_ansible(
+    playbooks=["../ops/ansible/install_kubify_on_mac.yaml"],
+    uninstall="no",
+    tags=["aws"],
+):
+    Options = namedtuple("Options", [])
+    options = Options(verbosity=None, check=False, tags=tags)
+    PlaybookExecutor(
+        playbooks=playbooks,
+        inventory=None,
+        variable_manager=None,
+        loader=None,
+        options=options,
+        passwords=None,
+    ).run()
 
 
 def clean_secrets(env, app_name):
@@ -259,8 +267,10 @@ def set_context_kind_kind():
 def get_entrypoint():
     kubify_utils.get_entrypoint()
 
+
 def build_entrypoint():
     kubify_utils.build_entrypoint()
+
 
 def get_service_pod(pod_name):
     kubify_utils.get_service_pod(pod_name)

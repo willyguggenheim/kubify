@@ -6,18 +6,33 @@ import kubify.src.kubify as kubify
 
 
 parser = argparse.ArgumentParser(description="CLI for kubify")
-parser.add_argument("--test_logger", action='store_true', help="tests logging to logging dir")
-parser.add_argument("--create_work_dirs", action='store_true', help="in users home kubify directory")
 parser.add_argument(
-    "--set_context_kind_kind", action='store_true', help="sets the kuberenetes context to kind"
+    "--test_logger", action="store_true", help="tests logging to logging dir"
 )
 parser.add_argument(
-    "--test_or_create_s3_artifacts_bucket", action='store_true',
+    "--create_work_dirs", action="store_true", help="in users home kubify directory"
+)
+parser.add_argument(
+    "--set_context_kind_kind",
+    action="store_true",
+    help="sets the kuberenetes context to kind",
+)
+parser.add_argument(
+    "--test_or_create_s3_artifacts_bucket",
+    action="store_true",
     help="sets the s3 bucket for state file for terraform",
 )
-parser.add_argument("--get_entrypoint", action='store_true', help="gets the entrypoint pod")
-parser.add_argument("--get_service_pod", action='store_true', help="gets the get_service_pod")
-parser.add_argument("--build_entrypoint", action='store_true', help="builds the entrybpoint docker image")
+parser.add_argument(
+    "--get_entrypoint", action="store_true", help="gets the entrypoint pod"
+)
+parser.add_argument(
+    "--get_service_pod", action="store_true", help="gets the get_service_pod"
+)
+parser.add_argument(
+    "--build_entrypoint",
+    action="store_true",
+    help="builds the entrybpoint docker image",
+)
 
 if len(sys.argv) <= 1:
     sys.argv.append("--help")
@@ -39,7 +54,7 @@ if args.get_service_pod:
     kubify.get_service_pod()
 if args.build_entrypoint:
     kubify.build_entrypoint()
-    
+
 print("Replace this message by putting your code into " "kubify.cli.main")
 
 

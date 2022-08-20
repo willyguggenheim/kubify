@@ -22,5 +22,6 @@ config_file = f"{config_path}/config.{env}.enc.yaml"
 ops_dir = os.path.join(*[cwd, "..", "..", "ops"])
 ansible_dir = os.path.join(*[ops_dir, "ansible"])
 
+
 def get_project_root_dir():
     return os.path.abspath(cwd)
