@@ -41,15 +41,27 @@ def test_logger():
     _logger.error("test logger")
     _logger.critical("test logger")
 
+
 kubify_utils = k8s_utils.K8SUtils()
 os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
 
 # TODO: also needs uninstall ("undeploy") for reset
-def run_ansible(playbooks=["../ops/ansible/install_kubify_on_mac.yaml"], uninstall="no", tags=["aws"]):
-    Options = namedtuple('Options', [])
-    options = Options(verbosity=None, check=False,tags=tags)
-    PlaybookExecutor(playbooks=playbooks, inventory=None, variable_manager=None, loader=None, options=options, passwords=None).run()
-    
+def run_ansible(
+    playbooks=["../ops/ansible/install_kubify_on_mac.yaml"],
+    uninstall="no",
+    tags=["aws"],
+):
+    Options = namedtuple("Options", [])
+    options = Options(verbosity=None, check=False, tags=tags)
+    PlaybookExecutor(
+        playbooks=playbooks,
+        inventory=None,
+        variable_manager=None,
+        loader=None,
+        options=options,
+        passwords=None,
+    ).run()
+
 
 def clean_secrets(env, app_name):
     # TODO add safety check
@@ -255,8 +267,10 @@ def set_context_kind_kind():
 def get_entrypoint():
     kubify_utils.get_entrypoint()
 
+
 def build_entrypoint():
     kubify_utils.build_entrypoint()
+
 
 def get_service_pod(pod_name):
     kubify_utils.get_service_pod(pod_name)

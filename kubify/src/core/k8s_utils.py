@@ -13,6 +13,7 @@ import kubify.src.core.app_constants as app_constants
 
 _logger = logging.getLogger()
 
+
 class K8SUtils:
     configuration = kubernetes.client.Configuration()
     # Configure API key authorization: BearerToken
@@ -66,7 +67,7 @@ class K8SUtils:
         # $ kubectl config view -o jsonpath='{.contexts[*].name}'
         # $ echo $?
         # 0
-        # "kubectl --namespace default rollout status -w deployment/entrypoint 
+        # "kubectl --namespace default rollout status -w deployment/entrypoint
         #   $KUBECTL_NS rollout status -w deployment/entrypoint &> /dev/null
         #   echo $(${KUBECTL_NS} get pods -o wide --field-selector=status.phase=Running -l role=entrypoint --no-headers | cut -d ' ' -f1 | head -n 1)
         deployment_name = "deployment/entrypoint"
@@ -77,12 +78,15 @@ class K8SUtils:
             pprint(api_response)
             return api_response
         except ApiException as e:
-            print(f"ApiException when calling AppsV1Api->read_namespaced_deployment_status: {e}")
+            print(
+                f"ApiException when calling AppsV1Api->read_namespaced_deployment_status: {e}"
+            )
             return None
         except Exception as e:
-            print(f"Exception when calling AppsV1Api->read_namespaced_deployment_status: {e}")
+            print(
+                f"Exception when calling AppsV1Api->read_namespaced_deployment_status: {e}"
+            )
             return None
-
 
     def set_context_get_client(self, context_name="default"):
         contexts, active_context = config.list_kube_config_contexts()
@@ -115,11 +119,15 @@ class K8SUtils:
         _logger.debug(f"set_context_kind_kind {contexts} {active_context}")
         if not contexts:
             _logger.warn("Cannot find any context in kube-config file.")
-            raise(Exception("Cannot find any context in kube-config file."))
+            raise (Exception("Cannot find any context in kube-config file."))
         _logger.debug(f"set_context_kind_kind reduce contexts to names")
         contexts = [context["name"] for context in contexts]
         if "kind-kind" not in contexts:
-            raise(Exception("kind-kind context not found, you need to install kind-kind, this should already be installed!?!"))
+            raise (
+                Exception(
+                    "kind-kind context not found, you need to install kind-kind, this should already be installed!?!"
+                )
+            )
         _logger.debug(f"set_context_kind_kind check if active_context is kind-kind")
         if active_context["name"] != "kind-kind":
             _logger.info(f"set_context_kind_kind setting active_context to kind-kind")
