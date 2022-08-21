@@ -6,18 +6,21 @@ import glob
 import boto3
 import logging
 from collections import namedtuple
+from pathlib import Path
 import kubify
 
 import kubify.src.aws_constants as aws_constants
 import kubify.src.aws.s3_utils as s3_utils
 import kubify.src.core.k8s_utils as k8s_utils
+import kubify.src.core.git_utils as git_utils
+import kubify.src.core.certs as certs
 
 import kubify.src.core.app_constants as app_constants
 import kubify.src.core.logging as my_logging
 import kubify.src.core.file_utils as file_utils
 
 from ansible.executor.playbook_executor import PlaybookExecutor, Options
-
+import docker
 
 # do this before logging for log file to be in work dir
 def create_work_dirs():
@@ -44,6 +47,64 @@ def test_logger():
 
 kubify_utils = k8s_utils.K8SUtils()
 os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
+
+KUBIFY_DEBUG = True
+KUBIFY_OUT = "/dev/null"
+ANSIBLE_VERBOSITY=1
+
+def read_flag_verbose():
+    if KUBIFY_DEBUG:
+        # set -o xtrace
+        ANSIBLE_VERBOSITY=4
+        KUBIFY_OUT="/dev/stdout"
+    else:
+        ANSIBLE_VERBOSITY=1
+        KUBIFY_OUT="/dev/null"
+    os.environ['ANSIBLE_VERBOSITY']=ANSIBLE_VERBOSITY
+
+        
+def kubify_version():
+    return git_utils.git_version()
+
+
+def generate_certs():
+    path = Path(f'{app_constants.kubify_work}//certs/ca.key')
+    if not path.is_file():
+        logging.info("generating ca.key")
+        # TODO fix this
+        certs.create_signed_cert(cn="www.kubify.com")
+
+        
+def build_image(image_name, src_path):
+    client = docker.from_env()
+    client.images.build(
+        path = src_path,
+        tag=f'{image_name}:latest',
+    )
+
+
+def get_service_pod(APP_NAME):
+    # timeout 10 ${KUBECTL_NS} rollout status -w deployment/${APP_NAME} &> /dev/null
+    # echo $(${KUBECTL_NS} get pods -o wide --field-selector=status.phase=Running -l app=${APP_NAME} --no-headers | cut -d ' ' -f1 | head -n 1)
+    pass 
+
+
+# def update_registry_secret():    
+# def update_npm_secret():
+# def get_npm_secret_direct
+# def get_npm_secret
+
+# def generate_local_cluster_cert():
+#     docker run -e COMMON_NAME="*.${KUBIFY_LOCAL_DOMAIN}" -v "${WORK_DIR}/certs:/certs" -w /certs -it alpine:latest sh -c ./gen-certs.sh
+
+def debug():
+    logging.info("!!ALL THE kube-system NAMESPACE OBJECTS:")
+    # $KUBECTL api-resources --verbs=list --namespaced -o name | xargs -n 1 $KUBECTL get --show-kind --ignore-not-found -n kube-system
+    logging.info("!!ALL THE kubify NAMESPACE OBJECTS:")
+    # $KUBECTL api-resources --verbs=list --namespaced -o name | xargs -n 1 $KUBECTL get --show-kind --ignore-not-found -n demo
+    
+def configure_cluster():
+    pass
 
 # TODO: also needs uninstall ("undeploy") for reset
 def run_ansible(

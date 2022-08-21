@@ -26,6 +26,8 @@ requirements = [
     "cv-pytorch",
     "ansible",
     "docker",
+    "pyopenssl",
+    "GitPython"
 ]
 
 test_requirements = [
