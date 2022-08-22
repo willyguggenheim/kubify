@@ -27,7 +27,9 @@ requirements = [
     "ansible",
     "docker",
     "pyopenssl",
-    "GitPython"
+    "GitPython",
+    "pykube-ng",
+    "google-auth"
 ]
 
 test_requirements = [

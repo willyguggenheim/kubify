@@ -19,6 +19,7 @@ import kubify.src.core.app_constants as app_constants
 import kubify.src.core.logging as my_logging
 import kubify.src.core.file_utils as file_utils
 
+import kubify.src.core.cluster.local.kind as kind
 from ansible.executor.playbook_executor import PlaybookExecutor, Options
 import docker
 
@@ -99,12 +100,89 @@ def get_service_pod(APP_NAME):
 
 def debug():
     logging.info("!!ALL THE kube-system NAMESPACE OBJECTS:")
+    kind.get_api_resources()
     # $KUBECTL api-resources --verbs=list --namespaced -o name | xargs -n 1 $KUBECTL get --show-kind --ignore-not-found -n kube-system
     logging.info("!!ALL THE kubify NAMESPACE OBJECTS:")
     # $KUBECTL api-resources --verbs=list --namespaced -o name | xargs -n 1 $KUBECTL get --show-kind --ignore-not-found -n demo
     
 def configure_cluster():
-    pass
+    MANIFESTS=f"{app_constants.k8s_path}"
+    TILLERLESS=os.environ.get("TILLERLESS",False)
+    UPSTREAM=os.environ.get("UPSTREAM",False)
+    if TILLERLESS:
+        TILLER="tiller run helm"
+    else:
+        TILLER=""
+    logging.info("Configuring cluster")
+    logging.info("Printing Kind K8s Cluster ID..")
+    logging.info("Kubernetes Cluster ID ->")
+    
+    k8s_cluster_id=kind.get_cluster_id() #`kubectl get ns kube-system -o=jsonpath='{.metadata.uid}'`
+    logging.info(f"{k8s_cluster_id}")
+    logging.info("<-")
+    logging.info(f"""
+      Go to https://license-issuer.appscode.com 
+      Register for a license for KubeDB Product 
+      Choose 'KubeDB Community Edition'
+      Put in the kubernetes cluster ID: {k8s_cluster_id}
+      After receiving license in email from registering
+      Copy the license file to ~/kubify/kubedb.txt
+      IMPORTANT NOTE: DO NOT SKIP THIS STEP (unless you are in-place re-installing on existing kind cluster)
+        BUT WHY: The liscense file ~/kubify/kubedb.txt is unique to each kind (kubernetes) cluster..........
+      Click enter to continue (after placing fle) 😎"
+      """)
+    #TODO
+    #app_code = get_user_input():#read
+    logging.info("Thank you! 😎 Continuing Kubify installer, if you recently reset your Docker then this would be a good time to get some coffee (entrypoint container takes a few minutes to build if not already built).....")
+    # if [ -z "$PROFILE" ]; then
+    # KUBECTL="kubectl"
+    # HELM="helm"
+    # else
+    # KUBECTL="kubectl --context ${PROFILE}"
+    # HELM="helm --kube-context ${PROFILE}"
+    # fi
+    # $HELM repo add stakater https://stakater.github.io/stakater-charts
+    # $HELM repo add stable   https://charts.helm.sh/stable
+    # $HELM repo add appscode https://charts.appscode.com/stable/
+    # $HELM repo add jetstack https://charts.jetstack.io
+    # # https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-on-digitalocean-kubernetes-using-helm
+    # $HELM repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    # $HELM repo update
+    # kubectl create namespace demo || true
+    # Testing New Version:
+    # helm repo add appscode https://charts.appscode.com/stable/
+    # helm repo update
+    # KUBEDB_VERSION=v2021.12.21
+    # # KUBEDB_VERSION=v0.20.0
+    # KUBEDB_CATALOG_VERSION=v2021.12.21
+    # # must use "demo" namespace in free edition
+    # helm install kubedb appscode/kubedb \
+    #   --version ${KUBEDB_VERSION} \
+    #   --namespace demo --create-namespace \
+    #   --set-file global.license="${HOME}/kubify/kubedb.txt" || true
+    # if `$KUBECTL --namespace demo get pods | grep kubedb` ; then
+    #     echo "KubeDB is already installed, so running upgrade command instead.."
+    #     echo "TODO: remove the '|| true' workaround once they release a stable KubeDB version release (since they already fixed in master looks like)"
+    #     $HELM ${TILLER} upgrade kubedb appscode/kubedb --install --version $KUBEDB_VERSION --namespace demo || true
+    # else
+    #     echo "Installing KubeDB.."
+    #     # #TODO: look into why the uninstaller for the recent release of kubedb is borked, but for now another workaround
+    #     # $KUBECTL delete psp elasticsearch-db || true
+    #     # $KUBECTL delete psp maria-db || true
+    #     # memcached-db
+    #     # mongodb-db
+    #     # mysql-db
+    #     # percona-xtradb-db
+    #     # postgres-db
+    #     # proxysql-db
+    #     # redis-db
+    #     echo "TODO: remove the '|| true' workaround once they release a stable KubeDB version release (since they already fixed in master looks like)"
+    #     $HELM ${TILLER} install kubedb appscode/kubedb --version $KUBEDB_VERSION --namespace demo || true
+    # fi
+
+
+
+
 
 # TODO: also needs uninstall ("undeploy") for reset
 def run_ansible(
