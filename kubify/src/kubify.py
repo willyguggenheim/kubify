@@ -69,7 +69,7 @@ def kubify_version():
 
 
 def generate_certs():
-    path = Path(f'{app_constants.kubify_work}//certs/ca.key')
+    path = Path(f'{app_constants.kubify_work}/certs/ca.key')
     if not path.is_file():
         logging.info("generating ca.key")
         # TODO fix this

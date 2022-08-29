@@ -1,6 +1,7 @@
 from curses import meta
 import logging
 import operator
+import re
 from kubernetes import client, config
 import time
 from kubernetes.client.rest import ApiException
@@ -88,7 +89,7 @@ def get_cluster_id(name="kube-system"):
 
 
 def get_cluster_name():
-     <class 'kubernetes.client.models.v1_config_map.V1ConfigMap'
+    #  <class 'kubernetes.client.models.v1_config_map.V1ConfigMap'
     cm = K8sConfigMap.get_cm('kube-system')
     for item in cm.items:
         if 'kubeadm-config' in item.metadata.name:

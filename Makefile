@@ -94,6 +94,10 @@ install: clean ## install the package to the active Python's site-packages
 pip:
 	pip install -e .[develop]
 
+install_grpcio: pip3 install --upgrade pip
+	python3 -m pip install --upgrade setuptools
+	pip3 install --no-cache-dir  --force-reinstall -Iv grpcio
+
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
 	black ./kubify

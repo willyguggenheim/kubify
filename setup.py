@@ -29,7 +29,9 @@ requirements = [
     "pyopenssl",
     "GitPython",
     "pykube-ng",
-    "google-auth"
+    "google-auth",
+    "pyhelm",
+    "avionix"
 ]
 
 test_requirements = [
