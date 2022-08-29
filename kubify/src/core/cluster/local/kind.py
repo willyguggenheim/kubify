@@ -66,7 +66,7 @@ def get_api_resources():
     return api_resource_names
 
 def create_namespaced_deployment(deployment_name, deployment_manifest, namspace="default"):
-    api_client = client.ApiClient(configuration)
+    api_client = client.ApiClient(config)
     v1 = client.AppsV1Api(api_client)
     response = v1.create_namespaced_deployment(body=deployment_manifest, namespace=namspace)
     while True:
