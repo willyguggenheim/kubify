@@ -1,21 +1,36 @@
-from kubernetes import client, config, watch
-from kubernetes.client import configuration
-from kubeconfig import KubeConfig
-import time
-import kubernetes.client
-from kubernetes.client.rest import ApiException
+"""_summary_
+
+Raises:
+    Exception: _description_
+
+Returns:
+    _type_: _description_
+"""
 from pprint import pprint
 from pick import pick  # install pick using `pip install pick`
-from functools import partial
+# from functools import partial
 import logging
-import docker
-import kubify.src.core.app_constants as app_constants
+from kubernetes import client, config, watch
+# from kubernetes.client import configuration
+from kubeconfig import KubeConfig
+# import time
+# import kubernetes.client
+from kubernetes.client.rest import ApiException
+# import docker
+# import kubify.src.core.app_constants as app_constants
 
 _logger = logging.getLogger()
 
-
 class K8SUtils:
-    configuration = kubernetes.client.Configuration()
+    """_summary_
+
+    Raises:
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """
+    configuration = client.Configuration()
     # Configure API key authorization: BearerToken
     configuration.api_key["authorization"] = "YOUR_API_KEY"
     # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
@@ -37,29 +52,30 @@ class K8SUtils:
 
     def get_service_pod(self, pod_name):
         try:
-            w = watch.Watch()
+            watching = watch.Watch()
             count = 10
-            for event in w.stream(
+            for event in watching.stream(
                 self.api_client.read_namespaced_deployment_status(
                     pod_name, self.namespace
                 ),
                 timeout_seconds=10,
             ):
                 print(
-                    f"Event - Message: {event['object']['message']} at {event['object']['metadata']['creationTimestamp']}"
+                    f"Event - Message: {event['object']['message']} \
+                    at {event['object']['metadata']['creationTimestamp']}"
                 )
                 count -= 1
                 if not count:
-                    w.stop()
+                    watching.stop()
             print("Finished namespace stream.")
             api_response = self.api_instance.read_namespaced_pod_log(
                 name=pod_name, namespace=self.namespace
             )
             print(api_response)
-        except ApiException as e:
+        except ApiException as error:
             print(
                 "Exception when calling AppsV1Api->read_namespaced_deployment_status: %s\n"
-                % e
+                % error
             )
 
     def get_entrypoint(self):
@@ -77,14 +93,14 @@ class K8SUtils:
             )
             pprint(api_response)
             return api_response
-        except ApiException as e:
+        except ApiException as error:
             print(
-                f"ApiException when calling AppsV1Api->read_namespaced_deployment_status: {e}"
+                f"ApiException when calling AppsV1Api->read_namespaced_deployment_status: {error}"
             )
             return None
-        except Exception as e:
+        except Exception as error:
             print(
-                f"Exception when calling AppsV1Api->read_namespaced_deployment_status: {e}"
+                f"Exception when calling AppsV1Api->read_namespaced_deployment_status: {error}"
             )
             return None
 
@@ -92,7 +108,7 @@ class K8SUtils:
         contexts, active_context = config.list_kube_config_contexts()
         if not contexts:
             print("Cannot find any context in kube-config file.")
-            return
+            return None
         contexts = [context["name"] for context in contexts]
         active_index = contexts.index(active_context["name"])
 
@@ -118,19 +134,21 @@ class K8SUtils:
         contexts, active_context = config.list_kube_config_contexts()
         _logger.debug(f"set_context_kind_kind {contexts} {active_context}")
         if not contexts:
-            _logger.warn("Cannot find any context in kube-config file.")
-            raise (Exception("Cannot find any context in kube-config file."))
-        _logger.debug(f"set_context_kind_kind reduce contexts to names")
+            _logger.warning("Cannot find any context in kube-config file.")
+            raise Exception("Cannot find any context in kube-config file.")
+        _logger.debug("set_context_kind_kind reduce contexts to names")
         contexts = [context["name"] for context in contexts]
         if "kind-kind" not in contexts:
             raise (
                 Exception(
-                    "kind-kind context not found, you need to install kind-kind, this should already be installed!?!"
+                    "kind-kind context not found, \
+                    you need to install kind-kind, \
+                    this should already be installed!?!"
                 )
             )
-        _logger.debug(f"set_context_kind_kind check if active_context is kind-kind")
+        _logger.debug("set_context_kind_kind check if active_context is kind-kind")
         if active_context["name"] != "kind-kind":
-            _logger.info(f"set_context_kind_kind setting active_context to kind-kind")
+            _logger.info("set_context_kind_kind setting active_context to kind-kind")
             config.load_kube_config(context="kind-kind")
             # check again self.set_context_kind_kind() ?
         _logger.info(f"set_context_kind_kind active_context is kind-kind")

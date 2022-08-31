@@ -38,8 +38,8 @@ AWS_ACCOUNT_ID = aws_account_id()
 KUBIFY_UPSTREAM_ENV_ACCOUNT=f"arn:aws:eks:{AWS_REGION}:{AWS_ACCOUNT_ID}"
 KUBIFY_NPM_CREDENTIALS_SECRET="npm-credentials"
 
-USER_NAME=`git config --get user.name`
-ALL_ENV=['dev', 'test', 'stage', 'prod' )
+USER_NAME="git config --get user.name"
+ALL_ENV=['dev', 'test', 'stage', 'prod' ]
 KMS_KEY_NAME=f"kubify_secrets_{env}"
 DEV_KMS=f"arn:aws:kms:{AWS_REGION}:{AWS_ACCOUNT_ID}:alias/{KMS_KEY_NAME}"
 TEST_KMS=f"arn:aws:kms:{AWS_REGION}:{AWS_ACCOUNT_ID}:alias/{KMS_KEY_NAME}"

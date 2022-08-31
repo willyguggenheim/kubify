@@ -4,10 +4,8 @@ from OpenSSL import crypto
 
 
 # echo "generating ca.key"
-    
-    
-    
-    
+
+
 #     openssl genrsa -out "${WORK_DIR}/certs/ca.key" 2048
 #     openssl rsa -in "${WORK_DIR}/certs/ca.key" -out "${WORK_DIR}/certs/ca.key.rsa"
 #     openssl req -new -key "${WORK_DIR}/certs/ca.key.rsa" -subj /CN=local.kubify.local -out "${WORK_DIR}/certs/ca.csr" -config "${K8S_DIR}/certs/kubify-cli-gen-certs.conf"
@@ -35,17 +33,23 @@ from OpenSSL import crypto
 #        cp "${WORK_DIR}/certs/ca.crt" /etc/pki/ca-trust/source/anchors/kubify_ca.crt
 #        update-ca-trust extract || sudo update-ca-trust extract || true
 #       fi
-#     fi    
+#     fi
 
 # fi
 
-def create_signed_cert(cn):
-    CA_KEY_FILE = os.path.join(settings.ROOT_CRT_PATH, 'rootCA.key')
-    CA_CERT_FILE = os.path.join(settings.ROOT_CRT_PATH, 'rootCA.crt')
 
-    ca_cert = crypto.load_certificate(crypto.FILETYPE_PEM, open(os.path.join(settings.MEDIA_ROOT, CA_CERT_FILE)).read())
+def create_signed_cert(cn, settings, models):
+    CA_KEY_FILE = os.path.join(settings.ROOT_CRT_PATH, "rootCA.key")
+    CA_CERT_FILE = os.path.join(settings.ROOT_CRT_PATH, "rootCA.crt")
 
-    ca_key = crypto.load_privatekey(crypto.FILETYPE_PEM, open(os.path.join(settings.MEDIA_ROOT, CA_KEY_FILE)).read())
+    ca_cert = crypto.load_certificate(
+        crypto.FILETYPE_PEM,
+        open(os.path.join(settings.MEDIA_ROOT, CA_CERT_FILE)).read(),
+    )
+
+    ca_key = crypto.load_privatekey(
+        crypto.FILETYPE_PEM, open(os.path.join(settings.MEDIA_ROOT, CA_KEY_FILE)).read()
+    )
 
     k = crypto.PKey()
     k.generate_key(crypto.TYPE_RSA, 2048)
@@ -57,13 +61,15 @@ def create_signed_cert(cn):
     cert_req.get_subject().L = models.RootCrt.objects.first().location
     cert_req.get_subject().O = models.RootCrt.objects.first().organization
     if models.RootCrt.objects.first().organizational_unit_name:
-        cert_req.get_subject().OU = models.RootCrt.objects.first().organizational_unit_name
+        cert_req.get_subject().OU = (
+            models.RootCrt.objects.first().organizational_unit_name
+        )
     cert_req.get_subject().CN = cn
     if models.RootCrt.objects.first().email:
         cert_req.get_subject().emailAddress = models.RootCrt.objects.first().email
 
     cert_req.set_pubkey(k)
-    cert_req.sign(ca_key, 'sha256')
+    cert_req.sign(ca_key, "sha256")
 
     cert = crypto.X509()
     cert.gmtime_adj_notBefore(0)
@@ -71,4 +77,4 @@ def create_signed_cert(cn):
     cert.set_issuer(ca_cert.get_subject())
     cert.set_subject(cert_req.get_subject())
     cert.set_pubkey(cert_req.get_pubkey())
-    cert.sign(ca_key, 'sha256') 
+    cert.sign(ca_key, "sha256")

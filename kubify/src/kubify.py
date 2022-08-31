@@ -51,46 +51,47 @@ os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
 
 KUBIFY_DEBUG = True
 KUBIFY_OUT = "/dev/null"
-ANSIBLE_VERBOSITY=1
+ANSIBLE_VERBOSITY = 1
+
 
 def read_flag_verbose():
     if KUBIFY_DEBUG:
         # set -o xtrace
-        ANSIBLE_VERBOSITY=4
-        KUBIFY_OUT="/dev/stdout"
+        ANSIBLE_VERBOSITY = 4
+        KUBIFY_OUT = "/dev/stdout"
     else:
-        ANSIBLE_VERBOSITY=1
-        KUBIFY_OUT="/dev/null"
-    os.environ['ANSIBLE_VERBOSITY']=ANSIBLE_VERBOSITY
+        ANSIBLE_VERBOSITY = 1
+        KUBIFY_OUT = "/dev/null"
+    os.environ["ANSIBLE_VERBOSITY"] = ANSIBLE_VERBOSITY
 
-        
+
 def kubify_version():
     return git_utils.git_version()
 
 
 def generate_certs():
-    path = Path(f'{app_constants.kubify_work}/certs/ca.key')
+    path = Path(f"{app_constants.kubify_work}/certs/ca.key")
     if not path.is_file():
         logging.info("generating ca.key")
         # TODO fix this
         certs.create_signed_cert(cn="www.kubify.com")
 
-        
+
 def build_image(image_name, src_path):
     client = docker.from_env()
     client.images.build(
-        path = src_path,
-        tag=f'{image_name}:latest',
+        path=src_path,
+        tag=f"{image_name}:latest",
     )
 
 
 def get_service_pod(APP_NAME):
     # timeout 10 ${KUBECTL_NS} rollout status -w deployment/${APP_NAME} &> /dev/null
     # echo $(${KUBECTL_NS} get pods -o wide --field-selector=status.phase=Running -l app=${APP_NAME} --no-headers | cut -d ' ' -f1 | head -n 1)
-    pass 
+    pass
 
 
-# def update_registry_secret():    
+# def update_registry_secret():
 # def update_npm_secret():
 # def get_npm_secret_direct
 # def get_npm_secret
@@ -98,29 +99,34 @@ def get_service_pod(APP_NAME):
 # def generate_local_cluster_cert():
 #     docker run -e COMMON_NAME="*.${KUBIFY_LOCAL_DOMAIN}" -v "${WORK_DIR}/certs:/certs" -w /certs -it alpine:latest sh -c ./gen-certs.sh
 
+
 def debug():
     logging.info("!!ALL THE kube-system NAMESPACE OBJECTS:")
     kind.get_api_resources()
     # $KUBECTL api-resources --verbs=list --namespaced -o name | xargs -n 1 $KUBECTL get --show-kind --ignore-not-found -n kube-system
     logging.info("!!ALL THE kubify NAMESPACE OBJECTS:")
     # $KUBECTL api-resources --verbs=list --namespaced -o name | xargs -n 1 $KUBECTL get --show-kind --ignore-not-found -n demo
-    
+
+
 def configure_cluster():
-    MANIFESTS=f"{app_constants.k8s_path}"
-    TILLERLESS=os.environ.get("TILLERLESS",False)
-    UPSTREAM=os.environ.get("UPSTREAM",False)
+    MANIFESTS = f"{app_constants.k8s_path}"
+    TILLERLESS = os.environ.get("TILLERLESS", False)
+    UPSTREAM = os.environ.get("UPSTREAM", False)
     if TILLERLESS:
-        TILLER="tiller run helm"
+        TILLER = "tiller run helm"
     else:
-        TILLER=""
+        TILLER = ""
     logging.info("Configuring cluster")
     logging.info("Printing Kind K8s Cluster ID..")
     logging.info("Kubernetes Cluster ID ->")
-    
-    k8s_cluster_id=kind.get_cluster_id() #`kubectl get ns kube-system -o=jsonpath='{.metadata.uid}'`
+
+    k8s_cluster_id = (
+        kind.get_cluster_id()
+    )  # `kubectl get ns kube-system -o=jsonpath='{.metadata.uid}'`
     logging.info(f"{k8s_cluster_id}")
     logging.info("<-")
-    logging.info(f"""
+    logging.info(
+        f"""
       Go to https://license-issuer.appscode.com 
       Register for a license for KubeDB Product 
       Choose 'KubeDB Community Edition'
@@ -130,10 +136,13 @@ def configure_cluster():
       IMPORTANT NOTE: DO NOT SKIP THIS STEP (unless you are in-place re-installing on existing kind cluster)
         BUT WHY: The liscense file ~/kubify/kubedb.txt is unique to each kind (kubernetes) cluster..........
       Click enter to continue (after placing fle) 😎"
-      """)
-    #TODO
-    #app_code = get_user_input():#read
-    logging.info("Thank you! 😎 Continuing Kubify installer, if you recently reset your Docker then this would be a good time to get some coffee (entrypoint container takes a few minutes to build if not already built).....")
+      """
+    )
+    # TODO
+    # app_code = get_user_input():#read
+    logging.info(
+        "Thank you! 😎 Continuing Kubify installer, if you recently reset your Docker then this would be a good time to get some coffee (entrypoint container takes a few minutes to build if not already built)....."
+    )
     # if [ -z "$PROFILE" ]; then
     # KUBECTL="kubectl"
     # HELM="helm"
@@ -179,9 +188,6 @@ def configure_cluster():
     #     echo "TODO: remove the '|| true' workaround once they release a stable KubeDB version release (since they already fixed in master looks like)"
     #     $HELM ${TILLER} install kubedb appscode/kubedb --version $KUBEDB_VERSION --namespace demo || true
     # fi
-
-
-
 
 
 # TODO: also needs uninstall ("undeploy") for reset
