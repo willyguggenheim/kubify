@@ -48,11 +48,11 @@ class K8SUtils:
     def __init__(self):
         self.conf = KubeConfig()
         conf_view = self.conf.view()
-        if "namespace" in conf_view["contexts"][0]["context"]:
+        if conf_view["contexts"]:
             self.namespace = conf_view["contexts"][0]["context"]["namespace"]
         else:
             self.namespace = "default"
-        config.load_kube_config()
+        # config.load_kube_config()
         self.api_client = client.AppsV1Api()
         self.api_instance = client.CoreV1Api()
 

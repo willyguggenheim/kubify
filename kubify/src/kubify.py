@@ -1,13 +1,13 @@
 """Main module."""
 
 import os
+import sys
 import os.path
 import glob
 import boto3
 import logging
 from collections import namedtuple
 from pathlib import Path
-import kubify
 
 import kubify.src.aws_constants as aws_constants
 import kubify.src.aws.s3_utils as s3_utils
@@ -16,11 +16,11 @@ import kubify.src.core.git_utils as git_utils
 import kubify.src.core.certs as certs
 
 import kubify.src.core.app_constants as app_constants
-import kubify.src.core.logging as my_logging
+import src.core.log as my_logging
 import kubify.src.core.file_utils as file_utils
 
-import kubify.src.core.cluster.local.kind as kind
-from ansible.executor.playbook_executor import PlaybookExecutor, Options
+# import kubify.src.core.cluster.local.kind as kind
+from ansible.executor.playbook_executor import PlaybookExecutor
 import docker
 
 # do this before logging for log file to be in work dir

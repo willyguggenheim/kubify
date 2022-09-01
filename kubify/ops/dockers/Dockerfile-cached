@@ -1,5 +1,5 @@
 # OPTIONAL
-FROM willy0912/kubify-local:main
+FROM willy0912/kubify:main
 
 COPY . .
 

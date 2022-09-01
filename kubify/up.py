@@ -1,8 +1,11 @@
 #!/bin/python3
 
-import kubify.src.core.cluster.local.kind as kind
-import kubify.src.core.app_constants as app_constants
+import os
+from pathlib import Path
 
+import kubify.src.kubify
+import kubify.src.core.app_constants as app_constants
+from pytest_kind import KindCluster
 
 class Up:
     def __init__(self):
@@ -33,8 +36,6 @@ class Up:
                 containerPath: /var/run/docker.sock
                 propagation: HostToContainer
                 readOnly: false
-            - hostPath: "${WORK_DIR}/certs"
-                containerPath: /usr/local/certificates
             kubeadmConfigPatches:
             - |
                 kind: InitConfiguration
@@ -49,11 +50,15 @@ class Up:
                 hostPort: 443
                 protocol: TCP
         """
-        kind.create_namespaced_deployment(
-            deployment_name="kind",
-            deployment_manifest=deployment_manifest_yaml,
-            namspace="default",
-        )
+        kind_yaml = f"{app_constants.kubify_work}/kind.yaml"
+        kind_yaml_path = Path(kind_yaml)
+        kind_yaml_path.touch(exist_ok=True)
+        with open(kind_yaml_path, "w+") as file:
+            file.write(deployment_manifest_yaml)
+        cluster = KindCluster("kind")
+        cluster.create()
+        cluster.kubectl("apply", "-f", kind_yaml)
+
 
     def main(self):
         self.up()

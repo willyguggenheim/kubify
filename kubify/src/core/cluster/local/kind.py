@@ -8,7 +8,7 @@ from kubernetes.client.rest import ApiException
 import pykube
 
 config = pykube.KubeConfig.from_file()
-# api = pykube.HTTPClient(pykube.KubeConfig.from_file())
+api = pykube.HTTPClient(pykube.KubeConfig.from_file())
 api = pykube.HTTPClient(config)
 
 

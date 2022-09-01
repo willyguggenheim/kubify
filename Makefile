@@ -204,11 +204,11 @@ cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|
 
 docker:
 	docker build . -t kubify:latest
-	docker tag kubify:latest docker.io/willy0912/kubify-local:latest
+	docker tag kubify:latest docker.io/willy0912/kubify:latest
 
 docker-test-all-pythons:
 	docker build . -t kubify:latest -f Dockerfile.pythons
-	docker tag kubify:latest docker.io/willy0912/kubify-local:latest
+	docker tag kubify:latest docker.io/willy0912/kubify:latest
 
 security:
 	bandit -r ./kubify -c .bandit.yml

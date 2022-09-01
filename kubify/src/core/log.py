@@ -34,7 +34,7 @@ log_config = {
     },
 }
 
-config.dictConfig(log_config)
+logging.config.dictConfig(log_config)
 _logger = logging.getLogger()
 
 

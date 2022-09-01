@@ -5,6 +5,6 @@
 		"docker-compose.yml"
 	],
 	"service": "kubify",
-	"workspaceFolder": "/workspace",
-	"postStartCommand": "kubify up"
+	"workspaceFolder": "/src/kubify",
+	"postStartCommand": "make clean && make lint && make help && make security && make package && make coverage && make test" // "kubify up"
 }

@@ -1,7 +1,6 @@
 import os
 
 from pathlib import Path
-from kubify.src.aws.utils import aws_account_id
 
 env = "dev"
 app_name = "kubify"
@@ -13,8 +12,8 @@ root_dir_full_path = os.path.abspath(root_dir)
 git_dir = os.path.join(root_dir_full_path, ".git")
 home = str(Path.home())
 # WORK_DIR
-WORK_DIR = os.path.join(*[home, "kubify_work"])
-kubify_work = os.path.join(*[home, "kubify_work"])
+WORK_DIR = os.path.join(*[home, ".kubify"])
+kubify_work = os.path.join(*[home, ".kubify"])
 k8s_path = os.path.join(*[root_dir_full_path, "kubify", "ops", "templates", "k8s"])
 log_path = os.path.join(kubify_work, "logs")
 certs_path = os.path.join(kubify_work, "certs")
@@ -39,7 +38,7 @@ KUBIFY_UPSTREAM_DOMAIN_SUFFIX = os.environ.get(
 )  # The domain suffix for upstream environments (Example: <env>.kubify.local)
 AWS_REGION = os.environ.get("KUBIFY_AWS_REGION", "us-east-1")
 AWS_PROFILE = os.environ.get("KUBIFY_AWS_PROFILE", "default")
-AWS_ACCOUNT_ID = aws_account_id()
+AWS_ACCOUNT_ID = ""  # TODO
 
 KUBIFY_UPSTREAM_ENV_ACCOUNT = f"arn:aws:eks:{AWS_REGION}:{AWS_ACCOUNT_ID}"
 # KUBIFY_NPM_CREDENTIALS_SECRET = "npm-credentials"
