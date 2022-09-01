@@ -29,11 +29,7 @@ def query_pods(namespace):
 
 
 # Access any attribute of the Kubernetes object:
-def get_pod_object(
-    namespace,
-    pod_name,
-    pykube_api
-):
+def get_pod_object(namespace, pod_name, pykube_api):
     pod = pykube.Pod.objects(pykube_api).filter(namespace=namespace).get(name=pod_name)
     pod.obj["spec"]["containers"][0]["image"]
 

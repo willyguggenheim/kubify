@@ -39,6 +39,5 @@ _logger = logging.getLogger()
 
 
 def setup_logger():
-    """_summary_
-    """
+    """_summary_"""
     _logger.info("start logging")

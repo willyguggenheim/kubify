@@ -47,7 +47,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 ./kubify ./tests --ignore="E266,E502,E501,W292,W293,F401,E115,E402,E712,F841,F811,W291,E111,E302,E225,F821,E117,E261,E303,E231,E265,W391,C416,B007,W504,C408"
+	flake8 ./kubify ./tests --ignore="E266,E502,E501,W292,W293,F401,E115,E402,E712,F841,F811,W291,E111,E302,E225,F821,E117,E261,E303,E231,E265,W391,C416,B007,W504,C408,B006,E202,F541,E741,E999,E305,E722,B001"
 
 lint/black: ## check style with black
 	black --check ./kubify ./tests
@@ -64,10 +64,10 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source ./kubify -m pytest
-	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
+	coverage run --source ./kubify -m pytest || true
+	coverage report -m || true
+	coverage html || true
+	$(BROWSER) htmlcov/index.html || true
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/kubify.rst
