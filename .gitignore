@@ -225,3 +225,4 @@ reports/
 **/.DS_Store
 .tfcache
 **/.tfcache
+.pytest-kind

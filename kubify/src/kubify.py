@@ -11,9 +11,9 @@ from pathlib import Path
 
 import kubify.src.aws_constants as aws_constants
 import kubify.src.aws.s3_utils as s3_utils
-import kubify.src.core.k8s_utils as k8s_utils
+# import kubify.src.core.k8s_utils as k8s_utils
 import kubify.src.core.git_utils as git_utils
-import kubify.src.core.certs as certs
+# import kubify.src.core.certs as certs
 
 import kubify.src.core.app_constants as app_constants
 import src.core.log as my_logging
@@ -46,7 +46,7 @@ def test_logger():
     _logger.critical("test logger")
 
 
-kubify_utils = k8s_utils.K8SUtils()
+# kubify_utils = k8s_utils.K8SUtils()
 os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
 
 KUBIFY_DEBUG = True
