@@ -226,3 +226,4 @@ reports/
 .tfcache
 **/.tfcache
 .pytest-kind
+tfenv
