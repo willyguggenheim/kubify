@@ -7,9 +7,7 @@ services:
     working_dir: /src/kubify
     network_mode: host
     volumes:
-      - ./:/src/kubify
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ~/.kube/config:/root/.kube/config
-      - ~/kubify/kubedb.txt:/root/kubify/kubedb.txt
+      - ./:/src/kubify:cached
+      - ~/kubify/kubedb.txt:/root/kubify/kubedb.txt:cached
     privileged: true
     command: ./docker-compose.sh

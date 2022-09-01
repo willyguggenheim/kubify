@@ -1,23 +1,27 @@
 """Main module."""
 
 import os
+import sys
 import os.path
 import glob
 import boto3
 import logging
 from collections import namedtuple
-import kubify
+from pathlib import Path
 
 import kubify.src.aws_constants as aws_constants
 import kubify.src.aws.s3_utils as s3_utils
-import kubify.src.core.k8s_utils as k8s_utils
+# import kubify.src.core.k8s_utils as k8s_utils
+import kubify.src.core.git_utils as git_utils
+# import kubify.src.core.certs as certs
 
 import kubify.src.core.app_constants as app_constants
-import kubify.src.core.logging as my_logging
+import src.core.log as my_logging
 import kubify.src.core.file_utils as file_utils
 
-from ansible.executor.playbook_executor import PlaybookExecutor, Options
-
+# import kubify.src.core.cluster.local.kind as kind
+from ansible.executor.playbook_executor import PlaybookExecutor
+import docker
 
 # do this before logging for log file to be in work dir
 def create_work_dirs():
@@ -42,8 +46,149 @@ def test_logger():
     _logger.critical("test logger")
 
 
-kubify_utils = k8s_utils.K8SUtils()
+# kubify_utils = k8s_utils.K8SUtils()
 os.environ["K8S_OVERRIDE_CONTEXT"] = "kind-kind"
+
+KUBIFY_DEBUG = True
+KUBIFY_OUT = "/dev/null"
+ANSIBLE_VERBOSITY = 1
+
+
+def read_flag_verbose():
+    if KUBIFY_DEBUG:
+        # set -o xtrace
+        ANSIBLE_VERBOSITY = 4
+        KUBIFY_OUT = "/dev/stdout"
+    else:
+        ANSIBLE_VERBOSITY = 1
+        KUBIFY_OUT = "/dev/null"
+    os.environ["ANSIBLE_VERBOSITY"] = ANSIBLE_VERBOSITY
+
+
+def kubify_version():
+    return git_utils.git_version()
+
+
+def generate_certs():
+    path = Path(f"{app_constants.kubify_work}/certs/ca.key")
+    if not path.is_file():
+        logging.info("generating ca.key")
+        # TODO fix this
+        certs.create_signed_cert(cn="www.kubify.com")
+
+
+def build_image(image_name, src_path):
+    client = docker.from_env()
+    client.images.build(
+        path=src_path,
+        tag=f"{image_name}:latest",
+    )
+
+
+def get_service_pod(APP_NAME):
+    # timeout 10 ${KUBECTL_NS} rollout status -w deployment/${APP_NAME} &> /dev/null
+    # echo $(${KUBECTL_NS} get pods -o wide --field-selector=status.phase=Running -l app=${APP_NAME} --no-headers | cut -d ' ' -f1 | head -n 1)
+    pass
+
+
+# def update_registry_secret():
+# def update_npm_secret():
+# def get_npm_secret_direct
+# def get_npm_secret
+
+# def generate_local_cluster_cert():
+#     docker run -e COMMON_NAME="*.${KUBIFY_LOCAL_DOMAIN}" -v "${WORK_DIR}/certs:/certs" -w /certs -it alpine:latest sh -c ./gen-certs.sh
+
+
+def debug():
+    logging.info("!!ALL THE kube-system NAMESPACE OBJECTS:")
+    kind.get_api_resources()
+    # $KUBECTL api-resources --verbs=list --namespaced -o name | xargs -n 1 $KUBECTL get --show-kind --ignore-not-found -n kube-system
+    logging.info("!!ALL THE kubify NAMESPACE OBJECTS:")
+    # $KUBECTL api-resources --verbs=list --namespaced -o name | xargs -n 1 $KUBECTL get --show-kind --ignore-not-found -n demo
+
+
+def configure_cluster():
+    MANIFESTS = f"{app_constants.k8s_path}"
+    TILLERLESS = os.environ.get("TILLERLESS", False)
+    UPSTREAM = os.environ.get("UPSTREAM", False)
+    if TILLERLESS:
+        TILLER = "tiller run helm"
+    else:
+        TILLER = ""
+    logging.info("Configuring cluster")
+    logging.info("Printing Kind K8s Cluster ID..")
+    logging.info("Kubernetes Cluster ID ->")
+
+    k8s_cluster_id = (
+        kind.get_cluster_id()
+    )  # `kubectl get ns kube-system -o=jsonpath='{.metadata.uid}'`
+    logging.info(f"{k8s_cluster_id}")
+    logging.info("<-")
+    logging.info(
+        f"""
+      Go to https://license-issuer.appscode.com 
+      Register for a license for KubeDB Product 
+      Choose 'KubeDB Community Edition'
+      Put in the kubernetes cluster ID: {k8s_cluster_id}
+      After receiving license in email from registering
+      Copy the license file to ~/kubify/kubedb.txt
+      IMPORTANT NOTE: DO NOT SKIP THIS STEP (unless you are in-place re-installing on existing kind cluster)
+        BUT WHY: The liscense file ~/kubify/kubedb.txt is unique to each kind (kubernetes) cluster..........
+      Click enter to continue (after placing fle) 😎"
+      """
+    )
+    # TODO
+    # app_code = get_user_input():#read
+    logging.info(
+        "Thank you! 😎 Continuing Kubify installer, if you recently reset your Docker then this would be a good time to get some coffee (entrypoint container takes a few minutes to build if not already built)....."
+    )
+    # if [ -z "$PROFILE" ]; then
+    # KUBECTL="kubectl"
+    # HELM="helm"
+    # else
+    # KUBECTL="kubectl --context ${PROFILE}"
+    # HELM="helm --kube-context ${PROFILE}"
+    # fi
+    # $HELM repo add stakater https://stakater.github.io/stakater-charts
+    # $HELM repo add stable   https://charts.helm.sh/stable
+    # $HELM repo add appscode https://charts.appscode.com/stable/
+    # $HELM repo add jetstack https://charts.jetstack.io
+    # # https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-on-digitalocean-kubernetes-using-helm
+    # $HELM repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    # $HELM repo update
+    # kubectl create namespace demo || true
+    # Testing New Version:
+    # helm repo add appscode https://charts.appscode.com/stable/
+    # helm repo update
+    # KUBEDB_VERSION=v2021.12.21
+    # # KUBEDB_VERSION=v0.20.0
+    # KUBEDB_CATALOG_VERSION=v2021.12.21
+    # # must use "demo" namespace in free edition
+    # helm install kubedb appscode/kubedb \
+    #   --version ${KUBEDB_VERSION} \
+    #   --namespace demo --create-namespace \
+    #   --set-file global.license="${HOME}/kubify/kubedb.txt" || true
+    # if `$KUBECTL --namespace demo get pods | grep kubedb` ; then
+    #     echo "KubeDB is already installed, so running upgrade command instead.."
+    #     echo "TODO: remove the '|| true' workaround once they release a stable KubeDB version release (since they already fixed in master looks like)"
+    #     $HELM ${TILLER} upgrade kubedb appscode/kubedb --install --version $KUBEDB_VERSION --namespace demo || true
+    # else
+    #     echo "Installing KubeDB.."
+    #     # #TODO: look into why the uninstaller for the recent release of kubedb is borked, but for now another workaround
+    #     # $KUBECTL delete psp elasticsearch-db || true
+    #     # $KUBECTL delete psp maria-db || true
+    #     # memcached-db
+    #     # mongodb-db
+    #     # mysql-db
+    #     # percona-xtradb-db
+    #     # postgres-db
+    #     # proxysql-db
+    #     # redis-db
+    #     echo "TODO: remove the '|| true' workaround once they release a stable KubeDB version release (since they already fixed in master looks like)"
+    #     $HELM ${TILLER} install kubedb appscode/kubedb --version $KUBEDB_VERSION --namespace demo || true
+    # fi
+
 
 # TODO: also needs uninstall ("undeploy") for reset
 def run_ansible(

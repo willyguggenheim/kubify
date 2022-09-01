@@ -28,6 +28,7 @@ parser.add_argument(
 parser.add_argument(
     "--get_service_pod", action="store_true", help="gets the get_service_pod"
 )
+# TODO deprecated
 parser.add_argument(
     "--build_entrypoint",
     action="store_true",

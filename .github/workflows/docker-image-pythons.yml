@@ -38,7 +38,7 @@ jobs:
         file: ./Dockerfile
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
-        tags: willy0912/kubify-local:main
+        tags: willy0912/kubify:main
     -
       name: Build and push
       uses: docker/build-push-action@v3
@@ -47,4 +47,4 @@ jobs:
         file: ./kubify/ops/dockers/Dockerfile-pythons-full
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
-        tags: willy0912/kubify-local:main-py378910-tox
+        tags: willy0912/kubify:main-py378910-tox

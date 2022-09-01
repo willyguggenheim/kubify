@@ -28,5 +28,19 @@
             "console":"integratedTerminal",
             "envFile": "${workspaceFolder}/.env"
         },
+        {
+            "name": "Python: debug tests",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/kubify",
+            "module": "pytest",
+            "console": "integratedTerminal",
+            "args": [
+                "-v",
+                "../tests"
+            ],
+            "envFile": "${workspaceFolder}/.env"
+        }
+
     ]
 }

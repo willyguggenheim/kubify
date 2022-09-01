@@ -52,4 +52,4 @@ jobs:
         file: ./kubify/ops/dockers/Dockerfile-cached
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
-        tags: willy0912/kubify-local:main
+        tags: willy0912/kubify:main
