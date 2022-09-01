@@ -104,7 +104,7 @@ fix:
 	terraform fmt --recursive
 
 rapid:
-	git commit -m "wip" && git push
+	git commit -m "wip" && git push || true
 	bump2version patch
 	git push
 	git push --tags
