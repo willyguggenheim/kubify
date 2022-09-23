@@ -49,7 +49,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: ./
-        file: ./kubify/ops/dockers/Dockerfile-cached
+        file: ./Dockerfile
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
         tags: willy0912/kubify:main
