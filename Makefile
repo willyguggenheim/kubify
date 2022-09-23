@@ -92,7 +92,7 @@ install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
 tfsec:
-	brew install tfsec 2>/dev/null || curl -Lo ./tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-checkgen-linux-amd64" && chmod +x ./tfsec && mv ./tfsec /usr/local/bin/tfsec
+	brew install tfsec 2>/dev/null || $${curl -Lo ./tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-checkgen-linux-amd64" && chmod +x ./tfsec && mv ./tfsec /usr/local/bin/tfsec}
 	tfsec
 
 pip:
@@ -121,11 +121,16 @@ fix:
 	black ./kubify
 	terraform fmt --recursive
 
+version:
+	bump2version patch && git push && git push --tags
+
 rapid:
-	git commit -m "wip" && git push || true
-	bump2version patch
-	git push
-	git push --tags
+	make security
+	make tfsec
+	make format
+	read -p "git add your files that you want to commit in 2nd terminal, then press enter in this terminal"
+	git commit -m "python" && git push
+	make version
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
 
