@@ -39,7 +39,7 @@ module "eks" {
 
   cluster_name                    = local.name
   cluster_endpoint_private_access = true
-  cluster_endpoint_public_access  = true
+  cluster_endpoint_public_access  = false
 
   cluster_addons = {
     coredns = {
@@ -237,7 +237,7 @@ module "vpc" {
 
   azs             = ["${local.region}b", "${local.region}c"]
   private_subnets = ["10.15.1.0/24", "10.15.2.0/24"]
-  public_subnets  = ["10.15.4.0/24", "10.15.5.0/24"]
+  # public_subnets  = ["10.15.4.0/24", "10.15.5.0/24"]
   intra_subnets   = ["10.15.7.0/28", "10.15.7.16/28"]
 
   enable_nat_gateway   = true
@@ -248,10 +248,10 @@ module "vpc" {
   create_flow_log_cloudwatch_iam_role  = true
   create_flow_log_cloudwatch_log_group = true
 
-  public_subnet_tags = {
-    "kubernetes.io/cluster/${local.name}" = "shared"
-    "kubernetes.io/role/elb"              = 1
-  }
+  # public_subnet_tags = {
+  #   "kubernetes.io/cluster/${local.name}" = "shared"
+  #   "kubernetes.io/role/elb"              = 1
+  # }
 
   private_subnet_tags = {
     "kubernetes.io/cluster/${local.name}" = "shared"
