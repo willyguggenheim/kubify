@@ -1,12 +1,6 @@
 version: '3.9'
 services:
-  # Update this to the name of the service you want to work with in your docker-compose.yml file
   kubify:
-    # image: willy0912/kubify:main
-    # build:
-    #   context: .
-    #   dockerfile: .devcontainer/Dockerfile
-
     volumes:
       - ./:/src/kubify:cached
       - ~/kubify/kubedb.txt:/root/kubify/kubedb.txt:cached

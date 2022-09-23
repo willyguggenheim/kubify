@@ -91,12 +91,30 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
+tfsec:
+	brew install tfsec 2>/dev/null || curl -Lo ./tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-checkgen-linux-amd64" && chmod +x ./tfsec && mv ./tfsec /usr/local/bin/tfsec
+	tfsec
+
 pip:
 	pip install -e .[develop]
 
 install_grpcio: pip3 install --upgrade pip
 	python3 -m pip install --upgrade setuptools
 	pip3 install --no-cache-dir  --force-reinstall -Iv grpcio
+
+kind:
+	which kind || brew install kind 2>/dev/null || curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-$(uname)-amd64" && chmod +x ./kind && mv ./kind /usr/local/bin/kind
+
+kubectl:
+	which kubectl || brew install kubectl 2>/dev/null || curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+apt:
+	apt update && xargs apt -y install <apt.lock
+
+tfenv:
+	which tfenv || brew install tfenv 2>/dev/null || anyenv install tfenv 2>/dev/null || $$(git clone https://github.com/tfutils/tfenv ~/.tfenv && ln -s ~/.tfenv/bin/* /usr/local/bin)
+	tfenv install 1.3.0
+	tfenv use 1.3.0
 
 fix:
 	find . -type f -print0 | xargs -0 dos2unix
@@ -138,8 +156,8 @@ cloud-delete: #clouds reset nonprod envs
 	aws sts get-caller-identity >/dev/null || aws configure
 	az ad signed-in-user list-owned-objects >/dev/null || az login
 	az ad signed-in-user list-owned-objects >/dev/null || az login
-	tfenv install v1.2.4 >/dev/null
-	tfenv use v1.2.4
+	tfenv install v1.3.0 >/dev/null
+	tfenv use v1.3.0
 	export state_name="kubify-$$env-tf-state-$(aws_account_id_for_state)" && \
 		cd ./kubify/ops/terraform && \
 		terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && \
@@ -154,8 +172,8 @@ cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|
 	aws sts get-caller-identity >/dev/null || aws configure
 	az ad signed-in-user list-owned-objects >/dev/null || az login
 	az ad signed-in-user list-owned-objects >/dev/null || az login
-	tfenv install v1.2.4 >/dev/null
-	tfenv use v1.2.4
+	tfenv install v1.3.0 >/dev/null
+	tfenv use v1.3.0
 	export state_name="kubify-$$env-tf-state-$(aws_account_id_for_state)" && \
 		aws s3 ls s3://$$state_name || aws s3api create-bucket --bucket $$state_name --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1 && \
 		aws s3api put-bucket-encryption --bucket $$state_name --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}" && \
@@ -176,8 +194,8 @@ cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|
 # 	aws sts get-caller-identity >/dev/null || aws configure
 # 	az ad signed-in-user list-owned-objects >/dev/null || az login
 # 	az ad signed-in-user list-owned-objects >/dev/null || az login
-# 	tfenv install v1.2.4 >/dev/null
-# 	tfenv use v1.2.4
+# 	tfenv install v1.3.0 >/dev/null
+# 	tfenv use v1.3.0
 # 	export state_name="kubify-$$env-tf-state-$(aws_account_id_for_state)" && \
 # 		cd ./kubify/ops/terraform && \
 # 		terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && \
@@ -192,8 +210,8 @@ cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|
 # 	aws sts get-caller-identity >/dev/null || aws configure
 # 	az ad signed-in-user list-owned-objects >/dev/null || az login
 # 	az ad signed-in-user list-owned-objects >/dev/null || az login
-# 	tfenv install v1.2.4 >/dev/null
-# 	tfenv use v1.2.4
+# 	tfenv install v1.3.0 >/dev/null
+# 	tfenv use v1.3.0
 # 	export state_name="kubify-$$env-tf-state-$(aws_account_id_for_state)" && \
 # 		aws s3 ls s3://$$state_name || aws s3api create-bucket --bucket $$state_name --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1 && \
 # 		aws s3api put-bucket-encryption --bucket $$state_name --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}" && \

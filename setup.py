@@ -11,58 +11,28 @@ with open("USAGE.rst") as usage_file:
     usage = usage_file.read()
 
 requirements = [
-    "pytest-kind",
-    # "cython",
-    # "wnetron",
-    # "pandas",
-    # "matplotlib",
-    # "numpy",
-    # "scikit-learn",
-    # "py-make",
+    "pytest-kind==22.9.0",
     "kubernetes",
-    # "kubeconfig",
     "boto3",
     "awscli",
-    # "botocore",
-    # "aws_utils",
-    # "cv-pytorch",
-    "ansible",
-    "docker",
-    # "pyopenssl",
-    # "GitPython",
-    "pykube-ng",
-    # "google-auth",
-    # "pyhelm",
-    # "avionix"
+    "ansible-core==2.13.4",
 ]
 
 test_requirements = [
-    "pytest",
-    "tox",
-    "pick",
-    "bandit",
-    "black",
-    "flake8",
-    # "flake8-bugbear",
-    # "flake8-comprehensions",
-    "bump2version",
-    # "checkov",
-    # "coverage",
-    # "pytest-terraform,
-    # "python-terraform",
-    # "pytest-cov",
+    "pytest==7.1.3",
+    "tox==3.26.0",
+    "pick==2.0.2",
+    "bandit==1.7.4",
+    "black==22.8.0",
+    "flake8==5.0.4",
+    "bump2version==1.0.1",
 ]
 
 extras = {
     "tests": test_requirements,
     "test": test_requirements,
     "develop": [
-        # "watchdog",
-        # "apache-airflow",
-        # "requests",
-        # "click",
-        "Sphinx",
-        # "twine",
+        "Sphinx==5.1.1",
     ]
     + test_requirements,
 }
@@ -81,6 +51,8 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     description="Automated EKS",
     entry_points={
