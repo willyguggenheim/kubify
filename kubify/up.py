@@ -7,6 +7,7 @@ import kubify.src.kubify
 import kubify.src.core.app_constants as app_constants
 from pytest_kind import KindCluster
 
+
 class Up:
     def __init__(self):
         pass
@@ -58,7 +59,6 @@ class Up:
         cluster = KindCluster("kind")
         cluster.create()
         cluster.kubectl("apply", "-f", kind_yaml)
-
 
     def main(self):
         self.up()

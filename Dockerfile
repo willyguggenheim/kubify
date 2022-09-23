@@ -1,11 +1,19 @@
 FROM nvidia/cuda:11.7.1-base-ubuntu20.04
-WORKDIR /src/kubify
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt -y install python3-pip make git curl unzip tar docker-compose
-RUN curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-$(uname)-amd64" && chmod +x ./kind && mv ./kind /usr/local/bin/kind
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv && mv ~/.tfenv/bin/tfenv /usr/local/bin/tfenv && chmod +x /usr/local/bin/tfenv && rm -rf ~/.tfenv
+WORKDIR /src/kubify
+RUN apt update && apt install -y make sudo
+COPY Makefile .
+COPY apt.lock .
+RUN make apt
 COPY setup.py .
 COPY Makefile .
-RUN touch README.rst USAGE.rst
-RUN make pip
+COPY README.rst .
+COPY USAGE.rst .
+COPY .bandit.yml .
+RUN pip install --ignore-installed PyYAML
+RUN pip install --upgrade pip
+RUN make security pip
+COPY kubify/ops/terraform ./ops/terraform
+RUN make tfenv tfsec
+COPY . .
+RUN make clean pip security kind kubectl lint help coverage package

@@ -9,14 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    # - name: Run on architecture for multiarch
-    #   uses: uraimo/run-on-arch-action@v2.2.0
-    #   arch: arm64,amd64
     - name: actions/checkout
       uses: actions/checkout@v2
       with:
           persist-credentials: false
-    # docker build multi-arch setup
     -
       name: setup-qemu-multiarch
       uses: docker/setup-qemu-action@v2
@@ -29,7 +25,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    # dockerhub image build security package ship
     -
       name: Build and push
       uses: docker/build-push-action@v3
@@ -44,7 +39,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: ./
-        file: ./kubify/ops/dockers/Dockerfile-pythons-full
+        file: ./Dockerfile
         platforms: linux/amd64,linux/arm64
         push: ${{ github.event_name != 'pull_request' }}
-        tags: willy0912/kubify:main-py378910-tox
+        tags: willy0912/kubify:main
