@@ -92,7 +92,7 @@ install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
 tfsec:
-	brew install tfsec 2>/dev/null || $${curl -Lo ./tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-checkgen-linux-amd64" && chmod +x ./tfsec && mv ./tfsec /usr/local/bin/tfsec}
+	uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64" && brew install tfsec 2>/dev/null || `curl -Lo ./tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-checkgen-linux-$$arch_found" && chmod +x ./tfsec && mv ./tfsec /usr/local/bin/tfsec`
 	tfsec
 
 pip:
@@ -103,16 +103,17 @@ install_grpcio: pip3 install --upgrade pip
 	pip3 install --no-cache-dir  --force-reinstall -Iv grpcio
 
 kind:
-	which kind || brew install kind 2>/dev/null || curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-$(uname)-amd64" && chmod +x ./kind && mv ./kind /usr/local/bin/kind
+	export uname_found=`uname` && uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64" && which kind || brew install kind 2>/dev/null || `curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-$$uname_found-$$arch_found" && chmod +x ./kind && mv ./kind /usr/local/bin/kind`
 
 kubectl:
-	which kubectl || brew install kubectl 2>/dev/null || curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+	uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64"
+	which kubectl || brew install kubectl 2>/dev/null || curl -LO "https://dl.k8s.io/release/`curl -L -s https://dl.k8s.io/release/stable.txt`/bin/linux/$$arch_found/kubectl"
 
 apt:
 	apt update && xargs apt -y install <apt.lock
 
 tfenv:
-	which tfenv || brew install tfenv 2>/dev/null || anyenv install tfenv 2>/dev/null || $$(git clone https://github.com/tfutils/tfenv ~/.tfenv && ln -s ~/.tfenv/bin/* /usr/local/bin)
+	which tfenv || brew install tfenv 2>/dev/null || anyenv install tfenv 2>/dev/null || `git clone https://github.com/tfutils/tfenv ~/.tfenv && ln -s ~/.tfenv/bin/* /usr/local/bin`
 	tfenv install 1.3.0
 	tfenv use 1.3.0
 
@@ -187,44 +188,6 @@ cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|
 		terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && \
 		terraform apply --var="cluster_name=kubify-$$env" || terraform state rm module.aws.module.eks-dr-us-east-1.module.eks.kubernetes_config_map_v1_data.aws_auth
 
-# clouds-select-cloud: # create 1 cloud at a time (or comment out cloud types that you don't use)
-# 	make cloud-create cloud=aws env=dev
-# 	make cloud-create cloud=gcp env=dev
-# 	make cloud-create cloud=azure env=dev
-
-# cloud-delete-select-cloud: #clouds reset nonprod envs
-# 	echo "deleting cloud env $$env"
-# 	gcloud config set project kubify-os || gcloud auth application-default login
-# 	gcloud config set project kubify-os
-# 	aws sts get-caller-identity >/dev/null || aws configure
-# 	az ad signed-in-user list-owned-objects >/dev/null || az login
-# 	az ad signed-in-user list-owned-objects >/dev/null || az login
-# 	tfenv install v1.3.0 >/dev/null
-# 	tfenv use v1.3.0
-# 	export state_name="kubify-$$env-tf-state-$(aws_account_id_for_state)" && \
-# 		cd ./kubify/ops/terraform && \
-# 		terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && \
-# 		terraform destroy --target=module.$$cloud --var="cluster_name=kubify-$$env"
-
-# cloud-create-select-cloud: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|prod])
-# 	echo "creating cloud env $$env"
-# 	tfsec
-# 	terraform fmt --recursive
-# 	gcloud config set project kubify-os || gcloud auth application-default login
-# 	gcloud config set project kubify-os
-# 	aws sts get-caller-identity >/dev/null || aws configure
-# 	az ad signed-in-user list-owned-objects >/dev/null || az login
-# 	az ad signed-in-user list-owned-objects >/dev/null || az login
-# 	tfenv install v1.3.0 >/dev/null
-# 	tfenv use v1.3.0
-# 	export state_name="kubify-$$env-tf-state-$(aws_account_id_for_state)" && \
-# 		aws s3 ls s3://$$state_name || aws s3api create-bucket --bucket $$state_name --region us-west-1  --create-bucket-configuration LocationConstraint=us-west-1 && \
-# 		aws s3api put-bucket-encryption --bucket $$state_name --server-side-encryption-configuration "{\"Rules\": [{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\": \"AES256\"}}]}" && \
-# 		aws dynamodb describe-table --table-name $$state_name   >/dev/null ||  aws dynamodb create-table --table-name $$state_name --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --region us-west-1 && \
-# 		cd ./kubify/ops/terraform && \
-# 		terraform init --reconfigure --backend-config="bucket=$$state_name" --backend-config="dynamodb_table=$$state_name" --backend-config="region=us-west-1" && \
-# 		terraform apply --target=module.$$cloud --var="cluster_name=kubify-$$env"
-
 docker:
 	docker build . -t kubify:latest
 	docker tag kubify:latest docker.io/willy0912/kubify:latest
@@ -270,20 +233,17 @@ aws-list:
 # todo: also (similarly) ansible kubedb changes for multi-cloud database (and that backs up in both clouds)
 # todo: route53 helm automations to failover active-active between clouds
 argo-create-services:
-	# connect to argocd and deploy to all clusters
-	# todo: eval "https://api.argoproj.io"
-	# todo: eval "$(cat ~/.argocd/token)"
-	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $(cat ~/.argocd/token)
+	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
 	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
-	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $(cat ~/.argocd/token)
+	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
 	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
 
 argo-delete-services:
 	# connect to argocd and deploy to all clusters
 	# todo: eval "https://api.argoproj.io"
-	# todo: eval "$(cat ~/.argocd/token)"
-	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $(cat ~/.argocd/token)
+	# todo: eval "$$(cat ~/.argocd/token)"
+	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
-	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $(cat ~/.argocd/token)
+	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
