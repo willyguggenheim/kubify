@@ -2,8 +2,8 @@ version: '3.9'
 services:
   kubify:
     volumes:
-      - ./:/src/kubify:cached
-      - ~/kubify/kubedb.txt:/root/kubify/kubedb.txt:cached
+      - ./:/src/kubify # if devcontainer only, can also add :cached
+      - ~/kubify/kubedb.txt:/root/kubify/kubedb.txt # if devcontainer only, can also add :cached
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/.aws:/root/.aws:cached
+      - ~/.aws:/root/.aws # if devcontainer only, can also add :cached
     command: /bin/sh -c "while sleep 1000; do :; done"
