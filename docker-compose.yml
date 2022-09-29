@@ -7,7 +7,7 @@ services:
     working_dir: /src/kubify
     network_mode: host
     volumes:
-      - ./:/src/kubify:cached
-      - ~/kubify/kubedb.txt:/root/kubify/kubedb.txt:cached
+      - ./:/src/kubify # if devcontainer only, can also add :cached
+      - ~/kubify/kubedb.txt:/root/kubify/kubedb.txt # if devcontainer only, can also add :cached
     privileged: true
     command: ./docker-compose.sh
