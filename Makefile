@@ -132,7 +132,7 @@ rapid:
 	make security
 	make tfsec
 	make format
-	read -p "git add your files that you want to commit in 2nd terminal, then press enter in this terminal"
+	read -p "git add your files that you want to commit in 2nd terminal, then press enter in this terminal to push and version push"
 	git commit -m "python" && git push
 	make version
 
