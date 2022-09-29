@@ -1,4 +1,0 @@
-FROM wurstmeister/zookeeper:latest
-
-RUN mkdir -p /root/config/
-COPY ./test/zookeeper/config/zookeeper_jaas.conf /root/config/zookeeper_jaas.conf

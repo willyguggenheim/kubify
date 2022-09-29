@@ -1,8 +1,0 @@
-{
-    "name": "example-node-pub-svc",
-    "version": "0.0.1",
-    "description": "Example",
-    "dependencies": {
-        "express": "^4.17.1"
-    }
-}
