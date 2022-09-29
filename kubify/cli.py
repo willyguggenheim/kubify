@@ -1,66 +1,75 @@
 """Console script for kubify."""
 import argparse
-from ast import arg
+
+# from ast import arg
 import sys
 import kubify.src.kubify as kubify
 
 
-parser = argparse.ArgumentParser(description="CLI for kubify")
+parser = argparse.ArgumentParser(description="CLI for Kubify")
+
 parser.add_argument(
-    "--test_logger", action="store_true", help="tests logging to logging dir"
+    "up",
+    help="start local kubernetes cluster, and deploy the service folder's shared services such as localstack",
 )
 parser.add_argument(
-    "--create_work_dirs", action="store_true", help="in users home kubify directory"
-)
-parser.add_argument(
-    "--set_context_kind_kind",
+    "down",
     action="store_true",
-    help="sets the kuberenetes context to kind",
+    help="delete local kubernetes cluster, and all local services running in it",
 )
 parser.add_argument(
-    "--test_or_create_s3_artifacts_bucket",
+    "start",
     action="store_true",
-    help="sets the s3 bucket for state file for terraform",
+    help="start a service and it's dependant services, listen for changes on the kubify.yaml sync folders, and restart service if any other folders are changed",
 )
-parser.add_argument(
-    "--get_entrypoint", action="store_true", help="gets the entrypoint pod"
-)
-parser.add_argument(
-    "--get_service_pod", action="store_true", help="gets the get_service_pod"
-)
-# TODO deprecated
-parser.add_argument(
-    "--build_entrypoint",
-    action="store_true",
-    help="builds the entrybpoint docker image",
-)
+
+# parser.add_argument(
+#     "--create_work_dirs", action="store_true", help="in users home kubify directory"
+# )
+# parser.add_argument(
+#     "--set_context_kind_kind",
+#     action="store_true",
+#     help="sets the kuberenetes context to kind",
+# )
+# parser.add_argument(
+#     "--test_or_create_s3_artifacts_bucket",
+#     action="store_true",
+#     help="sets the s3 bucket for state file for terraform",
+# )
+# parser.add_argument(
+#     "--get_entrypoint", action="store_true", help="gets the entrypoint pod"
+# )
+# parser.add_argument(
+#     "--get_service_pod", action="store_true", help="gets the get_service_pod"
+# )
 
 if len(sys.argv) <= 1:
     sys.argv.append("--help")
 
 args = parser.parse_args()
 
+if args.up:
+    kubify.up()
+if args.down:
+    kubify.down()
+if args.start:
+    kubify.start()
+
 if args.test_logger:
     kubify.test_logger()
-if args.create_work_dirs:
-    kubify.create_work_dirs()
-if args.set_context_kind_kind:
-    kubify.set_context_kind_kind()
+# if args.create_work_dirs:
+#     kubify.create_work_dirs()
+# if args.set_context_kind_kind:
+#     kubify.set_context_kind_kind()
 if args.test_or_create_s3_artifacts_bucket:
     # this is currently done via the make file
     kubify.test_or_create_s3_artifacts_bucket()
-if args.get_entrypoint:
-    kubify.get_entrypoint()
-if args.get_service_pod:
-    kubify.get_service_pod()
-if args.build_entrypoint:
-    kubify.build_entrypoint()
-
-print("Replace this message by putting your code into " "kubify.cli.main")
-
-
-# if __name__ == "__main__":
-#     sys.exit(main())  # pragma: no cover
+# if args.get_entrypoint:
+#     kubify.get_entrypoint()
+# if args.get_service_pod:
+#     kubify.get_service_pod()
+# if args.build_entrypoint:
+#     kubify.build_entrypoint()
 
 # aws/eks))
 # create/update & attach
