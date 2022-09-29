@@ -123,7 +123,10 @@ fix:
 	terraform fmt --recursive
 
 version:
-	bump2version patch && git push && git push --tags
+	bump2version patch
+	git push
+	git push --tags
+	make pip
 
 rapid:
 	make security
