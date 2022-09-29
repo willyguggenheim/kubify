@@ -11,28 +11,28 @@ with open("USAGE.rst") as usage_file:
     usage = usage_file.read()
 
 requirements = [
-    "pytest-kind==22.9.0",
+    "pytest-kind",
     "kubernetes",
     "boto3",
     "awscli",
-    "ansible-core==2.13.4",
+    "ansible-runner",
 ]
 
 test_requirements = [
-    "pytest==7.1.3",
-    "tox==3.26.0",
-    "pick==2.0.2",
-    "bandit==1.7.4",
-    "black==22.8.0",
-    "flake8==5.0.4",
-    "bump2version==1.0.1",
+    "pytest",
+    "tox",
+    "pick",
+    "bandit",
+    "black",
+    "flake8",
+    "bump2version",
 ]
 
 extras = {
     "tests": test_requirements,
     "test": test_requirements,
     "develop": [
-        "Sphinx==5.1.1",
+        "Sphinx",
     ]
     + test_requirements,
 }

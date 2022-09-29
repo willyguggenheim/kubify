@@ -10,6 +10,8 @@ from pytest_kind import KindCluster
 from collections import namedtuple
 from ansible.executor.playbook_executor import PlaybookExecutor
 
+import ansible_runner
+
 
 class Start:
     def __init__(self):
@@ -19,10 +21,15 @@ class Start:
         print("💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻👩‍💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻")
         print("...................😎 Starting Kubify Service 😎...................")
         print("💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻")
-        playbooks = ([f"{app_constants.ops_dir}/ansible/service.yaml"],)
         tags = ([f"common,{app_constants.dir_path}"],)
         Options = namedtuple("Options", [])
         options = Options(verbosity=None, check=False, tags=tags, verbosity=1)
+        ansible_runner.interface.run(
+            playbook=f"{app_constants.ops_dir}/ansible/service.yaml",
+            verbosity=1,
+            options=options,
+            tags=tags,
+        )
         # PlaybookExecutor(
         #     playbooks=playbooks,
         #     inventory=None,
