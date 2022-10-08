@@ -13,11 +13,6 @@ class Up:
         pass
 
     def up(self):
-        print("💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻👩‍💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻")
-        print(
-            "...................😎 Installing or Re-Installing Kubify 😎..................."
-        )
-        print("💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻")
         deployment_manifest_yaml = f"""
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -57,7 +52,6 @@ nodes:
         with open(kind_yaml_path, "w+") as file:
             file.write(deployment_manifest_yaml)
         cluster = KindCluster(name="kind")
-        # if you get error, to debug locally: .pytest-kind/kind/kind-v0.15.0 create cluster --name=kind --kubeconfig=.pytest-kind/kind/kubeconfig --config /root/.kubify/kind.yaml
         cluster.create(config_file=kind_yaml)
         cluster.kubectl("apply", "-f", kind_yaml_path)
 

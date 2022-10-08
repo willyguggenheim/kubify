@@ -95,6 +95,9 @@ subm:
 	mkdir -p ./submodules
 	git submodule update --init --recursive
 
+debug-up:
+	.pytest-kind/kind/kind-v0.15.0 create cluster --name=kind --kubeconfig=.pytest-kind/kind/kubeconfig --config /root/.kubify/kind.yaml
+
 mac:
 	brew bundle
 
@@ -224,8 +227,7 @@ package:
 	python3 setup.py sdist bdist_wheel
 
 clean:
-	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo
-	# stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
+	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-*
 
 # test every version of python enabled
 pythons-cache:
@@ -268,12 +270,20 @@ argo-delete-services:
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
 conda:
-	conda create --name kubify
-	conda activate kubify
+	conda info | grep "active environment" | grep kubify || make conda-install
+
+conda-install:
+	brew bundle || true
+	conda update -y -n base -c defaults conda
+	conda info --envs | grep kubify || conda create -y --name kubify
+	conda info | grep "active environment" | grep base && echo "now run: source activate kubify"
+	conda install --name kubify pip pylint mamba -y
 
 develop:
+	make conda
 	echo $$OSTYPE | grep arwin && make mac || make apt
-	make security clean pip 
-	make kind kubectl 
+	make pip
+	make security clean 
+	make kind kubectl
 	make lint help 
 	make coverage package
