@@ -1,11 +1,14 @@
 FROM nvidia/cuda:11.7.1-base-ubuntu20.04
-ENV DEBIAN_FRONTEND=noninteractive
-ENV NODE_VERSION 14.18.1
-ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
-ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 WORKDIR /src/kubify
-RUN apt update && apt install -y make sudo
+ENV DEBIAN_FRONTEND=noninteractive
+ENV NODE_VERSION=14.18.1
+ENV NVM_DIR=$HOME/.kubify_nvm
+RUN mkdir -p $NVM_DIR
+ENV NODE_PATH=$NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+RUN apt update && apt install -y make sudo curl git
 COPY Makefile .
+RUN make node
 COPY apt.lock .
 RUN make apt
 COPY setup.py .

@@ -99,12 +99,11 @@ mac:
 	brew bundle
 
 node:
+	export NVM_DIR=$${NVM_DIR:-$$HOME/.kubify_nvm}
+	mkdir -p $$NVM_DIR
 	export NODE_VERSION=$${NODE_VERSION:-14.18.1}
-	which nvm || curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-	stat $$NVM_DIR/nvm.sh && . $$NVM_DIR/nvm.sh || make mac
-	nvm install $$NODE_VERSION
-	nvm alias default $$NODE_VERSION 
-	nvm use kubify
+	stat $$NVM_DIR/nvm.sh || curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && nvm alias kubify "$$NODE_VERSION" && nvm use kubify
 
 tfsec:
 	mkdir -p ~/kubify_tools
@@ -259,7 +258,6 @@ argo-create-services:
 	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
 	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
-
 argo-delete-services:
 	# connect to argocd and deploy to all clusters
 	# todo: eval "https://api.argoproj.io"
@@ -276,6 +274,6 @@ conda:
 develop:
 	echo $$OSTYPE | grep arwin && make mac || make apt
 	make security clean pip 
-	make node kind kubectl 
+	make kind kubectl 
 	make lint help 
 	make coverage package
