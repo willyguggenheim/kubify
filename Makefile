@@ -28,6 +28,9 @@ help:
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
+down:
+	kind delete kubify
+
 clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
@@ -55,6 +58,8 @@ lint/black: ## check style with black
 lint: lint/flake8 lint/black ## check style
 
 format: ## format code with black
+	conda env update --file environment.yml --prune
+	find . -type f -print0 | xargs -0 dos2unix
 	black ./kubify ./tests
 
 test: ## run tests quickly with the default Python
@@ -91,9 +96,12 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
-subm:
+submodules:
 	mkdir -p ./submodules
 	git submodule update --init --recursive
+
+debug-up:
+	.pytest-kind/kind/kind-v0.15.0 create cluster --name=kind --kubeconfig=.pytest-kind/kind/kubeconfig --config $$HOME/.kubify/kind.yaml
 
 mac:
 	brew bundle
@@ -106,10 +114,10 @@ node:
 	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && nvm alias kubify "$$NODE_VERSION" && nvm use kubify
 
 tfsec:
-	mkdir -p ~/kubify_tools
-	which tfsec || echo $$OSTYPE | grep darwin && brew bundle || curl -o ~/kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
-	stat ~/kubify_tools/tfsec && chmod +x ~/kubify_tools/tfsec
-	stat ~/kubify_tools/tfsec && ~/kubify_tools/tfsec || tfsec
+	mkdir -p $$HOME/kubify_tools
+	which tfsec || echo $$OSTYPE | grep darwin && brew bundle || curl -o $$HOME/kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
+	stat $$HOME/kubify_tools/tfsec && chmod +x $$HOME/kubify_tools/tfsec
+	stat $$HOME/kubify_tools/tfsec && $$HOME/kubify_tools/tfsec || tfsec
 
 pip:
 	pip install -e .[develop]
@@ -129,7 +137,7 @@ apt:
 	apt update && xargs apt -y install <apt.lock
 
 tfenv:
-	which tfenv || brew install tfenv 2>/dev/null || anyenv install tfenv 2>/dev/null || `git clone https://github.com/tfutils/tfenv ~/.tfenv && ln -s ~/.tfenv/bin/* /usr/local/bin`
+	which tfenv || brew install tfenv 2>/dev/null || anyenv install tfenv 2>/dev/null || `git clone https://github.com/tfutils/tfenv $$HOME/.tfenv && ln -s $$HOME/.tfenv/bin/* /usr/local/bin`
 	tfenv install 1.3.0
 	tfenv use 1.3.0
 
@@ -144,7 +152,18 @@ version:
 	git push --tags
 	make pip
 
+python-rapid: # run git add first
+	check-manifest -u -v
+	make format
+	make lint
+	make docker
+	git commit -m "kubify python migration"
+	git push
+	bump2version patch && git push && git push --tags
+	open "https://github.com/willyguggenheim/kubify/compare/main...python"
+
 rapid:
+	check-manifest -u -v
 	make security
 	make tfsec
 	make format
@@ -224,8 +243,7 @@ package:
 	python3 setup.py sdist bdist_wheel
 
 clean:
-	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo
-	# stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
+	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-*
 
 # test every version of python enabled
 pythons-cache:
@@ -253,27 +271,35 @@ aws-list:
 # todo: also (similarly) ansible kubedb changes for multi-cloud database (and that backs up in both clouds)
 # todo: route53 helm automations to failover active-active between clouds
 argo-create-services:
-	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
+	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $$(cat $$HOME/.argocd/token)
 	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
-	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
+	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat $$HOME/.argocd/token)
 	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
 argo-delete-services:
 	# connect to argocd and deploy to all clusters
 	# todo: eval "https://api.argoproj.io"
-	# todo: eval "$$(cat ~/.argocd/token)"
-	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
+	# todo: eval "$$(cat $$HOME/.argocd/token)"
+	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $$(cat $$HOME/.argocd/token)
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
-	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
+	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat $$HOME/.argocd/token)
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
 conda:
-	conda create --name kubify
-	conda activate kubify
+	conda info | grep "active environment" | grep kubify || make conda-install
+	conda info | grep "active environment" | grep kubify || make conda-setup
+
+conda-install:
+	chmod +x ./kubify/ops/tools/scripts/conda_install.sh && ./kubify/ops/tools/scripts/conda_install.sh
+
+conda-setup:
+	chmod +x ./kubify/ops/tools/scripts/conda_setup.sh && ./kubify/ops/tools/scripts/conda_setup.sh
 
 develop:
+	make conda
 	echo $$OSTYPE | grep arwin && make mac || make apt
-	make security clean pip 
-	make kind kubectl 
+	make pip
+	make security clean 
+	make kind kubectl
 	make lint help 
 	make coverage package

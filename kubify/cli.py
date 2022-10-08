@@ -50,8 +50,7 @@ args = parser.parse_args()
 
 if args.up:
     kubify.up()
-if args.down:
-    kubify.down()
+
 if args.start:
     kubify.start()
 
