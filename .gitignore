@@ -246,3 +246,5 @@ kubify/src/core/__pycache__/
 **/*.log
 Brewfile.lock.json
 .kube
+condaenv*
+**/condaenv*
