@@ -145,7 +145,7 @@ rapid:
 	make tfsec
 	make format
 	echo "git add your files, then press any key to push"
-	read
+	bash -c "read"
 	git commit -m "python" && git push
 	make version
 
