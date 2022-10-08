@@ -8,7 +8,8 @@ import kubify.src.core.app_constants as app_constants
 from pytest_kind import KindCluster
 
 from collections import namedtuple
-from ansible.executor.playbook_executor import PlaybookExecutor
+
+# from ansible.executor.playbook_executor import PlaybookExecutor
 
 import ansible_runner
 

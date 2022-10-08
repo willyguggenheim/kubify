@@ -91,9 +91,21 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
+subm:
+	mkdir -p ./submodules
+	git submodule update --init --recursive
+
+mac:
+	brew bundle
+
+node:
+	./kubify/ops/make/scripts/make_node.sh
+
 tfsec:
-	uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64" && brew install tfsec 2>/dev/null || `curl -Lo ./tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-checkgen-linux-$$arch_found" && chmod +x ./tfsec && mv ./tfsec /usr/local/bin/tfsec`
-	tfsec
+	mkdir -p ~/kubify_tools
+	which tfsec || echo $$OSTYPE | grep darwin && brew bundle || curl -o ~/kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
+	stat ~/kubify_tools/tfsec && chmod +x ~/kubify_tools/tfsec
+	stat ~/kubify_tools/tfsec && ~/kubify_tools/tfsec || tfsec
 
 pip:
 	pip install -e .[develop]
@@ -132,7 +144,8 @@ rapid:
 	make security
 	make tfsec
 	make format
-	read -p "git add your files that you want to commit in 2nd terminal, then press enter in this terminal to push and version push"
+	echo "git add your files, then press any key to push"
+	read
 	git commit -m "python" && git push
 	make version
 
@@ -250,3 +263,7 @@ argo-delete-services:
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
+
+develop:
+	echo $$OSTYPE | grep arwin && make mac || make apt
+	make security clean pip node kind kubectl lint help coverage package

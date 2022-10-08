@@ -16,7 +16,6 @@ requirements = [
     "boto3",
     "awscli",
     "ansible-runner",
-    "ansible"
 ]
 
 test_requirements = [
