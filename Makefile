@@ -243,7 +243,7 @@ package:
 	python3 setup.py sdist bdist_wheel
 
 clean:
-	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-*
+	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-* ./kubify_tools
 
 # test every version of python enabled
 pythons-cache:

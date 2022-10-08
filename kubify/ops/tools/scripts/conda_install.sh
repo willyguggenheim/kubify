@@ -1,8 +1,8 @@
 #!/bin/bash
 
+brew bundle || true
 mkdir -p ./kubify_tools
-uname -a | grep arm && curl -o ./kubify_tools/miniconda-install.sh "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh" || true
-uname -a | grep amd && curl -o ./kubify_tools/miniconda-install.sh "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh" || true
-uname -a | grep aarch && curl -o ./kubify_tools/miniconda-install.sh "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh" || true
-echo $OSTYPE | grep arwin && brew bundle || stat ./kubify_tools/miniconda-install.sh
-/bin/bash ./kubify_tools/miniconda-install.sh -b -p /opt/conda || ./kubify_tools/miniconda-install.sh -b -p /opt/conda || $SHELL ./kubify_tools/miniconda-install.sh
+curl -o ./kubify_tools/miniconda-install-aarch64.sh "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh"
+curl -o ./kubify_tools/miniconda-install-x86_64.sh "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+chmod +x ./kubify_tools/miniconda-install*.sh
+echo $OSTYPE | grep arwin || ./kubify_tools/miniconda-install-aarch64.sh -b -p /opt/conda || ./kubify_tools/miniconda-install-x86_64.sh -b -p /opt/conda
