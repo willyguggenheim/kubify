@@ -99,7 +99,12 @@ mac:
 	brew bundle
 
 node:
-	./kubify/ops/make/scripts/make_node.sh
+	export NODE_VERSION=$${NODE_VERSION:-14.18.1}
+	which nvm || curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+	stat $$NVM_DIR/nvm.sh && . $$NVM_DIR/nvm.sh || make mac
+	nvm install $$NODE_VERSION
+	nvm alias default $$NODE_VERSION 
+	nvm use kubify
 
 tfsec:
 	mkdir -p ~/kubify_tools
@@ -221,7 +226,7 @@ package:
 
 clean:
 	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo
-	stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
+	# stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
 
 # test every version of python enabled
 pythons-cache:
@@ -229,16 +234,16 @@ pythons-cache:
 pythons:
 	tox -e py37,py38,py39,py310 -p all
 
-# mac intel, m1, m2 and other darwin-based ..
-mac:
+# mac intel, m1, m2 and other darwin-based (in case you want to install outside container while contributing) ..
+mac-direct-install:
 	ansible-playbook --connection=local "ansible/install_kubify_on_mac.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 
 # ubuntu, debian and other debian-based ..
-deb:
+deb-direct-install:
 	ansible-playbook --connection=local "ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 
 # rhel, centos and other epel-based ..
-epel:
+epel-direct-install:
 	ansible-playbook --connection=local "ansible/install_kubify_on_amzn2_centos_fedora_oracle_and_rhel.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 
 aws-list:
@@ -264,6 +269,13 @@ argo-delete-services:
 	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
+conda:
+	conda create --name kubify
+	conda activate kubify
+
 develop:
 	echo $$OSTYPE | grep arwin && make mac || make apt
-	make security clean pip node kind kubectl lint help coverage package
+	make security clean pip 
+	make node kind kubectl 
+	make lint help 
+	make coverage package

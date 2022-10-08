@@ -1,0 +1,6 @@
+cask "docker"
+brew "tfenv"
+brew "tfsec", link: true
+brew "nvm"
+brew "npm"
+brew "miniconda"
