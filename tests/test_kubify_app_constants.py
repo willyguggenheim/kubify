@@ -17,8 +17,6 @@ def test_dir_paths():
     assert path.is_file()
     path = Path(f"{app_constants.ops_dir}/ansible")
     assert path.exists()
-    path = Path(f"{app_constants.ops_dir}/services")
-    assert path.exists()
     path = Path(f"{app_constants.ops_dir}/terraform")
     assert path.exists()
     path = Path(f"{app_constants.ansible_dir}")

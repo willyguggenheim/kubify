@@ -2,9 +2,9 @@ version: '3.9'
 services:
   kubify:
     volumes:
-      - ./:/src/kubify # if devcontainer only, can also add :cached
-      - ~/kubify/kubedb.txt:/root/kubify/kubedb.txt # if devcontainer only, can also add :cached
+      - $PWD/:/src/kubify:cached
+      - $HOME/kubify/kubedb.txt:/root/kubify/kubedb.txt:cached
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/.aws:/root/.aws # if devcontainer only, can also add :cached
-      - ~/.ssh:~/.ssh # for git commands in devcontainer vscode
+      - $HOME/.aws:/root/.aws:cached
+      - $HOME/.ssh:/root/.ssh:cached
     command: /bin/sh -c "while sleep 1000; do :; done"

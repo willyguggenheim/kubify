@@ -19,7 +19,7 @@ COPY .bandit.yml .
 RUN pip install --ignore-installed PyYAML
 RUN pip install --upgrade pip
 COPY kubify/ops/terraform ./ops/terraform
-RUN make tfenv tfsec
+RUN make tfenv tfsec kubectl
 RUN make security pip package
 COPY . .
 RUN make develop

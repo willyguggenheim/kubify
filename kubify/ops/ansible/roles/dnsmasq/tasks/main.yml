@@ -168,10 +168,10 @@
   with_items: "{{ killed_processes.results | select('failed') | map(attribute='item') | list }}"
   when: ansible_os_family == "Darwin"
 
-- name: Workaround Mac Git M1 Folder Random Create
-  become: no
-  command: mv ~/.gitconfig ~/.gitconfig_BACKUP
-  ignore_errors: true
+# - name: Workaround Mac Git M1 Folder Random Create
+#   become: no
+#   command: mv ~/.gitconfig ~/.gitconfig_BACKUP
+#   ignore_errors: true
 
 - name: Restart dnsmasq as user (for running)
   become: no
