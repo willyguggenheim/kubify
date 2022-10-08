@@ -50,3 +50,6 @@ DEV_KMS = f"arn:aws:kms:{AWS_REGION}:{AWS_ACCOUNT_ID}:alias/{KMS_KEY_NAME}"
 TEST_KMS = f"arn:aws:kms:{AWS_REGION}:{AWS_ACCOUNT_ID}:alias/{KMS_KEY_NAME}"
 STAGE_KMS = f"arn:aws:kms:{AWS_REGION}:{AWS_ACCOUNT_ID}:alias/{KMS_KEY_NAME}"
 PROD_KMS = f"arn:aws:kms:{AWS_REGION}:{AWS_ACCOUNT_ID}:alias/{KMS_KEY_NAME}"
+
+# vars
+os.environ["KUBECONFIG"] = os.environ.get("KUBIFY_KUBECONFIG", f"{git_dir}/../.pytest-kind/kubify/kubeconfig")

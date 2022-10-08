@@ -1,5 +1,3 @@
-#!/bin/python3
-
 import os
 from pathlib import Path
 
@@ -13,8 +11,9 @@ class Down:
         pass
 
     def down(self):
-        cluster = KindCluster(name="kind")
-        cluster.delete()
+        os.environ["KUBECONFIG"] = f"{app_constants.cwd}/.pytest-kind/kubify/kubeconfig"
+        kind_cluster = KindCluster(name="kubify")
+        kind_cluster.delete()
 
     def main(self):
         self.down()

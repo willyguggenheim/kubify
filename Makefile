@@ -96,7 +96,7 @@ subm:
 	git submodule update --init --recursive
 
 debug-up:
-	.pytest-kind/kind/kind-v0.15.0 create cluster --name=kind --kubeconfig=.pytest-kind/kind/kubeconfig --config /root/.kubify/kind.yaml
+	.pytest-kind/kind/kind-v0.15.0 create cluster --name=kind --kubeconfig=.pytest-kind/kind/kubeconfig --config $$HOME/.kubify/kind.yaml
 
 mac:
 	brew bundle

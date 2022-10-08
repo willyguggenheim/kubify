@@ -1,6 +1,5 @@
-#!/bin/python3
-
 import os
+import requests
 from pathlib import Path
 
 import kubify.src.kubify
@@ -19,7 +18,7 @@ apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
   extraMounts:
-  - hostPath: "{app_constants.cwd}"
+  - hostPath: "{app_constants.git_dir}/../"
     containerPath: /src/kubify
     readOnly: false
   - hostPath: "{app_constants.home}/.aws"
@@ -40,10 +39,10 @@ nodes:
         node-labels: "ingress-ready=true"
   extraPortMappings:
   - containerPort: 80
-    hostPort: 80
+    hostPort: 8200
     protocol: TCP
   - containerPort: 443
-    hostPort: 443
+    hostPort: 8443
     protocol: TCP
         """
         kind_yaml = f"{app_constants.kubify_work}/kind.yaml"
@@ -51,9 +50,9 @@ nodes:
         kind_yaml_path.touch(exist_ok=True)
         with open(kind_yaml_path, "w+") as file:
             file.write(deployment_manifest_yaml)
-        cluster = KindCluster(name="kind")
-        cluster.create(config_file=kind_yaml)
-        cluster.kubectl("apply", "-f", kind_yaml_path)
+        kind_cluster = KindCluster(name="kubify")
+        kind_cluster.create(config_file=kind_yaml_path)
+        kind_cluster.kubectl("apply", "-f", f"{app_constants.git_dir}/../kubify/ops/templates/k8s/bootstrap.yaml")
 
     def main(self):
         self.up()
