@@ -18,7 +18,7 @@ jobs:
       name: setup-qemu-multiarch
       uses: docker/setup-qemu-action@v2
     -
-      name: setup-biuldx-multiarch
+      name: setup-buildx-multiarch
       uses: docker/setup-buildx-action@v2
     - name: pypi-make-package
       id: makepypipackage
@@ -30,7 +30,8 @@ jobs:
       with:
         context: ./
         file: ./Dockerfile
-        platforms: linux/amd64,linux/arm64
+        # linux/arm64
+        platforms: linux/amd64,linux/aarch64
         push: ${{ github.event_name != 'pull_request' }}
         tags: willy0912/kubify:main
     # conda ship package
