@@ -114,10 +114,10 @@ node:
 	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && nvm alias kubify "$$NODE_VERSION" && nvm use kubify
 
 tfsec:
-	mkdir -p $$HOME/kubify_tools
-	which tfsec || echo $$OSTYPE | grep darwin && brew bundle || curl -o $$HOME/kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
-	stat $$HOME/kubify_tools/tfsec && chmod +x $$HOME/kubify_tools/tfsec
-	stat $$HOME/kubify_tools/tfsec && $$HOME/kubify_tools/tfsec || tfsec
+	mkdir -p ./kubify_tools
+	which tfsec || echo $$OSTYPE | grep darwin && brew bundle || curl -o ./kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
+	stat ./kubify_tools/tfsec && chmod +x ./kubify_tools/tfsec
+	stat ./kubify_tools/tfsec && ./kubify_tools/tfsec || tfsec
 
 pip:
 	pip install -e .[develop]
