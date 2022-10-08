@@ -51,14 +51,14 @@ class Up:
                 hostPort: 443
                 protocol: TCP
         """
-        kind_yaml = f"{app_constants.kubify_work}/kind.yaml"
-        kind_yaml_path = Path(kind_yaml)
-        kind_yaml_path.touch(exist_ok=True)
-        with open(kind_yaml_path, "w+") as file:
-            file.write(deployment_manifest_yaml)
-        cluster = KindCluster("kind")
-        cluster.create()
-        cluster.kubectl("apply", "-f", kind_yaml)
+        # kind_yaml = f"{app_constants.kubify_work}/kind.yaml"
+        # kind_yaml_path = Path(kind_yaml)
+        # kind_yaml_path.touch(exist_ok=True)
+        # with open(kind_yaml_path, "w+") as file:
+        #     file.write(deployment_manifest_yaml)
+        cluster = KindCluster(name="kind")
+        cluster.create(config_file=deployment_manifest_yaml)
+        # cluster.kubectl("apply", "-f", kind_yaml)
 
     def main(self):
         self.up()

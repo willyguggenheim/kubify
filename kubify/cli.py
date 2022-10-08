@@ -10,17 +10,17 @@ parser = argparse.ArgumentParser(description="CLI for Kubify")
 
 parser.add_argument(
     "up",
-    help="start local kubernetes cluster, and deploy the service folder's shared services such as localstack",
+    help="start kubify kind local rapid testing kubernetes cluster",
 )
 parser.add_argument(
     "down",
     action="store_true",
-    help="delete local kubernetes cluster, and all local services running in it",
+    help="pause all running services and local cluster",
 )
 parser.add_argument(
     "start",
     action="store_true",
-    help="start a service and it's dependant services, listen for changes on the kubify.yaml sync folders, and restart service if any other folders are changed",
+    help="start service and it's kubify.yaml depends_on services, listen for changes on all services",
 )
 
 # parser.add_argument(

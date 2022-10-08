@@ -8,7 +8,8 @@ import kubify.src.core.app_constants as app_constants
 from pytest_kind import KindCluster
 
 from collections import namedtuple
-from ansible.executor.playbook_executor import PlaybookExecutor
+
+# from ansible.executor.playbook_executor import PlaybookExecutor
 
 import ansible_runner
 
@@ -23,7 +24,7 @@ class Start:
         print("💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻")
         tags = ([f"common,{app_constants.dir_path}"],)
         Options = namedtuple("Options", [])
-        options = Options(verbosity=None, check=False, tags=tags, verbosity=1)
+        options = Options(verbosity=1, check=False, tags=tags)
         ansible_runner.interface.run(
             playbook=f"{app_constants.ops_dir}/ansible/service.yaml",
             verbosity=1,

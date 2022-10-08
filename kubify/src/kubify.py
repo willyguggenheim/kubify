@@ -12,11 +12,13 @@ import logging
 # from collections import namedtuple
 # from pathlib import Path
 
-import kubify.src.core.utils as kubify_utils
+import kubify.src.aws.s3_utils as kubify_utils
 
-import kubify.src.core.up as kubify_up
-import kubify.src.core.down as kubify_down
-import kubify.src.core.start as kubify_start
+import kubify.up as kubify_up
+
+# TODO
+# import kubify.down as kubify_down
+import kubify.start as kubify_start
 
 import kubify.src.aws_constants as aws_constants
 
@@ -72,9 +74,10 @@ def up():
     kubify_up_class.up()
 
 
-def down():
-    kubify_down_class = kubify_down.Down()
-    kubify_down_class.down()
+# TODO
+# def down():
+#     kubify_down_class = kubify_down.Down()
+#     kubify_down_class.down()
 
 
 def start():  # start service in rapid testing coding mode

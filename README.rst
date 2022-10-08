@@ -1,7 +1,7 @@
 Welcome!
 ========
 
-Kubify OS, Version: 9010.0.12
+Kubify OS, Version: 9010.0.14
 
 Well hello there! Welcome to Kubify OS Python Package Repo
 

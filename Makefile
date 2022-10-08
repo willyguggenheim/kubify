@@ -91,9 +91,25 @@ dist: clean ## builds source and wheel package
 install: clean ## install the package to the active Python's site-packages
 	python3 setup.py install
 
+subm:
+	mkdir -p ./submodules
+	git submodule update --init --recursive
+
+mac:
+	brew bundle
+
+node:
+	export NVM_DIR=$${NVM_DIR:-$$HOME/.kubify_nvm}
+	mkdir -p $$NVM_DIR
+	export NODE_VERSION=$${NODE_VERSION:-14.18.1}
+	stat $$NVM_DIR/nvm.sh || curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && nvm alias kubify "$$NODE_VERSION" && nvm use kubify
+
 tfsec:
-	uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64" && brew install tfsec 2>/dev/null || `curl -Lo ./tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-checkgen-linux-$$arch_found" && chmod +x ./tfsec && mv ./tfsec /usr/local/bin/tfsec`
-	tfsec
+	mkdir -p ~/kubify_tools
+	which tfsec || echo $$OSTYPE | grep darwin && brew bundle || curl -o ~/kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
+	stat ~/kubify_tools/tfsec && chmod +x ~/kubify_tools/tfsec
+	stat ~/kubify_tools/tfsec && ~/kubify_tools/tfsec || tfsec
 
 pip:
 	pip install -e .[develop]
@@ -132,7 +148,8 @@ rapid:
 	make security
 	make tfsec
 	make format
-	read -p "git add your files that you want to commit in 2nd terminal, then press enter in this terminal to push and version push"
+	echo "git add your files, then press any key to push"
+	bash -c "read"
 	git commit -m "python" && git push
 	make version
 
@@ -208,7 +225,7 @@ package:
 
 clean:
 	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo
-	stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
+	# stat ./.git && git clean -xdf || cat .gitignore | sed '/^#.*/ d' | sed '/^\s*$$/ d' | sed 's/^/git rm -r /' | bash 2>/dev/null || true
 
 # test every version of python enabled
 pythons-cache:
@@ -216,16 +233,16 @@ pythons-cache:
 pythons:
 	tox -e py37,py38,py39,py310 -p all
 
-# mac intel, m1, m2 and other darwin-based ..
-mac:
+# mac intel, m1, m2 and other darwin-based (in case you want to install outside container while contributing) ..
+mac-direct-install:
 	ansible-playbook --connection=local "ansible/install_kubify_on_mac.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 
 # ubuntu, debian and other debian-based ..
-deb:
+deb-direct-install:
 	ansible-playbook --connection=local "ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 
 # rhel, centos and other epel-based ..
-epel:
+epel-direct-install:
 	ansible-playbook --connection=local "ansible/install_kubify_on_amzn2_centos_fedora_oracle_and_rhel.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 
 aws-list:
@@ -241,7 +258,6 @@ argo-create-services:
 	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
 	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
-
 argo-delete-services:
 	# connect to argocd and deploy to all clusters
 	# todo: eval "https://api.argoproj.io"
@@ -250,3 +266,14 @@ argo-delete-services:
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat ~/.argocd/token)
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
+
+conda:
+	conda create --name kubify
+	conda activate kubify
+
+develop:
+	echo $$OSTYPE | grep arwin && make mac || make apt
+	make security clean pip 
+	make kind kubectl 
+	make lint help 
+	make coverage package

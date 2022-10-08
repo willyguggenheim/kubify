@@ -1,3 +1,6 @@
+# Make Sure These Commit
+!BrewFiles
+
 # Terraform State Cache
 .terra*
 terraform/.terra*
@@ -241,3 +244,4 @@ kubify/src/core/__pycache__/
 **/node_modules
 *.log
 **/*.log
+Brewfile.lock.json
