@@ -6,4 +6,5 @@ services:
       - ~/kubify/kubedb.txt:/root/kubify/kubedb.txt # if devcontainer only, can also add :cached
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.aws:/root/.aws # if devcontainer only, can also add :cached
+      - ~/.ssh:~/.ssh # for git commands in devcontainer vscode
     command: /bin/sh -c "while sleep 1000; do :; done"
