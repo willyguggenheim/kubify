@@ -52,7 +52,11 @@ nodes:
             file.write(deployment_manifest_yaml)
         kind_cluster = KindCluster(name="kubify")
         kind_cluster.create(config_file=kind_yaml_path)
-        kind_cluster.kubectl("apply", "-f", f"{app_constants.git_dir}/../kubify/ops/templates/k8s/bootstrap.yaml")
+        kind_cluster.kubectl(
+            "apply",
+            "-f",
+            f"{app_constants.git_dir}/../kubify/ops/templates/k8s/bootstrap.yaml",
+        )
 
     def main(self):
         self.up()

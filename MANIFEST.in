@@ -8,3 +8,29 @@ recursive-exclude * *.py[co]
 
 recursive-exclude *.jpg *.png *.gif
 recursive-include docs conf.py *.cfg *.yml Makefile kubify examples .github
+
+include *.lock
+include *.yml
+include .bumpversion.cfg
+include BrewFile
+include Dockerfile
+include Makefile
+include __version__
+include ansible.cfg
+include tox.ini
+
+recursive-include docs *
+recursive-include kubify *
+recursive-include kubify Makefile
+
+recursive-include .devcontainer *
+recursive-include .vscode *
+recursive-include kubify *
+
+include .dockerignore
+include .editorconfig
+include .gitmodules
+include docs/CODEOWNERS
+
+recursive-exclude services *
+recursive-exclude environments *

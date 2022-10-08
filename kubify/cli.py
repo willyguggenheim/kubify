@@ -3,26 +3,24 @@ import argparse
 
 # from ast import arg
 import sys
-
-from kubify import up as kubify_up
-from kubify import down as kubify_down
-from kubify import start as kubify_start
-from kubify.src import kubify as kubify_py
+import kubify.src.kubify as kubify
 
 
 parser = argparse.ArgumentParser(description="CLI for Kubify")
 
-parser.add_argument( #"cluster", help="Command to run", choices=["up", "down"] )
-    help="start local kind kubify rapid test engine cluster",
-    dest="up", action="store_true", default=True
+parser.add_argument(
+    "up",
+    help="start kubify kind local rapid testing kubernetes cluster",
 )
 parser.add_argument(
-    help="stop local kind kubify rapid test engine cluster",
-    dest="down", action="store_true", default=False
+    "down",
+    action="store_true",
+    help="pause all running services and local cluster",
 )
 parser.add_argument(
-    help="start service and depends_on with folder listenings",
-    dest="start", action="store_true", default=False
+    "start",
+    action="store_true",
+    help="start service and it's kubify.yaml depends_on services, listen for changes on all services",
 )
 
 # parser.add_argument(
@@ -49,25 +47,22 @@ if len(sys.argv) <= 1:
     sys.argv.append("--help")
 
 args = parser.parse_args()
-args = vars(args)
 
-if args.get("up"):
-    kubify_up = kubify_up
-if args.get("down"):
-    kubify_down = kubify_down
-if args.get("start"):
-    kubify_start = kubify_start
+if args.up:
+    kubify.up()
 
+if args.start:
+    kubify.start()
 
-# if args.test_logger:
-#     kubify.test_logger()
+if args.test_logger:
+    kubify.test_logger()
 # if args.create_work_dirs:
 #     kubify.create_work_dirs()
 # if args.set_context_kind_kind:
 #     kubify.set_context_kind_kind()
 if args.test_or_create_s3_artifacts_bucket:
     # this is currently done via the make file
-    kubify_py.test_or_create_s3_artifacts_bucket()
+    kubify.test_or_create_s3_artifacts_bucket()
 # if args.get_entrypoint:
 #     kubify.get_entrypoint()
 # if args.get_service_pod:
