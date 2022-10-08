@@ -29,3 +29,4 @@ RUN make security pip package
 
 COPY . .
 RUN make develop
+RUN make clean
