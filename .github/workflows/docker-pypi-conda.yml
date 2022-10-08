@@ -23,12 +23,19 @@ jobs:
     - name: pypi-make-package
       id: makepypipackage
       run: python3 setup.py sdist bdist_wheel
+    # dockerhub ship image
+    -
+      name: login-dockerhub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     # docker arm/amd images build security test package
     -
       name: Build and push
       uses: docker/build-push-action@v3
       with:
-        context: ./
+        context: .
         file: ./Dockerfile
         # linux/arm64
         platforms: linux/amd64,linux/aarch64
@@ -45,10 +52,3 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
-    # dockerhub ship image
-    -
-      name: login-dockerhub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
