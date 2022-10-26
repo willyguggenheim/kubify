@@ -18,17 +18,13 @@ apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
   extraMounts:
-  - hostPath: "{app_constants.git_dir}/../"
+  - hostPath: "{app_constants.root_dir_full_path}"
     containerPath: /src/kubify
     readOnly: false
   - hostPath: "{app_constants.home}/.aws"
     containerPath: /root/.aws
   - hostPath: "{app_constants.home}/.ssh"
     containerPath: /root/.ssh
-  - hostPath: /var/run/docker.sock
-    containerPath: /var/run/docker.sock
-    propagation: HostToContainer
-    readOnly: false
   - hostPath: "{app_constants.certs_path}"
     containerPath: /usr/local/certificates
   kubeadmConfigPatches:
@@ -44,14 +40,17 @@ nodes:
   - containerPort: 443
     hostPort: 8443
     protocol: TCP
-        """
+"""
         kind_yaml = f"{app_constants.kubify_work}/kind.yaml"
         kind_yaml_path = Path(kind_yaml)
         kind_yaml_path.touch(exist_ok=True)
         with open(kind_yaml_path, "w+") as file:
             file.write(deployment_manifest_yaml)
         kind_cluster = KindCluster(name="kubify")
-        kind_cluster.create(config_file=kind_yaml_path)
+        try:
+          kind_cluster.load_docker_image("busybox")
+        except OSError:
+          kind_cluster.create(config_file=kind_yaml)
         kind_cluster.kubectl(
             "apply",
             "-f",

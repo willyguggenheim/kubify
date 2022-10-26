@@ -9,23 +9,24 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": true
         },
         {
-            "name": "Python: debug test_logger",
+            "name": "Python: cli.py",
             "type": "python",
-            "request":"launch",
+            "request": "launch",
             "cwd": "${workspaceFolder}",
-            "program":"kubify/cli.py",
+            "program": "kubify/cli.py",
             "args": [
-                // "--test_logger", 
+                "--test_logger", 
                 // "--set_context_kind_kind",
                 // "--create_work_dirs",
                 // "--get_entrypoint",
                 // "--get_service_pod",
-                "--build_entrypoint",
+                // "--build_entrypoint",
             ],
-            "console":"integratedTerminal",
+            "console": "integratedTerminal",
             "envFile": "${workspaceFolder}/.env"
         },
         {
@@ -41,6 +42,5 @@
             ],
             "envFile": "${workspaceFolder}/.env"
         }
-
     ]
 }

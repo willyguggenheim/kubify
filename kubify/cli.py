@@ -7,22 +7,32 @@ import kubify.src.kubify as kubify
 
 
 parser = argparse.ArgumentParser(description="CLI for Kubify")
-
+#
 parser.add_argument(
-    "up",
+    "--up",
+    action="store_true",
+    default=False,
     help="start kubify kind local rapid testing kubernetes cluster",
 )
 parser.add_argument(
-    "down",
+    "--down",
     action="store_true",
+    default=False,
     help="pause all running services and local cluster",
 )
 parser.add_argument(
-    "start",
+    "--start",
     action="store_true",
+    default=False,
     help="start service and it's kubify.yaml depends_on services, listen for changes on all services",
 )
-
+##
+parser.add_argument(
+    "--test_logger",
+    action="store_true",
+    default=False,
+    help="test logger functionality"
+)
 # parser.add_argument(
 #     "--create_work_dirs", action="store_true", help="in users home kubify directory"
 # )
@@ -50,6 +60,9 @@ args = parser.parse_args()
 
 if args.up:
     kubify.up()
+
+if args.down:
+    kubify.down()
 
 if args.start:
     kubify.start()
