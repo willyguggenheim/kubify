@@ -250,3 +250,5 @@ condaenv*
 **/condaenv*
 kubify_tool*
 **/kubify_tools
+kubectl
+kubify-*

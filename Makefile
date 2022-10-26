@@ -286,20 +286,20 @@ argo-delete-services:
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
 conda:
-	conda info | grep "active environment" | grep kubify || make conda-install
+	conda --version || make conda-install
 	conda info | grep "active environment" | grep kubify || make conda-setup
 
 conda-install:
-	chmod +x ./kubify/ops/tools/scripts/conda_install.sh && ./kubify/ops/tools/scripts/conda_install.sh
+	bash ./kubify/ops/tools/scripts/conda_install.sh
 
 conda-setup:
-	chmod +x ./kubify/ops/tools/scripts/conda_setup.sh && ./kubify/ops/tools/scripts/conda_setup.sh
+	bash ./kubify/ops/tools/scripts/conda_setup.sh
 
 develop:
-	make conda
 	echo $$OSTYPE | grep arwin && make mac || make apt
+	make clean
 	make pip
-	make security clean 
+	make security
 	make kind kubectl
-	make lint help 
+	make lint help
 	make coverage package

@@ -7,6 +7,7 @@ ENV CONDA_DIR /opt/conda
 ENV NODE_VERSION=14.18.1
 ENV NVM_DIR=$HOME/.kubify_nvm
 
+# node (for backstage ui development)
 RUN mkdir -p $NVM_DIR
 ENV NODE_PATH=$NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH=/opt/conda/bin:$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH

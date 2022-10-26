@@ -20,6 +20,7 @@ requirements = [
 
 test_requirements = [
     "pytest",
+    "pytest-cov",
     "tox",
     "pick",
     "bandit",
@@ -68,7 +69,7 @@ setup(
     name="kubify",
     packages=find_packages(include=["kubify", "kubify.*"]),
     test_suite="tests",
-    tests_requires=test_requirements,
+    tests_require=test_requirements,
     extras_require=extras,
     url="https://github.com/willyguggenheim/kubify",
     version="9010.5.0",
