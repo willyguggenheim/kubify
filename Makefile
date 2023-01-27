@@ -169,9 +169,9 @@ rapid:
 	make security
 	make tfsec
 	make format
-	echo "git add your files, then press any key to push"
+	echo "git add and git commit your files, then press enter to push"
 	bash -c "read"
-	git commit -m "python" && git push
+	git push
 	make version
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
