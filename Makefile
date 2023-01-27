@@ -104,21 +104,23 @@ debug-up:
 	.pytest-kind/kind/kind-v0.15.0 create cluster --name=kind --kubeconfig=.pytest-kind/kind/kubeconfig --config $$HOME/.kubify/kind.yaml
 
 mac:
-	brew bundle
+	brew bundle || true
 
 node:
 	export NVM_DIR=$${NVM_DIR:-$$HOME/.kubify_nvm}
 	mkdir -p $$NVM_DIR
 	export NODE_VERSION=$${NODE_VERSION:-18.13.0}
 	stat $$NVM_DIR/nvm.sh || curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && nvm alias kubify "$$NODE_VERSION" && nvm use kubify
+	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && \
+		nvm alias kubify "$$NODE_VERSION" && nvm use kubify
 
 tfsec:
-	which tfsec || mkdir -p ./kubify_tools
-	which tfsec || echo $$OSTYPE | grep darwin && brew bundle || curl -o ./kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
-	which tfsec || stat ./kubify_tools/tfsec && chmod +x ./kubify_tools/tfsec || true
-	which tfsec || stat ./kubify_tools/tfsec && ./kubify_tools/tfsec || true
-	make mac || true
+	which tfsec || mkdir -p ~/._kubify_tools
+	which tfsec || echo $$OSTYPE | grep darwin && make mac || \
+		curl -o ~/._kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
+	chmod +x ~/._kubify_tools/tfsec || true
+	which tfsec || stat ~/._kubify_tools/tfsec
+	echo $$PATH
 	tfsec --version
 
 pip:
@@ -246,7 +248,7 @@ package:
 	python3 setup.py sdist bdist_wheel
 
 clean:
-	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-* ./kubify_tools
+	rm -rf ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-*
 
 # test every version of python enabled
 pythons-cache:

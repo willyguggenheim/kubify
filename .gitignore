@@ -258,7 +258,7 @@ Brewfile.lock.json
 condaenv*
 **/condaenv*
 kubify_tool*
-**/kubify_tools
+**/._kubify_tools
 kubectl
 kubify-*
 

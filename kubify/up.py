@@ -49,8 +49,7 @@ nodes:
             "apply",
             "-f",
             f"{app_constants.git_dir}/../kubify/ops/templates/k8s/bootstrap.yaml",
-        )  # up
-        kind_cluster.load_docker_image("busybox")  # test
+        )
 
     def main(self):
         self.up()
