@@ -30,7 +30,7 @@ ENV PATH=${PATH}:/root/._kubify_tools
 RUN make tfenv tfsec
 
 # kubectl install
-RUN make k8s
+RUN make kubectl
 
 # apt update
 COPY apt.lock .
