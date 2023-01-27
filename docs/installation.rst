@@ -26,7 +26,7 @@ you through the process.
 From sources
 ------------
 
-The sources for kubify can be downloaded from the `Github repo`_.
+The sources for Kubify can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 

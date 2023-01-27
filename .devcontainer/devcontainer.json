@@ -5,7 +5,7 @@
 		"docker-compose.yml"
 	],
 	"service": "kubify",
-	"workspaceFolder": "/src/kubify",
+	"workspaceFolder": "/var/folders/kubify",
 	"postStartCommand": "make clean && make lint && make help && make security && make package && make coverage && make test", // "kubify up"
 	"customizations": {
 		// Configure properties specific to VS Code.

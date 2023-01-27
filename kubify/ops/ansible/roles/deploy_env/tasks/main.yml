@@ -6,7 +6,7 @@
 - name: Read values
   set_fact:
     kubify_version: "{{ deploy_config | json_query('kubify_version') }}"
-    kubify_cli: "{{ src_dir }}/src/kubify/tool/kubify"
+    kubify_cli: "{{ src_dir }}/var/folders/kubify/tool/kubify"
     environment_name: "{{ deploy_config | json_query('metadata.name') }}"
     target_cluster: "{{ deploy_config | json_query('target.cluster') }}"
     services: "{{ deploy_config | json_query('services') }}"
@@ -47,7 +47,7 @@
   shell: |
     kubectl get environment {{ environment_name }} -o yaml > {{ old_environment_path }}
   register: existing_environment
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Parse existing environment
   include_vars:

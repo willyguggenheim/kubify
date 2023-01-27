@@ -16,14 +16,14 @@ import kubify.src.aws.s3_utils as kubify_utils
 
 import kubify.up as kubify_up
 
-# TODO
-# import kubify.down as kubify_down
+import kubify.down as kubify_down
 import kubify.start as kubify_start
 
 import kubify.src.aws_constants as aws_constants
 
 import kubify.src.core.app_constants as app_constants
 import kubify.src.core.log as my_logging
+
 
 # do this before logging for log file to be in work dir
 def create_work_dirs():
@@ -65,8 +65,8 @@ def test_logger():
     _logger.critical("test logger")
 
 
-def kubify_version():
-    return git_utils.git_version()
+# def kubify_version():
+#     return git_utils.git_version()
 
 
 def up():
@@ -74,10 +74,9 @@ def up():
     kubify_up_class.up()
 
 
-# TODO
-# def down():
-#     kubify_down_class = kubify_down.Down()
-#     kubify_down_class.down()
+def down():
+    kubify_down_class = kubify_down.Down()
+    kubify_down_class.down()
 
 
 def start():  # start service in rapid testing coding mode
@@ -157,7 +156,7 @@ def start():  # start service in rapid testing coding mode
 #     # TODO
 #     # app_code = get_user_input():#read
 #     logging.info(
-#         "Thank you! 😎 Continuing Kubify installer, if you recently reset your Docker then this would be a good time to get some coffee (entrypoint container takes a few minutes to build if not already built)....."
+#         "Thank you! 😎 Continuing Kubify installer"
 #     )
 #     # if [ -z "$PROFILE" ]; then
 #     # KUBECTL="kubectl"
@@ -266,7 +265,10 @@ def start():  # start service in rapid testing coding mode
 #     # ansible-playbook \
 #     #     --connection=local \
 #     #     --inventory=127.0.0.1, "${K8S_DIR}/ansible/service.yaml" \
-#     #     --extra-vars="${EXPOSE_SERVICE_FLAG} env_domain=${ENV_DOMAIN} profile=${SERVICE_PROFILE} ${IS_LOCAL} cert_issuer=${CERT_ISSUER} ${KUBIFY_DOMAIN_ENV} kubify_domain_suffix=${KUBIFY_DOMAIN_SUFFIX} build_profile=${BUILD_PROFILE} skaffold_namespace=${NAMESPACE} env=${ENV} kubify_dir=${WORK_DIR} app_dir=${APP_DIR} app_name=${APP_NAME} app_image=${IMAGE} app_cicd_build_image=${CI_BUILD_IMAGE} kubify_version=${KUBIFY_CURRENT_VERSION} ${VARS}" \
+#     #     --extra-vars="${EXPOSE_SERVICE_FLAG} env_domain=${ENV_DOMAIN} profile=${SERVICE_PROFILE} ${IS_LOCAL} cert_issuer=${CERT_ISSUER} \
+#     #         ${KUBIFY_DOMAIN_ENV} kubify_domain_suffix=${KUBIFY_DOMAIN_SUFFIX} build_profile=${BUILD_PROFILE} skaffold_namespace=${NAMESPACE} \
+#     #         env=${ENV} kubify_dir=${WORK_DIR} app_dir=${APP_DIR} app_name=${APP_NAME} app_image=${IMAGE} app_cicd_build_image=${CI_BUILD_IMAGE} \
+#     #         kubify_version=${KUBIFY_CURRENT_VERSION} ${VARS}" \
 #     #     --tags=$TAGS
 #     pass
 #     # this is the heart of the program

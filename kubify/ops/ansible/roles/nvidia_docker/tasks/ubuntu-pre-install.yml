@@ -32,4 +32,4 @@
     update_cache: yes
   notify: restart docker
   environment: "{{proxy_env if proxy_env is defined else {}}}"
-  ignore_errors: yes
+  ignore_errors: true

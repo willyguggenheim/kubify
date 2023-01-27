@@ -1,5 +1,5 @@
-"""Top-level package for kubify."""
+"""Python Package for Kubify."""
 
 __author__ = "kubify"
 __email__ = "w@kubify.com"
-__version__ = "9010.5.0"
+__version__ = "9013.0.0"

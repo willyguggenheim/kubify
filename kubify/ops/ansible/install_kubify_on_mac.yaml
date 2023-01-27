@@ -137,7 +137,7 @@
 
     - name: Ensure Docker and Lens, VSCode are Installed
       shell: brew install --cask docker visual-studio-code lens
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Brew linking ensure kubectl
       shell: brew link --overwrite kubernetes-cli
@@ -166,7 +166,7 @@
         state: "upgraded"
         upgrade_all: "{{ upgrade_homebrew_packages }}"
       # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Ensure Homebrew Cask Packages Are Linked
       homebrew_cask:
@@ -179,27 +179,27 @@
     - name: Ensure Docker
       shell: brew install --cask docker
       # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Ensure VSCode
       shell: brew install --cask visual-studio-code
       # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Ensure Lens
       shell: brew install --cask lens
       # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
-      ignore_errors: yes
+      ignore_errors: true
 
     # - name: Brew linked the installed cask package binaries sha256 checks and linking
     #   shell: brew link --overwrite docker visual-studio-code lens
-    #   ignore_errors: yes
+    #   ignore_errors: true
 
     # - name: Brew Kubesec (and Go) with Make
     #   shell: brew install shyiko/kubesec/kubesec
     #   
     #   # until the new version of brew is released (they added accept_external_apps for pre-installed software on April 22, 2021)
-    #   ignore_errors: yes
+    #   ignore_errors: true
     # WORKAROUND 001: brew install kubesec #gives an error
     # - name: Install kubesec (workaround, since brew package has issues)
     #   shell: curl -sSL https://github.com/shyiko/kubesec/releases/download/0.9.2/kubesec-0.9.2-darwin-amd64 -o kubesec && chmod a+x kubesec && sudo mv kubesec /usr/local/bin/ && curl -sSL https://github.com/shyiko/kubesec/releases/download/0.9.2/kubesec-0.9.2-darwin-amd64.asc -o kubesec.asc && curl -sS https://keybase.io/shyiko/pgp_keys.asc | gpg --import && gpg --verify kubesec.asc /usr/local/bin/kubesec

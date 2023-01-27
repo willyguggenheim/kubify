@@ -1,10 +1,12 @@
 # from curses import meta
+import time
 import logging
 import operator
 import re
-from kubernetes import client, config
-import time
+from kubernetes import client as k8s_client
+from kubernetes import config as k8s_config
 from kubernetes.client.rest import ApiException
+from .modules.get_cm import K8sConfigMap
 import pykube
 
 config = pykube.KubeConfig.from_file()
@@ -46,9 +48,9 @@ def get_namespaces():
     # Load the connection config, default behaviour is to load ~/.kube/config
     # For development this is fine, when moving into production another way
     # of providing the config is required
-    config.load_kube_config()
+    k8s_config.load_kube_config()
 
-    v1 = client.CoreV1Api()
+    v1 = k8s_client.CoreV1Api()
     nameSpaceList = v1.list_namespace()
     for nameSpace in nameSpaceList.items:
         logging.info(nameSpace.metadata.name)
@@ -56,10 +58,9 @@ def get_namespaces():
 
 
 def get_api_resources():
-    config.load_kube_config()
+    k8s_config.load_kube_config()
     api_resource_names = []
-    a = ""
-    for api in client.ApisApi().get_api_versions().groups:
+    for api in k8s_client.ApisApi().get_api_versions().groups:
 
         versions = []
         for v in api.versions:
@@ -77,8 +78,8 @@ def get_api_resources():
 def create_namespaced_deployment(
     deployment_name, deployment_manifest, namspace="default"
 ):
-    api_client = client.ApiClient(config)
-    v1 = client.AppsV1Api(api_client)
+    api_client = k8s_client.ApiClient(config)
+    v1 = k8s_client.AppsV1Api(api_client)
     response = v1.create_namespaced_deployment(
         body=deployment_manifest, namespace=namspace
     )
@@ -99,9 +100,9 @@ def create_namespaced_deployment(
 
 
 def get_cluster_id(name="kube-system"):
-    metadata = client.V1ObjectMeta(name=name)
+    metadata = k8s_client.V1ObjectMeta(name=name)
     return metadata.uid
-    # cluster_context = config.kube_config.list_kube_config_contexts()
+    # cluster_context = k8s_config.kube_config.list_kube_config_contexts()
     # print (cluster_context)
 
 

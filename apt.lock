@@ -1,8 +1,13 @@
+ansible
 docker-compose
 python3-pip
 python3-bandit
 make
+wget
 git
 curl
 unzip
 jq
+dos2unix
+curl
+git

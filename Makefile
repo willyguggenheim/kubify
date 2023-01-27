@@ -50,17 +50,17 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 ./kubify ./tests --ignore="E266,E502,E501,W292,W293,F401,E115,E402,E712,F841,F811,W291,E111,E302,E225,F821,E117,E261,E303,E231,E265,W391,C416,B007,W504,C408,B006,E202,F541,E741,E999,E305,E722,B001"
+	flake8 --max-line-length=200 --exclude="kubify/ops/charts,tests,docs,build" ./
 
 lint/black: ## check style with black
-	black --check ./kubify ./tests
+	black --check ./
 
 lint: lint/flake8 lint/black ## check style
 
 format: ## format code with black
-	conda env update --file environment.yml --prune
 	find . -type f -print0 | xargs -0 dos2unix
-	black ./kubify ./tests
+	black ./
+	conda env update --file environment.yml --prune
 
 test: ## run tests quickly with the default Python
 	pytest
@@ -104,23 +104,28 @@ debug-up:
 	.pytest-kind/kind/kind-v0.15.0 create cluster --name=kind --kubeconfig=.pytest-kind/kind/kubeconfig --config $$HOME/.kubify/kind.yaml
 
 mac:
-	brew bundle
+	brew bundle || true
 
 node:
 	export NVM_DIR=$${NVM_DIR:-$$HOME/.kubify_nvm}
 	mkdir -p $$NVM_DIR
-	export NODE_VERSION=$${NODE_VERSION:-14.18.1}
+	export NODE_VERSION=$${NODE_VERSION:-18.13.0}
 	stat $$NVM_DIR/nvm.sh || curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && nvm alias kubify "$$NODE_VERSION" && nvm use kubify
+	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && \
+		nvm alias kubify "$$NODE_VERSION" && nvm use kubify
 
 tfsec:
-	mkdir -p ./kubify_tools
-	which tfsec || echo $$OSTYPE | grep darwin && brew bundle || curl -o ./kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
-	stat ./kubify_tools/tfsec && chmod +x ./kubify_tools/tfsec
-	stat ./kubify_tools/tfsec && ./kubify_tools/tfsec || tfsec
+	which tfsec || mkdir -p ~/._kubify_tools
+	which tfsec || echo $$OSTYPE | grep darwin && make mac || \
+		curl -o ~/._kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
+	chmod +x ~/._kubify_tools/tfsec || true
+	which tfsec || stat ~/._kubify_tools/tfsec
+	echo $$PATH
+	tfsec --version
 
 pip:
 	pip install -e .[develop]
+	ansible --version || pip install -U ansible
 
 install_grpcio: pip3 install --upgrade pip
 	python3 -m pip install --upgrade setuptools
@@ -129,9 +134,16 @@ install_grpcio: pip3 install --upgrade pip
 kind:
 	export uname_found=`uname` && uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64" && which kind || brew install kind 2>/dev/null || `curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-$$uname_found-$$arch_found" && chmod +x ./kind && mv ./kind /usr/local/bin/kind`
 
-kubectl:
-	uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64"
-	which kubectl || brew install kubectl 2>/dev/null || curl -LO "https://dl.k8s.io/release/`curl -L -s https://dl.k8s.io/release/stable.txt`/bin/linux/$$arch_found/kubectl"
+k8s:
+	mkdir -p ~/._kubify_tools/src
+	which skaffold || uname -m | grep amd && export arch_found="amd64" || export arch_found="arm64" && wget -O ~/._kubify_tools/skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-$$arch_found"
+	chmod +x ~/._kubify_tools/skaffold
+	which kubectl || uname -m | grep amd && export arch_found="amd64" || export arch_found="arm64" && wget -O ~/._kubify_tools/kubectl "https://dl.k8s.io/release/`curl -L -s https://dl.k8s.io/release/stable.txt`/bin/linux/$$arch_found/kubectl"
+	chmod +x ~/._kubify_tools/kubectl
+	# git clone https://github.com/ahmetb/kubectx ~/._kubify_tools/src/kubectx
+	# ln -s ~/._kubify_tools/src/kubectx/kubectx ~/._kubify_tools/kubectx
+	# chmod +x ~/._kubify_tools/kubectx
+	# rm -rf ~/._kubify_tools/src/kubectx
 
 apt:
 	apt update && xargs apt -y install <apt.lock
@@ -141,10 +153,10 @@ tfenv:
 	tfenv install 1.3.0
 	tfenv use 1.3.0
 
-fix:
-	find . -type f -print0 | xargs -0 dos2unix
-	black ./kubify
-	terraform fmt --recursive
+format:
+	find . -type f -print0 -not -path "./.git/*" >/dev/null | xargs -0 dos2unix >/dev/null
+	black ./
+	terraform fmt --recursive --write=true
 
 version:
 	bump2version patch
@@ -167,9 +179,9 @@ rapid:
 	make security
 	make tfsec
 	make format
-	echo "git add your files, then press any key to push"
+	echo "git add and git commit your files, then press enter to push"
 	bash -c "read"
-	git commit -m "python" && git push
+	git push
 	make version
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
@@ -211,7 +223,6 @@ cloud-delete: #clouds reset nonprod envs
 cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|prod])
 	echo "creating cloud env $$env"
 	tfsec
-	terraform fmt --recursive
 	gcloud config set project kubify-os || gcloud auth application-default login
 	gcloud config set project kubify-os
 	aws sts get-caller-identity >/dev/null || aws configure
@@ -228,6 +239,9 @@ cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|
 		terraform apply --var="cluster_name=kubify-$$env" || terraform state rm module.aws.module.eks-dr-us-east-1.module.eks.kubernetes_config_map_v1_data.aws_auth
 
 docker:
+	make security
+	make format
+	make lint
 	docker build . -t kubify:latest
 	docker tag kubify:latest docker.io/willy0912/kubify:latest
 
@@ -236,14 +250,13 @@ docker-test-all-pythons:
 	docker tag kubify:latest docker.io/willy0912/kubify:latest
 
 security:
-	bandit -r ./kubify -c .bandit.yml
-	bandit -r ./kubify/ops/services -c .bandit.yml
+	bandit -r . -c .bandit.yml
 
 package:
 	python3 setup.py sdist bdist_wheel
 
 clean:
-	rm -rf ./.kub* ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-* ./kubify_tools
+	rm -rf ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-*
 
 # test every version of python enabled
 pythons-cache:
@@ -286,20 +299,20 @@ argo-delete-services:
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
 conda:
-	conda info | grep "active environment" | grep kubify || make conda-install
+	conda --version || make conda-install
 	conda info | grep "active environment" | grep kubify || make conda-setup
 
 conda-install:
-	chmod +x ./kubify/ops/tools/scripts/conda_install.sh && ./kubify/ops/tools/scripts/conda_install.sh
+	bash ./kubify/ops/tools/scripts/conda_install.sh
 
 conda-setup:
-	chmod +x ./kubify/ops/tools/scripts/conda_setup.sh && ./kubify/ops/tools/scripts/conda_setup.sh
+	bash ./kubify/ops/tools/scripts/conda_setup.sh
 
 develop:
-	make conda
 	echo $$OSTYPE | grep arwin && make mac || make apt
+	make clean
 	make pip
-	make security clean 
+	make security
 	make kind kubectl
-	make lint help 
+	make lint help
 	make coverage package

@@ -2,7 +2,7 @@
 # https://gitlab.com/nvidia/container-images/cuda/-/blob/master/doc/supported-tags.md
 FROM nvcr.io/nvidia/cuda:11.7.0-runtime-ubuntu22.04
 
-WORKDIR /src/kubify/
+WORKDIR /var/folders/kubify/
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update
@@ -37,7 +37,7 @@ RUN curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-$(uname)-amd64" &&
 # Your services folder gets mounted automatically (for Kubify's rapid testing engine):
 COPY ./ansible.cfg /etc/ansible/
 COPY ./kubify/ops/ansible /tmp/ansible
-RUN rm -rf /src/kubify/.git /src/kubify/
+RUN rm -rf /var/folders/kubify/.git /var/folders/kubify/
 RUN ansible-playbook --connection=local "/tmp/ansible/install_kubify_on_debian_ubuntu_and_wsl2.yaml" --ask-become-pass -e ansible_python_interpreter=`which python3`
 RUN apt install -y  --no-install-recommends libxml2 libxml2-dev libxslt-dev
 RUN pip install Cython
