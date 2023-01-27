@@ -48,9 +48,9 @@ nodes:
             file.write(deployment_manifest_yaml)
         kind_cluster = KindCluster(name="kubify")
         try:
-          kind_cluster.load_docker_image("busybox")
+            kind_cluster.load_docker_image("busybox")
         except OSError:
-          kind_cluster.create(config_file=kind_yaml)
+            kind_cluster.create(config_file=kind_yaml)
         kind_cluster.kubectl(
             "apply",
             "-f",

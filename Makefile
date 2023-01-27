@@ -109,7 +109,7 @@ mac:
 node:
 	export NVM_DIR=$${NVM_DIR:-$$HOME/.kubify_nvm}
 	mkdir -p $$NVM_DIR
-	export NODE_VERSION=$${NODE_VERSION:-14.18.1}
+	export NODE_VERSION=$${NODE_VERSION:-18.13.0}
 	stat $$NVM_DIR/nvm.sh || curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && nvm alias kubify "$$NODE_VERSION" && nvm use kubify
 
@@ -228,6 +228,9 @@ cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|
 		terraform apply --var="cluster_name=kubify-$$env" || terraform state rm module.aws.module.eks-dr-us-east-1.module.eks.kubernetes_config_map_v1_data.aws_auth
 
 docker:
+	make security
+	make format
+	make lint
 	docker build . -t kubify:latest
 	docker tag kubify:latest docker.io/willy0912/kubify:latest
 
@@ -236,8 +239,7 @@ docker-test-all-pythons:
 	docker tag kubify:latest docker.io/willy0912/kubify:latest
 
 security:
-	bandit -r ./kubify -c .bandit.yml
-	bandit -r ./kubify/ops/services -c .bandit.yml
+	bandit -r . -c .bandit.yml
 
 package:
 	python3 setup.py sdist bdist_wheel

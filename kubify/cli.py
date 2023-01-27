@@ -31,7 +31,7 @@ parser.add_argument(
     "--test_logger",
     action="store_true",
     default=False,
-    help="test logger functionality"
+    help="test logger functionality",
 )
 # parser.add_argument(
 #     "--create_work_dirs", action="store_true", help="in users home kubify directory"

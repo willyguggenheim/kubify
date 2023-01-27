@@ -4,7 +4,7 @@ WORKDIR /src/kubify
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CONDA_DIR /opt/conda
-ENV NODE_VERSION=14.18.1
+ENV NODE_VERSION=18.13.0
 ENV NVM_DIR=$HOME/.kubify_nvm
 
 # node (for backstage ui development)

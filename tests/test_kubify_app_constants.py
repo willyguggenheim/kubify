@@ -7,17 +7,17 @@ def test_dir_paths():
     env = "dev"
     app_name = "kubify"
     path = Path(f"{app_constants.root_dir}/__version__")
-    assert path.is_file()
+    assert path.is_file()  # nosec - ✅ B101: assert used
     # os.path.isfile(fname)
     path = Path(f"{app_constants.root_dir_full_path}/__version__")
-    assert path.is_file()
+    assert path.is_file()  # nosec - ✅ B101: assert used
     path = Path(f"{app_constants.git_dir}/HEAD")
-    assert path.is_file()
+    assert path.is_file()  # nosec - ✅ B101: assert used
     path = Path(f"{app_constants.k8s_path}/kubify.yaml")
-    assert path.is_file()
+    assert path.is_file()  # nosec - ✅ B101: assert used
     path = Path(f"{app_constants.ops_dir}/ansible")
-    assert path.exists()
+    assert path.exists()  # nosec - ✅ B101: assert used
     path = Path(f"{app_constants.ops_dir}/terraform")
-    assert path.exists()
+    assert path.exists()  # nosec - ✅ B101: assert used
     path = Path(f"{app_constants.ansible_dir}")
-    assert path.exists()
+    assert path.exists()  # nosec - ✅ B101: assert used
