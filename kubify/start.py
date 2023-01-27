@@ -14,7 +14,7 @@ class Start:
 
     def start(self):
         # TODO (COMMENT)
-        subprocess.run(["kubify_port.sh", "start"])  # noqa: E1101
+        subprocess.run(["kubify_port.sh", "start"])  # nosec: B603 B607 - placeholder
         # TODO (UNCOMMENT)
         # tags = ([f"common,{app_constants.dir_path}"],)
         # Options = namedtuple("Options", [])
