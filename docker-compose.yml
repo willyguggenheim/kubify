@@ -4,9 +4,9 @@ services:
   kubify:
     build:
       network: host
-    working_dir: /src/kubify
+    working_dir: /var/folders
     network_mode: host
     volumes:
-      - $PWD/:/src/kubify:cached
+      - $PWD/:/var/folders:cached
     privileged: true
     command: ./docker-compose.sh

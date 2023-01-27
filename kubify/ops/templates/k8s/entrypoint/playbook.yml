@@ -126,4 +126,4 @@
         line: "{{ item.line }}"
       with_items:
         - { regexp: '^export AWS_PROFILE=',                           line: 'export AWS_PROFILE=default' }
-        - { regexp: '^export PATH=/src/kubify(/tools)?/kubify/tool(2)?.*', line: 'export PATH=/src/kubify/src/kubify/tool:$PATH'}
+        - { regexp: '^export PATH=/var/folders(/tools)?/kubify/tool(2)?.*', line: 'export PATH=/var/folders/var/folders/tool:$PATH'}

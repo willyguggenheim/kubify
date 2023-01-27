@@ -14,6 +14,8 @@ home = str(Path.home())
 # WORK_DIR
 WORK_DIR = os.path.join(*[home, ".kubify"])
 kubify_work = os.path.join(*[home, ".kubify"])
+if not os.path.exists(kubify_work):
+    os.makedirs(kubify_work)
 k8s_path = os.path.join(*[root_dir_full_path, "kubify", "ops", "templates", "k8s"])
 log_path = os.path.join(kubify_work, "logs")
 certs_path = os.path.join(kubify_work, "certs")

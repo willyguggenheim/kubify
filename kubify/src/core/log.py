@@ -2,7 +2,7 @@
 
 import logging
 
-# from logging import config
+from logging import config  # noqa
 
 import kubify.src.core.app_constants as app_constants
 

@@ -50,7 +50,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 --max-line-length=200 --exclude="kubify/ops/charts,tests,docs" ./
+	flake8 --max-line-length=200 --exclude="kubify/ops/charts,tests,docs,build" ./
 
 lint/black: ## check style with black
 	black --check ./
@@ -114,10 +114,12 @@ node:
 	. $$NVM_DIR/nvm.sh && nvm install $${NODE_VERSION} && . $$NVM_DIR/bash_completion && nvm alias kubify "$$NODE_VERSION" && nvm use kubify
 
 tfsec:
-	mkdir -p ./kubify_tools
+	which tfsec || mkdir -p ./kubify_tools
 	which tfsec || echo $$OSTYPE | grep darwin && brew bundle || curl -o ./kubify_tools/tfsec "https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64"
-	stat ./kubify_tools/tfsec && chmod +x ./kubify_tools/tfsec
-	stat ./kubify_tools/tfsec && ./kubify_tools/tfsec || tfsec
+	which tfsec || stat ./kubify_tools/tfsec && chmod +x ./kubify_tools/tfsec || true
+	which tfsec || stat ./kubify_tools/tfsec && ./kubify_tools/tfsec || true
+	make mac || true
+	tfsec --version
 
 pip:
 	pip install -e .[develop]

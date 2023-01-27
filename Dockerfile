@@ -1,6 +1,7 @@
 FROM nvidia/cuda:11.7.1-base-ubuntu20.04
 
-WORKDIR /src/kubify
+RUN mkdir -p /var/folders
+WORKDIR /var/folders
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CONDA_DIR /opt/conda

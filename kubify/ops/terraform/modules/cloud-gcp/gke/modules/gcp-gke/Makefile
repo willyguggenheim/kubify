@@ -13,7 +13,7 @@ DOCKER_BIN ?= docker
 docker_run:
 	$(DOCKER_BIN) run --rm -it \
 		-e SERVICE_ACCOUNT_JSON \
-		-v "$(CURDIR)":/src/kubify \
+		-v "$(CURDIR)":/var/folders \
 		$(REGISTRY_URL)/${DOCKER_IMAGE_DEVELOPER_TOOLS}:${DOCKER_TAG_VERSION_DEVELOPER_TOOLS} \
 		/bin/bash
 
@@ -25,7 +25,7 @@ docker_test_prepare:
 		-e TF_VAR_org_id \
 		-e TF_VAR_folder_id \
 		-e TF_VAR_billing_account \
-		-v "$(CURDIR)":/src/kubify \
+		-v "$(CURDIR)":/var/folders \
 		$(REGISTRY_URL)/${DOCKER_IMAGE_DEVELOPER_TOOLS}:${DOCKER_TAG_VERSION_DEVELOPER_TOOLS} \
 		/usr/local/bin/execute_with_credentials.sh prepare_environment
 
@@ -37,7 +37,7 @@ docker_test_cleanup:
 		-e TF_VAR_org_id \
 		-e TF_VAR_folder_id \
 		-e TF_VAR_billing_account \
-		-v "$(CURDIR)":/src/kubify \
+		-v "$(CURDIR)":/var/folders \
 		$(REGISTRY_URL)/${DOCKER_IMAGE_DEVELOPER_TOOLS}:${DOCKER_TAG_VERSION_DEVELOPER_TOOLS} \
 		/usr/local/bin/execute_with_credentials.sh cleanup_environment
 
@@ -46,7 +46,7 @@ docker_test_cleanup:
 docker_test_integration:
 	$(DOCKER_BIN) run --rm -it \
 		-e SERVICE_ACCOUNT_JSON \
-		-v "$(CURDIR)":/src/kubify \
+		-v "$(CURDIR)":/var/folders \
 		$(REGISTRY_URL)/${DOCKER_IMAGE_DEVELOPER_TOOLS}:${DOCKER_TAG_VERSION_DEVELOPER_TOOLS} \
 		/usr/local/bin/test_integration.sh
 
@@ -55,7 +55,7 @@ docker_test_integration:
 docker_test_lint:
 	$(DOCKER_BIN) run --rm -it \
 		-e ENABLE_PARALLEL=1 \
-		-v "$(CURDIR)":/src/kubify \
+		-v "$(CURDIR)":/var/folders \
 		$(REGISTRY_URL)/${DOCKER_IMAGE_DEVELOPER_TOOLS}:${DOCKER_TAG_VERSION_DEVELOPER_TOOLS} \
 		/usr/local/bin/test_lint.sh
 
@@ -63,7 +63,7 @@ docker_test_lint:
 .PHONY: docker_generate_docs
 docker_generate_docs:
 	$(DOCKER_BIN) run --rm -it \
-		-v "$(CURDIR)":/src/kubify \
+		-v "$(CURDIR)":/var/folders \
 		$(REGISTRY_URL)/${DOCKER_IMAGE_DEVELOPER_TOOLS}:${DOCKER_TAG_VERSION_DEVELOPER_TOOLS} \
 		/bin/bash -c 'source /usr/local/bin/task_helper_functions.sh && generate_docs'
 
@@ -71,7 +71,7 @@ docker_generate_docs:
 .PHONY: docker_generate_modules
 docker_generate_modules:
 	$(DOCKER_BIN) run --rm -it \
-                -v "$(CURDIR)":/src/kubify \
+                -v "$(CURDIR)":/var/folders \
                 $(REGISTRY_URL)/${DOCKER_IMAGE_DEVELOPER_TOOLS}:${DOCKER_TAG_VERSION_DEVELOPER_TOOLS} \
                 /bin/bash -c 'source /usr/local/bin/task_helper_functions.sh && generate_modules'
 

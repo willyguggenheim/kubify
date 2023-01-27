@@ -16,8 +16,8 @@ nodes:
 - role: control-plane
   extraMounts:
   - hostPath: "{app_constants.root_dir_full_path}"
-    containerPath: /src/kubify
-    readOnly: false
+    containerPath: /var/folders
+    readOnly: true
   - hostPath: "{app_constants.home}/.aws"
     containerPath: /root/.aws
   - hostPath: "{app_constants.home}/.ssh"
@@ -44,15 +44,13 @@ nodes:
         with open(kind_yaml_path, "w+") as file:
             file.write(deployment_manifest_yaml)
         kind_cluster = KindCluster(name="kubify")
-        try:
-            kind_cluster.load_docker_image("busybox")
-        except OSError:
-            kind_cluster.create(config_file=kind_yaml)
+        kind_cluster.create(config_file=kind_yaml)
         kind_cluster.kubectl(
             "apply",
             "-f",
             f"{app_constants.git_dir}/../kubify/ops/templates/k8s/bootstrap.yaml",
-        )
+        )  # up
+        kind_cluster.load_docker_image("busybox")  # test
 
     def main(self):
         self.up()

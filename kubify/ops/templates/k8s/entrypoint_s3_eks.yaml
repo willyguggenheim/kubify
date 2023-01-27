@@ -43,7 +43,7 @@ spec:
       volumes:
         - name: src-mount
           hostPath:
-            path: /src/kubify
+            path: /var/folders
         - name: home-mount-aws
           hostPath:
             path: /root/.aws
@@ -64,9 +64,9 @@ spec:
             - /bin/bash
             - -c
             - "trap : TERM INT; sleep infinity & wait"
-          workingDir: /src/kubify
+          workingDir: /var/folders
           volumeMounts:
-            - mountPath: /src/kubify
+            - mountPath: /var/folders
               name: src-mount
             - mountPath: /root/.aws
               name: home-mount-aws
