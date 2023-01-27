@@ -5,7 +5,9 @@
 # import ansible_runner
 
 # TODO (COMMENT)
-from subprocess import run as sp_run
+from subprocess import (  # nosec - B404: placeholder until ported to python fully
+    run as sp_run,
+)
 
 
 class Start:
