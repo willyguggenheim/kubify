@@ -44,7 +44,7 @@
     group: root
     mode: 0644
   notify: restart docker
-  ignore_errors: yes
+  ignore_errors: true
 
 # We could use the "nvidia-docker2" package to install this wrapper for us.
 # Instead, we grab the wrapper directly to avoid packaging issues stemming from

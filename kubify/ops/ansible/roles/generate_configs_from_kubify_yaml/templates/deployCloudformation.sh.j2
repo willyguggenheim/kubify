@@ -215,7 +215,7 @@ STAGE #}
         cp {{ app_dir }}/requirements.txt {{ app_kubify_dir }}/cloudformation/lambda/layer/requirements.txt
         cd {{ app_kubify_dir }}/cloudformation/lambda/layer
         # pip3 install -r requirements.txt
-        docker build -t lambda_layer_python:v1 -f {{ app_kubify_dir }}/../../../var/folders/tool/scripts/lambda/lambda/layer/python/Dockerfile {{ app_kubify_dir }}/../../../var/folders/tool/scripts/lambda/lambda/layer/python/
+        docker build -t lambda_layer_python:v1 -f {{ app_kubify_dir }}/../../../var/folders/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile {{ app_kubify_dir }}/../../../var/folders/kubify/tool/scripts/lambda/lambda/layer/python/
         # docker images
         docker run -i -v `pwd`:/package lambda_layer_python:v1 /package/requirements.txt > {{ app_kubify_dir }}/log-lambda-package-pip3.log
         #exit 0

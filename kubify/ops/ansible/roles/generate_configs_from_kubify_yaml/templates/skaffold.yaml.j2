@@ -27,9 +27,9 @@ profiles:
         context: .
         sync:
           manual:
-          - src: "/var/folders/var/folders/templates/aws/***"
+          - src: "/var/folders/kubify/var/folders/kubify/templates/aws/***"
             dest: "/root/.aws/"
-          - src: "/var/folders/._kubify_work/certs/***"
+          - src: "/var/folders/kubify/._kubify_work/certs/***"
             dest: "/usr/local/certificates/"
 {% set kubify_config_sync = kubify_config | json_query("dev.sync") | default(dict(), true) %}
 {% if kubify_config_sync|length %}
@@ -54,9 +54,9 @@ profiles:
         context: .
         sync:
           manual:
-          - src: "/var/folders/var/folders/templates/aws/***"
+          - src: "/var/folders/kubify/var/folders/kubify/templates/aws/***"
             dest: "/root/.aws/"
-          - src: "/var/folders/._kubify_work/certs/***"
+          - src: "/var/folders/kubify/._kubify_work/certs/***"
             dest: "/usr/local/certificates/"
         docker:
           dockerfile: "../../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/Dockerfile.release"

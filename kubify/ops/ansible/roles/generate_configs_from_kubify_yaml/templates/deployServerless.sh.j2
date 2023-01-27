@@ -21,7 +21,7 @@ cp {{ app_kubify_dir }}/serverless.yml {{ app_kubify_dir }}/serverless-with-add.
 
 mkdir -p {{ app_kubify_dir }}/code/lambdaci
 cd {{ app_kubify_dir }}/code/lambdaci
-docker build -t lambci/lambda:build-undefined -f {{ app_kubify_dir }}/../../../var/folders/tool/scripts/serverless/lambdaci/Dockerfile .
+docker build -t lambci/lambda:build-undefined -f {{ app_kubify_dir }}/../../../var/folders/kubify/tool/scripts/serverless/lambdaci/Dockerfile .
 
 cd {{ app_kubify_dir }}/code
 # delete the add section, as it was already utilized
@@ -41,10 +41,10 @@ export NODE_TLS_REJECT_UNAUTHORIZED=0
     {% endif %}
 
     {% if env == 'local' %}
-        echo "cd /var/folders/._kubify_work/local/{{ app_name }}/code" > {{ app_kubify_dir }}/sls-reinvoke.sh
+        echo "cd /var/folders/kubify/._kubify_work/local/{{ app_name }}/code" > {{ app_kubify_dir }}/sls-reinvoke.sh
         echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION AWS_REGION=$AWS_REGION AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID ACCOUNT_ID=$ACCOUNT_ID serverless deploy --stage {{ env }}" >> {{ app_kubify_dir }}/sls-reinvoke.sh
         chmod +x {{ app_kubify_dir }}/sls-reinvoke.sh
-        {{ app_kubify_dir }}/../../../kubify run_in_entrypoint /var/folders/._kubify_work/local/{{ app_name }}/sls-reinvoke.sh || {{ app_kubify_dir }}/../../../kubify run_in_entrypoint /var/folders/._kubify_work/local/{{ app_name }}/sls-reinvoke.sh
+        {{ app_kubify_dir }}/../../../kubify run_in_entrypoint /var/folders/kubify/._kubify_work/local/{{ app_name }}/sls-reinvoke.sh || {{ app_kubify_dir }}/../../../kubify run_in_entrypoint /var/folders/kubify/._kubify_work/local/{{ app_name }}/sls-reinvoke.sh
     {% else %}
         serverless deploy --stage {{ env }}
     {% endif %}

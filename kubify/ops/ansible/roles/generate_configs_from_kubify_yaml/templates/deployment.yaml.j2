@@ -87,12 +87,6 @@ spec:
       - name: init-volume
         configMap:
           name: "{{ app_name }}-init"
-      - name: init-aws-volume
-        hostPath:
-          path: "/var/folders/var/folders/templates/aws"
-      - name: init-certs
-        hostPath:
-          path: "/var/folders/._kubify_work/certs"
       containers:
         - name: "{{ app_name }}-init"
           image: "{{ app_image }}"
@@ -106,10 +100,6 @@ spec:
           - name: init-volume
             mountPath: /init.sh
             subPath: init.sh
-          - name: init-aws-volume
-            mountPath: "/root/.aws"
-          - name: init-certs
-            mountPath: "/usr/local/certificates"
           envFrom:
           - configMapRef:
               name: "{{ app_name }}-generated"

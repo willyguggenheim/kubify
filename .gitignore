@@ -32,6 +32,8 @@ default.profraw
 **/.aws
 secrets
 **/secrets
+certs
+**/certs
 credentials
 **/credentials
 **/.aws
@@ -42,6 +44,7 @@ credentials
 ._kubify_work
 **/._kubify_work
 ./._kubify_work
+**/*kubify_work
 ._*
 kubify_config.sh
 **/kubify_config.sh

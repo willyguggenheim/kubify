@@ -3,12 +3,11 @@ services:
   kubify:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - $PWD/:/var/folders:cached
+      - $PWD/:/var/folders/kubify:cached
       - $HOME/kubify/kubedb.txt:/root/kubify/kubedb.txt:cached
       - $HOME/.aws:/root/.aws:cached
-      - $HOME/.ssh:/root/.ssh:cached
     command: /bin/sh -c "while sleep 1000; do :; done"
-    # uncomment for rtx datascience
+    # uncomment for rtx datascience gpu
     # deploy:
     #   resources:
     #     reservations:

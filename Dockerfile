@@ -1,9 +1,10 @@
 FROM nvidia/cuda:11.7.1-base-ubuntu20.04
 
 # docker variables
-WORKDIR /var/folders
+WORKDIR /var/folders/kubify
 ENV DEBIAN_FRONTEND=noninteractive
 ENV KUBIFY_TOOLS=/root/._kubify_tools
+ENV KUBIFY_UNIQUE_COMPANY_ACRONYM=kubify-oss
 
 # conda config
 ENV CONDA_DIR /opt/conda

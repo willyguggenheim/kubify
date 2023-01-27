@@ -16,14 +16,8 @@ nodes:
 - role: control-plane
   extraMounts:
   - hostPath: "{app_constants.root_dir_full_path}"
-    containerPath: /var/folders
+    containerPath: /var/folders/kubify
     readOnly: true
-  - hostPath: "{app_constants.home}/.aws"
-    containerPath: /root/.aws
-  - hostPath: "{app_constants.home}/.ssh"
-    containerPath: /root/.ssh
-  - hostPath: "{app_constants.certs_path}"
-    containerPath: /usr/local/certificates
   kubeadmConfigPatches:
   - |
     kind: InitConfiguration

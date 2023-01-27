@@ -137,7 +137,7 @@
 #   register: secret_file_exists
 
 # - name: Check secrets file exists (create common secret context if not)
-#   shell: "cp {{ app_dir }}/../../var/folders/templates/secrets/secrets.{{ profile }}.enc.yaml {{ app_dir }}/secrets/secrets.{{ profile }}.enc.yaml && sed -i bak -e 's|common|'\"{{ app_name }}\"'|g' \"${SECRETS_FILE}\" && "
+#   shell: "cp {{ app_dir }}/../../var/folders/kubify/templates/secrets/secrets.{{ profile }}.enc.yaml {{ app_dir }}/secrets/secrets.{{ profile }}.enc.yaml && sed -i bak -e 's|common|'\"{{ app_name }}\"'|g' \"${SECRETS_FILE}\" && "
 #   when: secret_file_exists.stat.exists == false
 
 - name: Decrypt secrets

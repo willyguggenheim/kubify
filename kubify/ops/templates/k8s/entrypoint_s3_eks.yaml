@@ -43,13 +43,7 @@ spec:
       volumes:
         - name: src-mount
           hostPath:
-            path: /var/folders
-        - name: home-mount-aws
-          hostPath:
-            path: /root/.aws
-        - name: home-mount-ssh
-          hostPath:
-            path: /root/.ssh
+            path: /var/folders/kubify
         - name: docker-sock
           hostPath:
             path: "{{DOCKER_SOCKET_FILE_LOCATION}}"
@@ -64,14 +58,10 @@ spec:
             - /bin/bash
             - -c
             - "trap : TERM INT; sleep infinity & wait"
-          workingDir: /var/folders
+          workingDir: /var/folders/kubify
           volumeMounts:
-            - mountPath: /var/folders
+            - mountPath: /var/folders/kubify
               name: src-mount
-            - mountPath: /root/.aws
-              name: home-mount-aws
-            - mountPath: /root/.ssh
-              name: home-mount-ssh
             - mountPath: "{{DOCKER_SOCKET_FILE_LOCATION}}"
               name: docker-sock
           envFrom:
