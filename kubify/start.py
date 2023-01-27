@@ -5,9 +5,7 @@
 # import ansible_runner
 
 # TODO (COMMENT)
-from subprocess import (  # nosec - B404: placeholder until ported to python fully
-    run as sp_run,
-)
+import subprocess  # nosec - B404: placeholder until ported to python fully
 
 
 class Start:
@@ -16,7 +14,7 @@ class Start:
 
     def start(self):
         # TODO (COMMENT)
-        sp_run.run(["kubify_port.sh", "start"])
+        subprocess.run(["kubify_port.sh", "start"])  # noqa: E1101
         # TODO (UNCOMMENT)
         # tags = ([f"common,{app_constants.dir_path}"],)
         # Options = namedtuple("Options", [])

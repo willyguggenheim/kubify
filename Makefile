@@ -125,6 +125,7 @@ tfsec:
 
 pip:
 	pip install -e .[develop]
+	ansible --version || pip install -U ansible
 
 install_grpcio: pip3 install --upgrade pip
 	python3 -m pip install --upgrade setuptools
@@ -133,9 +134,16 @@ install_grpcio: pip3 install --upgrade pip
 kind:
 	export uname_found=`uname` && uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64" && which kind || brew install kind 2>/dev/null || `curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-$$uname_found-$$arch_found" && chmod +x ./kind && mv ./kind /usr/local/bin/kind`
 
-kubectl:
-	uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64"
-	which kubectl || brew install kubectl 2>/dev/null || curl -LO "https://dl.k8s.io/release/`curl -L -s https://dl.k8s.io/release/stable.txt`/bin/linux/$$arch_found/kubectl"
+k8s:
+	mkdir -p ~/._kubify_tools/src
+	which skaffold || uname -m | grep amd && export arch_found="amd64" || export arch_found="arm64" && wget -O ~/._kubify_tools/skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-$$arch_found"
+	chmod +x ~/._kubify_tools/skaffold
+	which kubectl || uname -m | grep amd && export arch_found="amd64" || export arch_found="arm64" && wget -O ~/._kubify_tools/kubectl "https://dl.k8s.io/release/`curl -L -s https://dl.k8s.io/release/stable.txt`/bin/linux/$$arch_found/kubectl"
+	chmod +x ~/._kubify_tools/kubectl
+	# git clone https://github.com/ahmetb/kubectx ~/._kubify_tools/src/kubectx
+	# ln -s ~/._kubify_tools/src/kubectx/kubectx ~/._kubify_tools/kubectx
+	# chmod +x ~/._kubify_tools/kubectx
+	# rm -rf ~/._kubify_tools/src/kubectx
 
 apt:
 	apt update && xargs apt -y install <apt.lock

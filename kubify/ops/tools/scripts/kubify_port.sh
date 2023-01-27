@@ -17,6 +17,8 @@ export KUBIFY_DEBUG=${KUBIFY_VERBOSE:-0}
 export KUBIFY_CONTAINER="willy0912/kubify:main"
 export KUBIFY_CONTAINER_NAME="kubify-engine"
 
+alias kubify="kubify_port.sh"
+
 ACTUAL_OS_TYPE=mac
 FILE=/proc/version
 
@@ -207,7 +209,7 @@ elif [[ "$OSTYPE" == *"linux"* && "$MUST_INSTALL_YQ" == 1 ]]; then
 fi
 
 if [[ $KUBIFY_CI != '1' ]]; then
-  PROFILE=${KUBIFY_PROFILE:-kind-kind}
+  PROFILE=${KUBIFY_PROFILE:-kubify-kubify}
 
 else
   PROFILE=${KUBIFY_PROFILE:-default}
@@ -243,7 +245,7 @@ KUBIFY_CURRENT_VERSION=`git --git-dir="${GIT_DIR}/.git" rev-parse --verify HEAD 
 
 WORK_DIR="${GIT_DIR}/._kubify_work"
 mkdir -p "${WORK_DIR}/certs"
-K8S_DIR="${GIT_DIR}/var/folders/kubify/k8s"
+K8S_DIR="${GIT_DIR}/ops"
 mkdir -p "${WORK_DIR}"
 alias kubify="${DIR}/kubify"
 
@@ -459,7 +461,7 @@ function set_context {
     elif [[ "$KUBIFY_ENGINE" == "local" ]]; then
       echo Context already set
     fi
-    kubectx $PROFILE || kubectx kind-kind || kubectx docker-desktop
+    kind export kubeconfig --name kubify
   }
 }
 
@@ -593,7 +595,7 @@ function update_npm_secret() {
           read -s NPM_TOKEN
         else
           echo "npm token creation failed, please delete a token from https://www.npmjs.com/settings/(USERNAME)/tokens "
-          echo " and try the command directly: kubify update_npm_secret"
+          echo " and try the command directly: update_npm_secret"
           exit 1
         fi
       fi
@@ -621,7 +623,7 @@ function get_npm_secret_direct() {
         export NPM_TOKEN=${ADDR[1]}
 
       else
-        echo "$HOME/.npmrc does not exist, please login to NPMJS, so that you can pull private packages.. Try using kubify up"
+        echo "$HOME/.npmrc does not exist, please login to NPMJS, so that you can pull private packages.. Try using up"
         exit 1
       fi
     fi
@@ -636,7 +638,7 @@ function get_npm_secret() {
       K8_NPM_TOKEN=$(${KUBECTL_NS} get secrets --field-selector=metadata.name=npm-credentials -o json | jq -r .items[0].data.NPM_TOKEN | $BASE64_DECODE)
       echo "${K8_NPM_TOKEN}" | grep -q '[0-9]'
       if [ $? = 1 ]; then
-          echo "Problem accessing k8 npm secret. Try running 'kubify up', test the 'kubify update_npm_secret' and the 'kubify get_npm_secret' commands."
+          echo "Problem accessing k8 npm secret. Try running 'up', test the 'update_npm_secret' and the 'get_npm_secret' commands."
           exit 1
       else
         echo ${K8_NPM_TOKEN}
@@ -737,7 +739,7 @@ function configure_cluster {
       cmp -s "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/ca || sudo cp "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/ca || true
       cmp -s "${WORK_DIR}/certs/ca.key" /usr/local/certificates/key || sudo cp "${WORK_DIR}/certs/ca.key" /usr/local/certificates/key || true
         kubectl create ns ingress-nginx || echo 'cert-manager ns exists'
-        $KUBECTL apply -f "${GIT_DIR}/var/folders/kubify/templates/manifests/ingress-nginx-kind.yaml"
+        $KUBECTL apply -f "${GIT_DIR}/kubify/templates/manifests/ingress-nginx-kind.yaml"
       kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
@@ -920,7 +922,7 @@ configure_cluster
 
   echo "Creating secrets"
   {
-    export_secret dev kubify "${GIT_DIR}/var/folders/kubify/templates/empty"
+    export_secret dev kubify "${GIT_DIR}/kubify/templates/empty"
     echo `_get_secret dev kubify 0` | $KUBECTL_NS apply -f  -
   } &> "$KUBIFY_OUT"
   echo "Building containers (Please be patient)"
@@ -1018,7 +1020,7 @@ function install {
 
     } &> "$KUBIFY_OUT"
   else
-    echo "'kubify install' not supported on $OSTYPE ... yet"
+    echo "'install' not supported on $OSTYPE ... yet"
     exit 1
   fi
   
@@ -1043,10 +1045,10 @@ nodes:
   - hostPath: "${GIT_DIR}"
     containerPath: /var/folders/kubify
     readOnly: false
-  - hostPath: "${HOME}/.aws"
-    containerPath: /root/.aws
-  - hostPath: "${HOME}/.ssh"
-    containerPath: /root/.ssh
+  # - hostPath: "${HOME}/.aws"
+  #   containerPath: /root/.aws
+  # - hostPath: "${HOME}/.ssh"
+  #   containerPath: /root/.ssh
 
 - hostPath: /var/run/docker.sock
     containerPath: /var/run/docker.sock
@@ -1106,7 +1108,7 @@ spec:
       hostPath: 
         path: /var/run 
 EOF
-$KUBECTL apply -f "${GIT_DIR}/var/folders/kubify/templates/manifests/ingress-nginx-kind.yaml"
+$KUBECTL apply -f "${GIT_DIR}/kubify/templates/manifests/ingress-nginx-kind.yaml"
 
 $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
@@ -1181,7 +1183,7 @@ function up {
   fi
   configure
   kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
-  docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/var/folders/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/var/folders/kubify/tool/scripts/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
+  docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/kubify/tool/scripts/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
   if [[ "$ACTUAL_OS_TYPE" == "mac" ]]; then
    open /Applications/Lens.app || echo ""
   fi
@@ -1221,7 +1223,7 @@ function down {
 function check_local_env {
   if [[ "$KUBIFY_ENGINE" == "minikube" ]]; then
     if ! [ -x "$(command -v minikube)" ]; then
-      echo 'Error: minikube is not installed. Run "kubify install" first.' >&2
+      echo 'Error: minikube is not installed. Run "install" first.' >&2
       exit 1
     fi
     MK_STATUS=$($MINIKUBE status --profile ${PROFILE} | grep host | cut -d ':' -f2 | xargs)
@@ -1245,7 +1247,7 @@ function local_env_running {
   fi
   if [ -z "${RUNNING}" ]
   then
-    echo "Local cluster is not running. (Hint: try 'kubify up')"
+    echo "Local cluster is not running. (Hint: try 'up')"
     exit 1
   fi
 }
@@ -1253,7 +1255,7 @@ function local_env_running {
 function display_running {
   if [ -z "$1" ]
   then
-    echo "Local cluster is not running. (Hint: try 'kubify up')"
+    echo "Local cluster is not running. (Hint: try 'up')"
   else
     echo "Local cluster is running"
   fi
@@ -1264,7 +1266,7 @@ function delete {
     if [[ "$KUBIFY_ENGINE" == "minikube" ]]; then
       $MINIKUBE delete --profile $PROFILE &> "$KUBIFY_OUT"
     elif [[ "$KUBIFY_ENGINE" == "local" ]]; then
-      echo "Deleting kubify namespace ${NAMESPACE}"
+      echo "Deleting namespace ${NAMESPACE}"
                                                     kind delete cluster --name docker-desktop || echo "run: docker system prune -a"
     fi
   fi
@@ -1284,39 +1286,14 @@ function status {
 }
 
 function check_kubify {
-  pwd
-  BASE=`basename "$(dirname $PWD)"`
-  
-  if [[ "$BASE" != "svc" && "$BASE" != "pub" ]]; then
-    echo "This command should be run in a service directory located under: src (backend) or pub (frontend)"
-    exit 1
-  fi
+  pwd | grep services || echo "This command should be run in a service directory located under: src (backend) or pub (frontend)"
+  pwd | grep services || exit 1
 }
 
 function check_arg {
   if [ -z "$2" ]; then
     echo "$1"
     exit 1
-  fi
-}
-function post_to_slack {
-  if [[ $KUBIFY_CI == '1' ]]; then
-    if [ -x `which slack` ] ; then
-                                                          if [ "$
-        slack chat send \
-          --channel $1 \
-          --title "$2" \
-          --text "$3" \
-          --color $4 \
-          --actions "$5"
-      elif [ "$
-        slack chat send \
-          --channel $1 \
-          --title "$2" \
-          --text "$3" \
-          --color $4
-      fi
-    fi
   fi
 }
 
@@ -1384,7 +1361,7 @@ function check_skaffold {
   APP_DIR="$PWD"
   KUBIFY_FILE=${APP_DIR}/kubify.yml
   if [ ! -f $KUBIFY_FILE ]; then
-    echo "Have you run 'kubify init' yet?"
+    echo "Have you run 'init' yet?"
     exit 1
   fi
   if [[ $KUBIFY_CI != '1' ]]; then
@@ -1425,12 +1402,13 @@ function dir {
 }
 
 function run-all {
-  if [ "$
+  if [ "$#" -eq 0 ]; then
     echo "there was no services passed in to \"run-all\" command, so running all services.."
     SERVICES=`services --list`
   else
     SERVICES="$@"
   fi
+
   for entry in $SERVICES
   do
     split=$(echo $entry | tr ":" "\n")
@@ -1440,10 +1418,10 @@ function run-all {
 
     if [ -d "${GIT_DIR}/dev/svc/$service" ]; then
       cd "${GIT_DIR}/dev/svc/$service"
-      kubify run $version
+      run $version
     elif [ -d "${GIT_DIR}/dev/pub/$service" ]; then
       cd "${GIT_DIR}/dev/pub/$service"
-      kubify run $version
+      run $version
     else
       echo "Error: Service '${service}' doesn't exist"
     fi
@@ -1451,12 +1429,13 @@ function run-all {
 }
 
 function build-run-all {
-  if [ "$
+  if [ "$#" -eq 0 ]; then
     echo "there was no services passed in to \"run-all\" command, so running all services.."
     SERVICES=`services --list`
   else
     SERVICES="$@"
   fi
+
   for entry in $SERVICES
   do
     split=$(echo $entry | tr ":" "\n")
@@ -1464,10 +1443,10 @@ function build-run-all {
 
     if [ -d "${GIT_DIR}/dev/svc/$service" ]; then
       cd "${GIT_DIR}/dev/svc/$service"
-      kubify run
+      run
     elif [ -d "${GIT_DIR}/dev/pub/$service" ]; then
       cd "${GIT_DIR}/dev/pub/$service"
-      kubify run
+      run
     else
       echo "Error: Service '${service}' doesn't exist"
     fi
@@ -1475,11 +1454,12 @@ function build-run-all {
 }
 
 function stop-all {
-  if [ "$
+  if [ "$#" -eq 0 ]; then
     SERVICES=`${KUBECTL_NS} get deployment -l context=kubify -o=jsonpath='{.items[*].metadata.name}'`
   else
     SERVICES="$@"
   fi
+
   for entry in ${SERVICES}
 
   do
@@ -1490,10 +1470,10 @@ function stop-all {
 
     if [ -d "${GIT_DIR}/dev/svc/$service" ]; then
       cd "${GIT_DIR}/dev/svc/$service"
-      ../../kubify stop
+      stop
     elif [ -d "${GIT_DIR}/dev/pub/$service" ]; then
       cd "${GIT_DIR}/dev/pub/$service"
-      ../../kubify stop
+      stop
     else
       echo "Error: Service '${service}' doesn't exist"
     fi
@@ -1517,20 +1497,20 @@ function run {
   CONFIG_FILE="${APP_DIR}/config/config.${ENV}.yaml"
   
   if [ ! -f "${SECRETS_FILE}" ]; then
-      kubify secrets create ${ENV}
+      secrets create ${ENV}
 
   fi
   if [ ! -f "${CONFIG_FILE}" ]; then
       echo "${CONFIG_FILE} file not found, creating blank one"
       mkdir -p "${APP_DIR}/config" | true
-      cp "${GIT_DIR}/var/folders/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
+      cp "${GIT_DIR}/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
   fi
   start_dependencies "${APP_DIR}"
   cd "${APP_DIR}"
 
   echo "Starting application '$APP_NAME'"
-  echo "Once the application is running, get its URL by running 'kubify url'"
+  echo "Once the application is running, get its URL by running 'url'"
   init
   _stop $APP_NAME
   export NPM_TOKEN=`get_npm_secret`
@@ -1562,10 +1542,10 @@ if [[ $APP_VERSION != '' ]]; then
 }
 
 function run-kubify {
-  kubify run-all \
+  run-all \
     be-svc \
     fe-svc
-  kubify logs *
+  logs *
 }
 
 function build-run-kubify {
@@ -1575,15 +1555,15 @@ function build-run-kubify {
     echo "To stop builder: control-c (or if you must: pkill -f kubify)"
     trap 'kill $BGPID1;kill $BGPID2; exit' INT
     echo "The date before build is: `date`"
-    kubify build-run-all \
+    build-run-all \
       be-svc &> ${WORK_DIR}/${ENV}/logs/build-run-kubify-CORE1.log &
     BGPID1=$!
-    kubify build-run-all \
+    build-run-all \
       fe-svc &> ${WORK_DIR}/${ENV}/logs/build-run-kubify-CORE2.log &
     BGPID2=$!
     wait
     echo "The date after build is: `date`"
-    kubify logs *
+    logs *
 }
 
 function build-start-kubify {
@@ -1594,14 +1574,14 @@ function build-start-kubify {
     trap 'kill $BGPID1;kill $BGPID2; exit' INT
     echo "The date before build is: `date`"
     cd ${WORK_DIR}/../dev/svc/be-svc
-    kubify start be-svc &> ${WORK_DIR}/${ENV}/logs/build-run-kubify-CORE_be-svc.log &
+    start be-svc &> ${WORK_DIR}/${ENV}/logs/build-run-kubify-CORE_be-svc.log &
     BGPID1=$!
     cd ${WORK_DIR}/../dev/pub/fe-svc
-    kubify start fe-svc &> ${WORK_DIR}/${ENV}/logs/build-run-kubify-CORE_fe-svc.log &
+    start fe-svc &> ${WORK_DIR}/${ENV}/logs/build-run-kubify-CORE_fe-svc.log &
     BGPID2=$!
     wait
     echo "The date after build is: `date`"
-    kubify logs *
+    logs *
 }
 
 function get_extention {
@@ -1620,9 +1600,9 @@ function start_dependencies {
   pods_wc=$(_get_service_pod localstack-aws-svc | grep localstack-aws-svc 2> /dev/null | wc -l | tr -d " ")
   if [[ "${pods_wc}" != "1" ]]
   then
-    cd "${APP_DIR}/../localstack-aws-svc"
+    cd "${APP_DIR}/../../../services/shared/localstack-aws-svc"
     pwd
-    echo $APP_DIR | grep localstack || kubify run
+    echo $APP_DIR | grep localstack || run
   fi
   
   kubify_depends_on=$(cat "${APP_DIR}/kubify.${extension}" | ~/kubify/yq e '.depends_on' -)
@@ -1640,7 +1620,7 @@ function start_dependencies {
         echo "Starting service: ${dependancy_name}"
         cd "${APP_DIR}/../${dependancy_name}"
         pwd
-            kubify run || exit 1
+            run || exit 1
         count_seconds=0
         while [[ ${pods_wc} != "1" ]]
         do
@@ -1651,7 +1631,7 @@ function start_dependencies {
           if [ "$count_seconds" -gt "$max_seconds" ]; then
             ${KUBECTL_NS} delete deployment ${dependancy_name}
 
-            kubify run || exit 1
+            run || exit 1
           fi
         done
         echo "Validated Required Service: ${dependancy_name} is Running"
@@ -1680,7 +1660,7 @@ function start {
   CONFIG_FILE="${APP_DIR}/config/config.${ENV}.yaml"
   
   if [ ! -f "${SECRETS_FILE}" ]; then
-      kubify secrets create ${ENV}
+      secrets create ${ENV}
 
   fi
   aws_ecr_login
@@ -1692,13 +1672,13 @@ function start {
   if [ ! -f "${CONFIG_FILE}" ]; then
       echo "${CONFIG_FILE} file not found, creating blank one"
       mkdir -p "${APP_DIR}/config" | true
-      cp "${GIT_DIR}/var/folders/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
+      cp "${GIT_DIR}/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
   fi
   start_dependencies "${APP_DIR}"
   cd "${APP_DIR}"
   echo "Listening for code changes (on sync folders).."
-  echo "NOTE: From Workstation (Outside Kind Cluster Network) to Access URL: kubify url: https://${APP_NAME}.local.kubify.local"
+  echo "NOTE: From Workstation (Outside Kind Cluster Network) to Access URL: url: https://${APP_NAME}.local.kubify.local"
   echo "NOTE: From services: ${APP_NAME}.demo.svc"
   echo "NOTE: From services to KubeDB Databases: ${APP_NAME}-[database_name].demo.svc"
   echo "NOTE: Access DB or to/from additional Ports: kubectl -n demo port-forward [pod] [port]:[port]"
@@ -1753,7 +1733,7 @@ function start {
   cat "${APP_DIR}/kubify.yml" | grep "lambda:" && echo "aws resources localstack deployment results (lambda, s3, sqs, ..):" && aws cloudformation list-stacks --endpoint-url https://localstack-aws-svc.local.kubify.local --no-verify-ssl 2> /dev/null | grep UPDATE_IN_PROGRESS && sleep 10
   cat "${APP_DIR}/kubify.yml" | grep "lambda:" && echo "aws resources localstack deployment results (lambda, s3, sqs, ..):" && aws cloudformation list-stacks --endpoint-url https://localstack-aws-svc.local.kubify.local --no-verify-ssl 2> /dev/null
   
-  echo "NOTE: too see lambda logs: kubify logs | grep localstack-aws-svc"
+  echo "NOTE: too see lambda logs: logs | grep localstack-aws-svc"
   echo "
   "
 
@@ -1895,7 +1875,7 @@ function init {
   TAGS="common"
   if [ ! -d "$APP_DIR/secrets" ]; then
     echo "It looks like you haven't imported secrets from AWS. Checking..."
-    kubify secrets import all
+    secrets import all
   fi
   
   if [[ "$RERUN" == "1" ]] || ( [[ ! -f "$KUBIFY_CONFIG" ]] ) || ( [[ -f "$DOCKERFILE" ]] && [[ ! -f "$KUBIFY_CONFIG" ]] ); then
@@ -1965,7 +1945,7 @@ function secrets {
   ENV_UPPER=`echo ${ENV} | awk '{ print toupper($0) }'`
   KEY_VAR="${ENV_UPPER}_KMS"
   if [[ $ENV == 'all' ]] && [[ $1 != 'import' ]]; then
-    echo "'all' is only valid for 'kubify secrets import'"
+    echo "'all' is only valid for 'secrets import'"
     exit 1
   fi
   
@@ -1991,7 +1971,7 @@ function secrets {
           if [ ! -f "${SECRETS_FILE}" ]; then
               echo "${SECRETS_FILE} file not found, creating blank encrypted secret file and opening it with your EDITOR"
               mkdir -p $APP_DIR/secrets | true
-              cp "${GIT_DIR}/var/folders/kubify/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
+              cp "${GIT_DIR}/kubify/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
                         sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${SECRETS_FILE}"
                                         fi
           aws kms list-aliases | grep kubify | grep ${ENV} || echo " please create your KMS key with it's alias, ARN should be like \"${!KEY_VAR}\" "
@@ -2005,7 +1985,7 @@ function secrets {
           if [ ! -f "${SECRETS_FILE}" ]; then
               echo "${SECRETS_FILE} file not found, creating blank encrypted secret file and opening it with your EDITOR"
               mkdir -p $APP_DIR/secrets | true
-              cp "${GIT_DIR}/var/folders/kubify/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
+              cp "${GIT_DIR}/kubify/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
                         sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${SECRETS_FILE}"
                                         fi
           echo "
@@ -2074,7 +2054,7 @@ function _get_secret {
   SECRET_NAME=kubify_secrets_${APP_NAME}_${ENV}
 
   
-  aws secretsmanager get-secret-value --region $AWS_REGION --secret-id $SECRET_NAME &> /dev/null || kubify export
+  aws secretsmanager get-secret-value --region $AWS_REGION --secret-id $SECRET_NAME &> /dev/null || export
   SECRET_DATA=$(aws secretsmanager get-secret-value --region $AWS_REGION --secret-id $SECRET_NAME | jq -r .SecretString | jq -r 'map_values(. | @base64)')
   if [ -z "$SECRET_DATA" ]; then
       echo "SECRET_DATA came back empty, debug that?"
@@ -2115,7 +2095,7 @@ function undeploy_env {
 
 function deploy_env {
   check_ci_mode deploy_env
-  check_arg $1 "Error! Usage: kubify deploy_env <env>"
+  check_arg $1 "Error! Usage: deploy_env <env>"
   ENV=$1
   TAGS=deploy_env
   UNDEPLOY=${UNDEPLOY:-no}
@@ -2133,12 +2113,12 @@ function deploy_env {
 
 function deploy {
   check_ci_mode deploy
-  check_arg $1 "Error! Usage: kubify deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
-  check_arg $2 "Error! Usage: kubify deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
-  check_arg $3 "Error! Usage: kubify deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
-  check_arg $4 "Error! Usage: kubify deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
-  check_arg $5 "Error! Usage: kubify deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
-  check_arg $6 "Error! Usage: kubify deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
+  check_arg $1 "Error! Usage: deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
+  check_arg $2 "Error! Usage: deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
+  check_arg $3 "Error! Usage: deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
+  check_arg $4 "Error! Usage: deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
+  check_arg $5 "Error! Usage: deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
+  check_arg $6 "Error! Usage: deploy <service> <cluster> <namespace> <profile> <image_tag> <config_sha>"
   APP_NAME=$1
   CLUSTER=$2
   NAMESPACE=$3
@@ -2207,7 +2187,7 @@ function environments {
           echo "Error: Environment ${ENV} does not exist!"
           exit 1
         fi
-        echo "Error: 'kubify environments status' not implemented yet!"
+        echo "Error: 'environments status' not implemented yet!"
         exit 1
         ;;
       get-context)
@@ -2253,10 +2233,10 @@ function environments {
         KUBIFY_VERSION_2=$(echo $TO_ENV_JSON | jq -r ".kubify_version")
         printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
         echo "Kubify Diff"
-        git --no-pager diff ${KUBIFY_VERSION_1}..${KUBIFY_VERSION_2} "${GIT_DIR}/var/folders/kubify"
+        git --no-pager diff ${KUBIFY_VERSION_1}..${KUBIFY_VERSION_2} "${GIT_DIR}/kubify"
             echo "Services Diff"
         for service in ${SERVICES}; do
-          SERVICE_DIR=`kubify dir $service`
+          SERVICE_DIR=`dir $service`
           CONFIG_VERSION_1=$(echo $ENV_JSON | jq -r ".services[\"$service\"].config")
           CONFIG_VERSION_2=$(echo $TO_ENV_JSON | jq -r ".services[\"$service\"].config")
           CODE_VERSION_1=$(echo $ENV_JSON | jq -r ".services[\"$service\"].image")
@@ -2289,7 +2269,7 @@ function environments {
           fi
           if [ ! -z "${SHOW_CONFIG_DIFF}" ]; then
             echo "Config Diff"
-            REL_SERVICE_DIR=`RELATIVE=1 kubify dir $service`
+            REL_SERVICE_DIR=`RELATIVE=1 dir $service`
             rm -f ${WORK_DIR}/compare_config_1.json ${WORK_DIR}/compare_config_2.json
             git show ${CONFIG_VERSION_1}:${REL_SERVICE_DIR}/config/config.${ENV}.yaml    | ~/kubify/yq e -j - | ~/kubify/yq e '.data' - > ${WORK_DIR}/compare_config_1.json
             git show ${CONFIG_VERSION_2}:${REL_SERVICE_DIR}/config/config.${TO_ENV}.yaml | ~/kubify/yq e -j - | ~/kubify/yq e '.data' - > ${WORK_DIR}/compare_config_2.json
@@ -2304,10 +2284,10 @@ function environments {
 
 function undeploy {
   check_ci_mode undeploy
-  check_arg $1 "Error! Usage: kubify undeploy <service> <cluster> <namespace> <profile>"
-  check_arg $2 "Error! Usage: kubify undeploy <service> <cluster> <namespace> <profile>"
-  check_arg $3 "Error! Usage: kubify undeploy <service> <cluster> <namespace> <profile>"
-  check_arg $4 "Error! Usage: kubify undeploy <service> <cluster> <namespace> <profile>"
+  check_arg $1 "Error! Usage: undeploy <service> <cluster> <namespace> <profile>"
+  check_arg $2 "Error! Usage: undeploy <service> <cluster> <namespace> <profile>"
+  check_arg $3 "Error! Usage: undeploy <service> <cluster> <namespace> <profile>"
+  check_arg $4 "Error! Usage: undeploy <service> <cluster> <namespace> <profile>"
   APP_NAME=$1
   CLUSTER=$2
   NAMESPACE=$3
@@ -2328,23 +2308,26 @@ function undeploy {
 }
 
 function new {
-  check_arg $1 "Error! Usage: kubify new <app_type> <app_name>"
-  check_arg $2 "Error! Usage: kubify new <app_type> <app_name>"
-  run_in_entrypoint KUBIFY_DEBUG=${KUBIFY_DEBUG} KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY} KUBIFY_UNIQUE_COMPANY_ACRONYM=${KUBIFY_UNIQUE_COMPANY_ACRONYM} kubify _new "$@"
+  check_arg $1 "Error! Usage: new <app_type> <app_name>"
+  check_arg $2 "Error! Usage: new <app_type> <app_name>"
+  run_in_entrypoint KUBIFY_DEBUG=${KUBIFY_DEBUG} KUBIFY_CONTAINER_REGISTRY=${KUBIFY_CONTAINER_REGISTRY} KUBIFY_UNIQUE_COMPANY_ACRONYM=${KUBIFY_UNIQUE_COMPANY_ACRONYM} _new "$@"
 }
 
 function _new {
   APP_TYPE=$1
   APP_NAME=$2
   APP_DIR="${GIT_DIR}/${APP_TYPE}/${APP_NAME}"
+
   if [ -d "${APP_DIR}" ]; then
     echo "Error: The app '$APP_NAME' already exists!"
     exit
   fi
-  if [ "${
-    echo "Error: Name of app (${APP_NAME}) is too long (${
+
+  if [ "${#APP_NAME}" -gt 17 ]; then
+    echo "Error: Name of app (${APP_NAME}) is too long (${#APP_NAME} chars), please keep it under 18 characters!"
     exit
   fi
+
   while true; do
     cat << EOF
 Do you want to base this app on an existing template?
@@ -2356,7 +2339,7 @@ EOF
       break
     fi
   done
-  TEMPLATES_DIR="${GIT_DIR}/var/folders/kubify/templates"
+  TEMPLATES_DIR="${GIT_DIR}/kubify/templates"
   case "$choice" in
     1)
       echo "Using backend (svc) template..."
@@ -2382,25 +2365,6 @@ EOF
       exit
     ;;
   esac
-}
-
-function tf_atlantis {
-  check_ci_mode tf_atlantis
-  if [ -z "${TF_BACKEND_CREDENTIALS}" ]; then
-    echo "Error: TF_BACKEND_CREDENTIALS is not set. Aborting"
-    exit 1
-  fi
-  SCRIPT="${GIT_DIR}/var/folders/kubify/atlantis/bootstrap/terraform"
-  env $(echo "${TF_BACKEND_CREDENTIALS}" | xargs) ${SCRIPT} init && \
-  env $(echo "${TF_BACKEND_CREDENTIALS}" | xargs) ${SCRIPT} apply -auto-approve
-}
-
-function publish_atlantis_image {
-  check_ci_mode publish_atlantis_image
-  SCRIPT="${GIT_DIR}/var/folders/kubify/atlantis/atlantis-terragrunt-image/build.sh"
-  chmod +x ${SCRIPT}
-
-  ${SCRIPT}
 }
 
 function check_ci_mode {
@@ -2480,7 +2444,7 @@ function install_container {
 
     } &> "$KUBIFY_OUT"
   else
-    echo "'kubify install' not supported on $OSTYPE ... yet"
+    echo "'install' not supported on $OSTYPE ... yet"
     exit 1
   fi
   
@@ -2502,10 +2466,10 @@ nodes:
   - hostPath: "${GIT_DIR}"
     containerPath: /var/folders/kubify
     readOnly: false
-  - hostPath: "${HOME}/.aws"
-    containerPath: /root/.aws
-  - hostPath: "${HOME}/.ssh"
-    containerPath: /root/.ssh
+  # - hostPath: "${HOME}/.aws"
+  #   containerPath: /root/.aws
+  # - hostPath: "${HOME}/.ssh"
+  #   containerPath: /root/.ssh
 
 - hostPath: /var/run/docker.sock
     containerPath: /var/run/docker.sock
@@ -2530,8 +2494,8 @@ EOF
   stat ~/kubify/kubedb.txt || touch ~/kubify/kubedb.txt
   docker-compose up -d
   docker ps | grep kubify-kubify-1
-  docker exec -it --privileged -w "/var/folders/kubify" "kubify-kubify-1" ./kubify _up_container
-  docker exec -it --privileged -w "/var/folders/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" ../../../kubify run
+  docker exec -it --privileged -w "/var/folders/kubify" "kubify-kubify-1" ./_up_container
+  docker exec -it --privileged -w "/var/folders/kubify/dev/svc/localstack-aws-svc" "kubify-kubify-1" ../../../run
   
 }
 
@@ -2592,7 +2556,7 @@ spec:
       hostPath: 
         path: /var/run 
 EOF
-$KUBECTL apply -f "${GIT_DIR}/var/folders/kubify/templates/manifests/ingress-nginx-kind.yaml"
+$KUBECTL apply -f "${GIT_DIR}/kubify/templates/manifests/ingress-nginx-kind.yaml"
 
 $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
@@ -2636,7 +2600,7 @@ $KUBECTL wait --namespace ingress-nginx \
   fi
   configure
   kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
-  docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/var/folders/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/var/folders/kubify/tool/scripts/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
+  docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/kubify/tool/scripts/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
   echo '💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻👩‍💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻'
   echo 'Function Up: SUCCESS: Installation/Re-Installation Complete!! Kubify for life!!'
   echo '💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻'
@@ -2664,90 +2628,128 @@ function delete_clouds_testing {
 function help {
   cat << EOF
 Kubify is a CLI tool to manage the development and deployment lifecycle of microservices.
+
 Usage:
   kubify [command]
+
 Quickstart:
-  kubify up
+  up
   cd <your-app>
-  kubify start
+  start
+
 Available Commands:
-  dir               List the full path of the kubify directory or any of the services
-                      cd \$(kubify dir be-svc)                       cd \$(kubify dir)                
+  dir               List the full path of the directory or any of the services
+                      cd \$(dir be-svc)     # Change to the be-svc directory
+                      cd \$(dir)                # Change to the directory
+
   check             Perform some sanity checks
+
   up                Start the local cluster
+
   down              Stop the local cluster
+
   delete            Delete the local cluster
+
   status            Show the status of the local cluster
+
   services          List all the services
+
   images            List the Docker images
+
   clean             Purges/clears any caches
-                      kubify clean
+                      clean
+
                       - Removes cached docker images (Minikube)
                       - Removes unused application images
+
   ps                List the running services
+
   logs              Tail the logs of all applications
-                      kubify logs
+                      logs
+
   new               Create a new application from a template
-                      kubify new {{ app_type }} {{ app_name }}
+                      new {{ app_type }} {{ app_name }}
 
   secrets           Import, create, edit or view secrets per app per environment
-                      kubify secrets <export/import/create/view/edit> {{ env }}
+                      secrets <export/import/create/view/edit> {{ env }}
 
                       export: Write the encrypted secrets to AWS secrets manager
                       import: Read the secrets from AWS secrets manager and write to secrets locally
                       create: Create an empty version-controlled secrets file
                       view:   View the entries in cleartext for version-controlled secrets
                       edit:   Edit the entries for version-controlled secrets
+
   start             Start the app locally for local development (Watch changes)
-                      kubify start
+                      start
+
   start-all         Start all services in debug mode
+
   run               Run the app locally
-                      kubify run [<app_version>]
+                      run [<app_version>]
+
   run-all           Run a list of services in one-shot locally
-                      kubify run-all [[service1]:[tag]] [[service2]:[tag]] ...
+                      run-all [[service1]:[tag]] [[service2]:[tag]] ...
                       OR
-                      kubify run-all
+                      run-all
+
                     Example:
-                      kubify run-all kubify be-svc
+                      run-all kubify be-svc
+
   stop              Stop the app locally
-                      kubify stop
+                      stop
+
   stop-all          Stop a list of services in one-shot locally
-                      kubify stop-all [service1] [service2] ... [service_N]
+                      stop-all [service1] [service2] ... [service_N]
                       OR
-                      kubify stop-all
+                      stop-all
+
                     Example:
-                      kubify stop-all kubify be-svc
+                      stop-all kubify be-svc
+
   cmd               Run a command/shell in the current application
-                      kubify cmd [<cmd_name> [<options>]]
+                      cmd [<cmd_name> [<options>]]
+
   url               Get the URL for the current service
-                      kubify url
+                      url
+
   exec              Run a command/shell in the entrypoint container
-                      kubify exec [<cmd_name> [<options>]]
+                      exec [<cmd_name> [<options>]]
+
   environments      Get information/logs about environments
                       list:         List all the environments
                       logs:         Tail logs for an application in an environment
-                                      Example: kubify environments logs dev kubify
+                                      Example: environments logs dev kubify
                       view:         View the details for a given environment
-                                      Example: kubify environments view dev
+                                      Example: environments view dev
                       status:       View the deployment status for a given environment
-                                      Example: kubify environments status dev
+                                      Example: environments status dev
                       diff:         Compare two environments to see differences in deployed images and configs
                                       Examples:
-                                        kubify environments diff stage prod                                                           kubify environments diff stage prod "kubify,be-svc"                      get-context:  Switch the kubectl context to the environment
-                                      Example: kubify environments get-context dev
+                                        environments diff stage prod                       # Compare entire environment
+                                        environments diff stage prod "kubify,be-svc"    # Compare kubify and be-svc
+                      get-context:  Switch the kubectl context to the environment
+                                      Example: environments get-context dev
+
 
 Flags (Enable: 1; Disable: 0):
   KUBIFY_VERBOSE      Toggle verbose logging
   KUBIFY_DEBUG        Toggle verbose plus show every command (extra verbose)
   KUBIFY_ENGINE       The kubernetes engine to use (Supported: local (default), minikube)
   KUBIFY_PROFILE      The kubernetes profile to use (Advanced)
+
 EOF
 }
 
 read_flag_verbose
+
 if [ "$*" == "" ]; then
   help
 else
-
+  # TODO: ensure commenting this block does not break anything:
+  # Update the kube context
+  # if [ -x "$(command -v kubectx)" ]; then
+  #   # | true fixes partial install edge case
+  #   kubectx $PROFILE &> /dev/null | true
+  # fi
   "$@"
 fi
