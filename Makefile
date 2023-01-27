@@ -134,7 +134,7 @@ install_grpcio: pip3 install --upgrade pip
 kind:
 	export uname_found=`uname` && uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64" && which kind || brew install kind 2>/dev/null || `curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-$$uname_found-$$arch_found" && chmod +x ./kind && mv ./kind /usr/local/bin/kind`
 
-k8s:
+kubectl:
 	mkdir -p ~/._kubify_tools/src
 	which skaffold || uname -m | grep amd && export arch_found="amd64" || export arch_found="arm64" && wget -O ~/._kubify_tools/skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-$$arch_found"
 	chmod +x ~/._kubify_tools/skaffold
