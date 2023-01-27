@@ -1,15 +1,11 @@
-##
-## for when using localstack in "local" mode (non-did)
+# for when using localstack in "local" mode (non-did)
 import os
 import sys
 
 if os.environ["STAGE"] == "local":
     sys.path += [f"{os.getcwd()}/python/lib/python3.7/site-packages"]
-##
+#
 
-import boto3
-import json
-import kafka
 import os
 import logging
 

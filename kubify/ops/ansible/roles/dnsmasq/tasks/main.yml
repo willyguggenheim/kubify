@@ -20,7 +20,7 @@
     file_dnsmasq: "{{ 'dnsmasq.conf' if ansible_os_family == 'Darwin' else 'kubify.conf' }}"
 
 # TODO: what about when there is no networkmanager, make sure all edge cases are tested and stable..
-- name: create NetworkManager dnsmasq config for kubify
+- name: create NetworkManager dnsmasq config for Kubify
   become: yes
   file:
     path: "{{ dir_dnsmasq }}/{{ file_dnsmasq }}"

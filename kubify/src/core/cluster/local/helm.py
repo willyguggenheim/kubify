@@ -1,9 +1,3 @@
-from avionix import ChartBuilder, ChartDependency, ChartInfo, ObjectMeta
-from avionix.kube.apps import Deployment, DeploymentSpec, PodTemplateSpec
-from avionix.kube.core import Container, ContainerPort, EnvVar, LabelSelector, PodSpec
-from src.core.cluster.local.kind import api_version
-
-
 from pyhelm.chartbuilder import ChartBuilder
 from pyhelm.tiller import Tiller
 
@@ -25,27 +19,27 @@ def init():
     pass
 
 
-def deployment():
-    container = Container(
-        name="test-container",
-        image="k8s.gcr.io/echoserver:1.4",
-        env=[EnvVar("test", "test-value")],
-        ports=[ContainerPort(8080)],
-    )
+# def deployment():
+#     container = Container(
+#         name="test-container",
+#         image="k8s.gcr.io/echoserver:1.4",
+#         env=[EnvVar("test", "test-value")],
+#         ports=[ContainerPort(8080)],
+#     )
 
-    deployment = Deployment(
-        metadata=ObjectMeta(name="test-deployment", labels={"app": "my_app"}),
-        spec=DeploymentSpec(
-            replicas=1,
-            template=PodTemplateSpec(
-                ObjectMeta(labels={"app": "my_app"}),
-                spec=PodSpec(containers=[container]),
-            ),
-            selector=LabelSelector(match_labels={"app": "my_app"}),
-        ),
-    )
+# deployment = Deployment(
+#     metadata=ObjectMeta(name="test-deployment", labels={"app": "my_app"}),
+#     spec=DeploymentSpec(
+#         replicas=1,
+#         template=PodTemplateSpec(
+#             ObjectMeta(labels={"app": "my_app"}),
+#             spec=PodSpec(containers=[container]),
+#         ),
+#         selector=LabelSelector(match_labels={"app": "my_app"}),
+#     ),
+# )
 
-    # builder = install_chart (api_version="3.2.4", name="test", version="0.1.0", app_version="v1", deployment=[deployment])
+# builder = install_chart (api_version="3.2.4", name="test", version="0.1.0", app_version="v1", deployment=[deployment])
 
 
 # def install_chart(api_version="3.2.4", name="test", version="0.1.0", app_version="v1",[deployment]):

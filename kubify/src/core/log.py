@@ -1,7 +1,8 @@
 """Main module."""
 
 import logging
-from logging import config
+
+# from logging import config
 
 import kubify.src.core.app_constants as app_constants
 
@@ -26,8 +27,8 @@ log_config = {
     "formatters": {
         "std_out": {
             "format": """%(asctime)s : %(levelname)s : %(module)s : %(funcName)s : %(lineno)d
-                : (Process Details : (%(process)d, %(processName)s), 
-                Thread Details : (%(thread)d, %(threadName)s))\nLog 
+                : (Process Details : (%(process)d, %(processName)s),
+                Thread Details : (%(thread)d, %(threadName)s))\nLog
                 : %(message)s""",
             "datefmt": "%d-%m-%Y %I:%M:%S",
         }

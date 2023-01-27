@@ -1,8 +1,5 @@
-import os
-import requests
 from pathlib import Path
 
-import kubify.src.kubify
 import kubify.src.core.app_constants as app_constants
 from pytest_kind import KindCluster
 

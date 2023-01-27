@@ -50,17 +50,17 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 ./kubify ./tests --ignore="E266,E502,E501,W292,W293,F401,E115,E402,E712,F841,F811,W291,E111,E302,E225,F821,E117,E261,E303,E231,E265,W391,C416,B007,W504,C408,B006,E202,F541,E741,E999,E305,E722,B001"
+	flake8 --max-line-length=200 --exclude="kubify/ops/charts,tests,docs" ./
 
 lint/black: ## check style with black
-	black --check ./kubify ./tests
+	black --check ./
 
 lint: lint/flake8 lint/black ## check style
 
 format: ## format code with black
-	conda env update --file environment.yml --prune
 	find . -type f -print0 | xargs -0 dos2unix
-	black ./kubify ./tests
+	black ./
+	conda env update --file environment.yml --prune
 
 test: ## run tests quickly with the default Python
 	pytest
@@ -141,10 +141,10 @@ tfenv:
 	tfenv install 1.3.0
 	tfenv use 1.3.0
 
-fix:
-	find . -type f -print0 | xargs -0 dos2unix
-	black ./kubify
-	terraform fmt --recursive
+format:
+	find . -type f -print0 -not -path "./.git/*" >/dev/null | xargs -0 dos2unix >/dev/null
+	black ./
+	terraform fmt --recursive --write=true
 
 version:
 	bump2version patch
@@ -211,7 +211,6 @@ cloud-delete: #clouds reset nonprod envs
 cloud-create: #aws azure or gcp (make cloud cloud=[aws|azure|gcp] env=[dev|test|prod])
 	echo "creating cloud env $$env"
 	tfsec
-	terraform fmt --recursive
 	gcloud config set project kubify-os || gcloud auth application-default login
 	gcloud config set project kubify-os
 	aws sts get-caller-identity >/dev/null || aws configure

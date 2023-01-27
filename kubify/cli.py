@@ -1,4 +1,4 @@
-"""Console script for kubify."""
+"""Console script for Kubify."""
 import argparse
 
 # from ast import arg
