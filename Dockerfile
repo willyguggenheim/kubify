@@ -46,6 +46,7 @@ RUN pip install --ignore-installed PyYAML
 RUN pip install --upgrade pip
 COPY kubify/ops/terraform ./ops/terraform
 RUN make security pip package
+ENV PATH=${PATH}:/var/folders/kubify/kubify/ops/tools/scripts
 
 # python update
 COPY . .
