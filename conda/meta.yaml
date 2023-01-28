@@ -1,0 +1,49 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: kubify
+  version: {{ data['version'] }}
+
+source:
+  path: ..
+
+build:
+  noarch: generic
+  script: {{ PYTHON }} -m pip install --no-deps --ignore-installed -vv .
+  noarch: python
+
+  entry_points:
+    {% for entry in data['entry_points']['console_scripts'] %}
+      - {{ entry.split('=')[0].strip() }} = {{ entry.split('=')[1].strip() }}
+    {% endfor %}
+
+
+requirements:
+  # https://docs.conda.io/projects/conda-build/en/latest/resources/compiler-tools.html
+  # build:
+  #   - {{ compilers('c') }}
+  host:
+    - python
+    - pip
+  run:
+    - python
+    # dependencies are defined in setup.py
+    {% for dep in data['install_requires'] %}
+    - {{ dep.lower() }}
+    {% endfor %}
+
+test:
+  source_files:
+    - tests
+  requires:
+    - pytest
+    - pytest-cov
+  commands:
+    - pytest
+
+about:
+  home: https://github.com/willyguggenheim/kubify
+  summary: Rapid Testing Framework for Kubernetes
+  description: {{ data.get('description') }}
+  license: {{ data.get('license') }}
+  license_file: LICENSE

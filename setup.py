@@ -57,7 +57,7 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
     ],
-    description="Automated EKS",
+    description="Rapid Testing Framework for Kubernetes",
     entry_points={
         "console_scripts": [
             "kubify=kubify.cli:main",
