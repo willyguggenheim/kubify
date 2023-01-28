@@ -3,7 +3,7 @@ rapid testing framework for k8s
 welcome
 =======
 
-kubify os oss, version: 9019.0.0
+kubify os oss, version: 9020.0.0
 
 turn-key devops/mlops stack, rapid development platform for services and infra on kubernetes
 
