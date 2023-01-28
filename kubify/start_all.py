@@ -6,7 +6,9 @@ class StartAll:
         pass
 
     def start_all(self):
-        subprocess.run(["kubify_port.sh", "start-all"])  # nosec: B603 B607 - placeholder
+        subprocess.run(  # nosec: B603 B607 - placeholder
+            ["kubify_port.sh", "start-all"]
+        )
         # tags = ([f"common,{app_constants.dir_path}"],)
         # Options = namedtuple("Options", [])
         # options = Options(verbosity=1, check=False, tags=tags)

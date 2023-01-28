@@ -1,5 +1,6 @@
 import subprocess  # nosec - B404: placeholder until ported to python fully
 
+
 class Start:
     def __init__(self):
         pass

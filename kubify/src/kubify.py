@@ -84,9 +84,11 @@ def start():  # start service in rapid testing coding mode
     kubify_start_class = kubify_start.Start()
     kubify_start_class.start()
 
+
 def start_all():  # start service in rapid testing coding mode
     kubify_start_all_class = kubify_start_all.StartAll()
     kubify_start_all_class.start_all()
+
 
 # def generate_certs():
 #     path = Path(f"{app_constants.kubify_work}/certs/ca.key")
