@@ -1,6 +1,7 @@
 include *.rst
 include *.md
 include LICENSE
+exclude *.log
 
 recursive-include tests *
 recursive-exclude * __pycache__
@@ -38,3 +39,5 @@ recursive-exclude services *
 recursive-exclude environments *
 # local dev king cluster for rapid coding
 recursive-exclude kubify/._kubify_work *
+
+exclude docs/kubify.log
