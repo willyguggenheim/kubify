@@ -42,9 +42,12 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: willy0912/kubify:main
     # conda ship package
-    - name: release-conda
-      uses: fdiblen/anaconda-action@0.1.7
+    - name: publish-to-conda
+      uses: fcakyon/conda-publish-action@v1.3
       with:
+        subdir: 'conda'
+        anacondatoken: ${{ secrets.ANACONDA_TOKEN }}
+        platforms: 'win osx linux'
         envFileName: 'environment.yml'
     # pypi ship package
     - name: release-pypi

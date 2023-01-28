@@ -1,7 +1,7 @@
 welcome
 =======
 
-kubify os, version: 9018.0.0
+kubify os, version: 9019.0.0
 
 turn-key devops/mlops stack
 
@@ -42,7 +42,9 @@ b: listen for code changes on service ``kubify --start``
         * to code even faster, enable hot reloading in your ``kubify.yml:sync``
             * for example https://github.com/willyguggenheim/kubify/blob/main/services/internal-facing/example-csharp-svc/kubify.yml#L9
 
-stop local kubernetes kind cluster ``kubify --down`` you just tested on the real deal
+stop local kubernetes kind cluster ``kubify --down`` 
+
+think docker-compose, but for kubernetes, the cloud on your laptop, while you code in it
 
 and when you push to your named branch environment, cicd auto-versions and deploys
 
