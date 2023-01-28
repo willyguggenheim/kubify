@@ -32,10 +32,10 @@ container):
 3. rhel, centos and other epel-based: ``make epel``
 
 Environment Isolation
-=====================
+~~~~~~~~~~~~~~~~~~~~~
 
 Security Minute: You should not give prod access to anyone (but devs
-need to debug urgent issue in prod). How?
+need to debug urgent issue in prod). No Data Access, Identical Env. How?
 
 .. code:: bash
 
@@ -50,7 +50,7 @@ environment) without access to data, but with the full real prod!
 Kubernetes can be amazing, and it is, with Kubify..
 
 Contributing Workflow Patterns
-==============================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. DevContainer
 2. Invoke Python Directly (pull image if missing tools)

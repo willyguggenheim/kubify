@@ -9,7 +9,7 @@ rapid development platform
 
 
 getting started
-===============
+~~~~~~~~~~~~~~~
 
 local install
 
@@ -17,21 +17,21 @@ local install
 
     b: `conda install kubify`
 
-local start kubernetes kind kubify rapid testing cluster `kubify --up`
+local start kubernetes kind kubify rapid testing cluster ``kubify --up``
 
-a: start all services and infra locally `kubify --start-all`
+a: start all services and infra locally ``kubify --start-all``
     * deploys all terraform locally to localstack aws cloud services
     * deploys all serverless framework to localstack aws cloud services
 
 
-b: listen for code changes on the service you want to work on `kubify --start`
-    1. `cd services/[][]`
-    2. `kubify --start`
+b: listen for code changes on the service you want to work on ``kubify --start``
+    1. ``cd services/[][]``
+    2. ``kubify --start``
     * deploys dependant services 
     * deploys service with hot reloading (default) 
-        * to code even faster, enable hot reloading in your `kubify.yml:sync`
+        * to code even faster, enable hot reloading in your ``kubify.yml:sync``
 
-stop local kubernetes kind cluster `kubify --down`
+stop local kubernetes kind cluster ``kubify --down``
 
 https://kubify-os.readthedocs.io/en/latest/index.html
 

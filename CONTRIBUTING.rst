@@ -16,7 +16,7 @@ Thank You For Contributing, and Please Do Contribute Code
 
 
 Who is this for?
-================
+~~~~~~~~~~~~~~~~
 
 Data Scientists/Devs/DevOps/MLOps Person/Teams/Companies who want self service and autopilot
 
@@ -36,7 +36,7 @@ Ideoligy: If it works on your laptop/test/notebook, it works in prod
 
 
 How?
-====
+~~~
 
 DevEx First Class Ideology
 
