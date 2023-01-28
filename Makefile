@@ -177,11 +177,9 @@ python-rapid: # run git add first
 	open "https://github.com/willyguggenheim/kubify/compare/main...python"
 
 push:
-	rapid
-
+	make rapid
 sendit:
-	rapid
-
+	make rapid
 rapid:
 	check-manifest -u -v
 	make security
