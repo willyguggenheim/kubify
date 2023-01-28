@@ -41,7 +41,9 @@ Here is the missing tool
 AutoDevOps AutoMLOps Turn-Key solution
 1 Click To On-Board Developers To Your Infra And Repos
 Rapid Test Real Infra and Code Changes At The Same Time
-* Deploy the Same Way that you Code
-* Itterate Fast when Building Many-to-Many Services
-* Rapid Test Your Real Infra As You Build
-    * Know Before You Deploy
+* Deploy the Same Way that you Code, With The Real Infra Code
+* Itterate Fast when Building Many-to-Many Services, Really Fast
+* Rapid Test Your Real Infra As You Code, Test and Itterate
+* Know How It Will Function In The Cloud, Before You Push
+
+Happy Coding
