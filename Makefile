@@ -192,9 +192,10 @@ rapid_test:
 rapid:
 	check-manifest -u -v
 	make security
-	make develop
 	make tfsec
+	make develop
 	make format
+	make lint
 	make test
 	make rapid_test
 	echo "git add and git commit your files, then press enter to push"
