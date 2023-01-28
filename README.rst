@@ -1,7 +1,7 @@
 Welcome
 =======
 
-Kubify OS, Version: 9015.0.0
+Kubify OS, Version: 9015.0.1
 
 Turn-Key DevOps/MLOps Stack
 
