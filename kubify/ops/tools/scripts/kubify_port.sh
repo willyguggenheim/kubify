@@ -1,6 +1,10 @@
 #!/bin/bash
 
-set +e
+# debug = -o
+set +o xtrace
+
+# strict = -e
+set -e
 
 export ANSIBLE_PYTHON_INTERPRETER=`which python3`
 export INTERPRETER_PYTHON=auto_silent
@@ -18,6 +22,10 @@ export KUBIFY_CONTAINER="willy0912/kubify:main"
 export KUBIFY_CONTAINER_NAME="kubify-engine"
 
 alias kubify="kubify_port.sh"
+kind export kubeconfig --name kubify 2>/dev/null || \
+  echo "kubify local k8s kind cluster not yet found"
+kubectl --context kind-kubify get nodes 2>/dev/null || \
+  echo "kubify local k8s kind cluster not yet connected"
 
 ACTUAL_OS_TYPE=mac
 FILE=/proc/version
@@ -132,18 +140,19 @@ if ! [ -x "$(command -v docker)" ]; then
 fi
 if ! [ -x "$(docker ps)" ]; then
   if [[ "$OSTYPE" == *"darwin"* ]]; then
-    open --background -a Docker
+    open --background -a Docker 2>/dev/null
     echo "waiting until docker ps command works (please confirm it's running).."
     for i in 1 2 3 4 5; do docker ps && break || sleep 5; done
   elif [[ "$OSTYPE" == *"linux"* ]]; then
       if [[ "$ACTUAL_OS_TYPE" == "debian" ]]; then
-            systemctl start docker || service docker start || true
+            systemctl start docker 2>/dev/null || service docker start 2>/dev/null || true
       fi
       if [[ "$ACTUAL_OS_TYPE" == "centos" ]]; then
-            systemctl start docker || service docker start || true
+            systemctl start docker 2>/dev/null || service docker start 2>/dev/null || true
       fi
   fi
 fi
+docker ps >/dev/null
 if [[ "$OSTYPE" == *"darwin"* ]]; then
   if ! [ -x "$(command -v brew)" ]; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -209,7 +218,7 @@ elif [[ "$OSTYPE" == *"linux"* && "$MUST_INSTALL_YQ" == 1 ]]; then
 fi
 
 if [[ $KUBIFY_CI != '1' ]]; then
-  PROFILE=${KUBIFY_PROFILE:-kubify-kubify}
+  PROFILE=${KUBIFY_PROFILE:-kind-kubify}
 
 else
   PROFILE=${KUBIFY_PROFILE:-default}
@@ -236,12 +245,11 @@ elif [[ "$OSTYPE" == *"linux"* ]]; then
 fi
 export NAMING_PREFIX=$KUBIFY_UNIQUE_COMPANY_ACRONYM-$ENV-kubify
 export AWS_REGION=${KUBIFY_AWS_REGION:-us-east-1}
-
 export AWS_PROFILE=${KUBIFY_AWS_PROFILE:-default}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 GIT_DIR=`echo "$(cd "$(dirname "$DIR/../../../..")"; pwd)"`
-KUBIFY_CURRENT_VERSION=`git --git-dir="${GIT_DIR}/.git" rev-parse --verify HEAD --short`
+KUBIFY_CURRENT_VERSION=`cat ${GIT_DIR}/../__version__`
 
 WORK_DIR="${GIT_DIR}/._kubify_work"
 mkdir -p "${WORK_DIR}/certs"
@@ -273,7 +281,7 @@ elif [[ "$KUBIFY_CONTAINER_REGISTRY" == "ecr" ]]; then
 fi
 
 if [[ "$KUBIFY_ENGINE" == "minikube" ]]; then
-  PROFILE=kubify-kubify
+  PROFILE=kind-kubify
   
   MINIKUBE_DISK_SIZE=80g
   MINIKUBE_MEMORY=8192            
@@ -739,7 +747,7 @@ function configure_cluster {
       cmp -s "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/ca || sudo cp "${WORK_DIR}/certs/ca.crt" /usr/local/certificates/ca || true
       cmp -s "${WORK_DIR}/certs/ca.key" /usr/local/certificates/key || sudo cp "${WORK_DIR}/certs/ca.key" /usr/local/certificates/key || true
         kubectl create ns ingress-nginx || echo 'cert-manager ns exists'
-        $KUBECTL apply -f "${GIT_DIR}/kubify/templates/manifests/ingress-nginx-kind.yaml"
+        $KUBECTL apply -f "${GIT_DIR}/../kubify/ops/templates/manifests/ingress-nginx-kind.yaml"
       kubectl wait --namespace ingress-nginx \
 --for=condition=ready pod \
 --selector=app.kubernetes.io/component=controller \
@@ -922,7 +930,7 @@ configure_cluster
 
   echo "Creating secrets"
   {
-    export_secret dev kubify "${GIT_DIR}/kubify/templates/empty"
+    export_secret dev kubify "${GIT_DIR}/../kubify/ops/templates/empty"
     echo `_get_secret dev kubify 0` | $KUBECTL_NS apply -f  -
   } &> "$KUBIFY_OUT"
   echo "Building containers (Please be patient)"
@@ -1108,7 +1116,7 @@ spec:
       hostPath: 
         path: /var/run 
 EOF
-$KUBECTL apply -f "${GIT_DIR}/kubify/templates/manifests/ingress-nginx-kind.yaml"
+$KUBECTL apply -f "${GIT_DIR}/../kubify/ops/templates/manifests/ingress-nginx-kind.yaml"
 
 $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
@@ -1183,7 +1191,7 @@ function up {
   fi
   configure
   kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
-  docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/kubify/tool/scripts/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
+  docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/../kubify/ops/tools/docker/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/../kubify/ops/tools/docker/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
   if [[ "$ACTUAL_OS_TYPE" == "mac" ]]; then
    open /Applications/Lens.app || echo ""
   fi
@@ -1455,7 +1463,7 @@ function build-run-all {
 
 function stop-all {
   if [ "$#" -eq 0 ]; then
-    SERVICES=`${KUBECTL_NS} get deployment -l context=kubify -o=jsonpath='{.items[*].metadata.name}'`
+    SERVICES=`${KUBECTL_NS} get deployment -l context=kind-kubify -o=jsonpath='{.items[*].metadata.name}'`
   else
     SERVICES="$@"
   fi
@@ -1503,7 +1511,7 @@ function run {
   if [ ! -f "${CONFIG_FILE}" ]; then
       echo "${CONFIG_FILE} file not found, creating blank one"
       mkdir -p "${APP_DIR}/config" | true
-      cp "${GIT_DIR}/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
+      cp "${GIT_DIR}/../kubify/ops/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
   fi
   start_dependencies "${APP_DIR}"
@@ -1672,7 +1680,7 @@ function start {
   if [ ! -f "${CONFIG_FILE}" ]; then
       echo "${CONFIG_FILE} file not found, creating blank one"
       mkdir -p "${APP_DIR}/config" | true
-      cp "${GIT_DIR}/kubify/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
+      cp "${GIT_DIR}/../kubify/ops/templates/config/config.${ENV}.yaml" "${CONFIG_FILE}"
       sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${CONFIG_FILE}"
   fi
   start_dependencies "${APP_DIR}"
@@ -1786,7 +1794,7 @@ function url {
 
 function logs {
   set_context
-  kubetail --context $PROFILE -n $NAMESPACE -l context=kubify
+  kubetail --context $PROFILE -n $NAMESPACE -l context=kind-kubify
 }
 
 function exec {
@@ -1969,11 +1977,11 @@ function secrets {
           echo "Creating secrets for ${APP_NAME} for ${ENV} environment"
           echo "Note: You can change the secrets text editor by setting the EDITOR env var"
           if [ ! -f "${SECRETS_FILE}" ]; then
-              echo "${SECRETS_FILE} file not found, creating blank encrypted secret file and opening it with your EDITOR"
+              echo "Creating AWS KMS Encrypted Versioned Secret ${SECRETS_FILE}"
               mkdir -p $APP_DIR/secrets | true
-              cp "${GIT_DIR}/kubify/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
-                        sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${SECRETS_FILE}"
-                                        fi
+              cp "${GIT_DIR}/../kubify/ops/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
+              sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${SECRETS_FILE}" || sed -e 's|common|'"${APP_NAME}"'|g' "${SECRETS_FILE}"
+          fi
           aws kms list-aliases | grep kubify | grep ${ENV} || echo " please create your KMS key with it's alias, ARN should be like \"${!KEY_VAR}\" "
           kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" || kubesec encrypt -i --key="${!KEY_VAR}" "${SECRETS_FILE}" --cleartext
           echo "Reloading secrets in-cluster"
@@ -1985,7 +1993,7 @@ function secrets {
           if [ ! -f "${SECRETS_FILE}" ]; then
               echo "${SECRETS_FILE} file not found, creating blank encrypted secret file and opening it with your EDITOR"
               mkdir -p $APP_DIR/secrets | true
-              cp "${GIT_DIR}/kubify/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
+              cp "${GIT_DIR}/../kubify/ops/templates/secrets/secrets.${ENV}.enc.yaml" "${SECRETS_FILE}"
                         sed -i bak -e 's|common|'"${APP_NAME}"'|g' "${SECRETS_FILE}"
                                         fi
           echo "
@@ -2217,8 +2225,8 @@ function environments {
         fi
         CLUSTER=$(cat ${ENV_FILE} | ~/kubify/yq e '.target.cluster' -)
         CONTEXT="${KUBIFY_UPSTREAM_ENV_ACCOUNT}:cluster/${CLUSTER}"
-        ENV_JSON=$($KUBECTL --context kubify-${ENV} get environments ${ENV} -o yaml | ~/kubify/yq e -j -)
-        TO_ENV_JSON=$($KUBECTL --context kubify-${TO_ENV} get environments ${TO_ENV} -o yaml | ~/kubify/yq e -j -)
+        ENV_JSON=$($KUBECTL --context kind-kubify get environments ${ENV} -o yaml | ~/kubify/yq e -j -)
+        TO_ENV_JSON=$($KUBECTL --context kind-kubify get environments ${TO_ENV} -o yaml | ~/kubify/yq e -j -)
         SERVICES=$(echo $4 | sed 's/,/ /g')
         if [ -z "${SERVICES}" ]; then
           SERVICES=$(echo $ENV_JSON | ~/kubify/yq e ".data | keys[]" -)
@@ -2229,12 +2237,12 @@ function environments {
         echo "${ENV_JSON}" | jq -r "{kubify_version,services}" > ${WORK_DIR}/compare_env_1.json
         echo "${TO_ENV_JSON}" | jq -r "{kubify_version,services}" > ${WORK_DIR}/compare_env_2.json
         json-diff ${WORK_DIR}/compare_env_1.json ${WORK_DIR}/compare_env_2.json
-            KUBIFY_VERSION_1=$(echo $ENV_JSON | jq -r ".kubify_version")
+        KUBIFY_VERSION_1=$(echo $ENV_JSON | jq -r ".kubify_version")
         KUBIFY_VERSION_2=$(echo $TO_ENV_JSON | jq -r ".kubify_version")
         printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
         echo "Kubify Diff"
         git --no-pager diff ${KUBIFY_VERSION_1}..${KUBIFY_VERSION_2} "${GIT_DIR}/kubify"
-            echo "Services Diff"
+        echo "Services Diff"
         for service in ${SERVICES}; do
           SERVICE_DIR=`dir $service`
           CONFIG_VERSION_1=$(echo $ENV_JSON | jq -r ".services[\"$service\"].config")
@@ -2339,7 +2347,7 @@ EOF
       break
     fi
   done
-  TEMPLATES_DIR="${GIT_DIR}/kubify/templates"
+  TEMPLATES_DIR="${GIT_DIR}/../kubify/ops/templates"
   case "$choice" in
     1)
       echo "Using backend (svc) template..."
@@ -2556,7 +2564,7 @@ spec:
       hostPath: 
         path: /var/run 
 EOF
-$KUBECTL apply -f "${GIT_DIR}/kubify/templates/manifests/ingress-nginx-kind.yaml"
+$KUBECTL apply -f "${GIT_DIR}/../kubify/ops/templates/manifests/ingress-nginx-kind.yaml"
 
 $KUBECTL wait --namespace ingress-nginx \
   --for=condition=ready pod \
@@ -2600,7 +2608,7 @@ $KUBECTL wait --namespace ingress-nginx \
   fi
   configure
   kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
-  docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/kubify/tool/scripts/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/kubify/tool/scripts/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
+  docker build -t lambda_layer_python:v1 -f ${GIT_DIR}/../kubify/ops/tools/docker/lambda/lambda/layer/python/Dockerfile ${GIT_DIR}/../kubify/ops/tools/docker/lambda/lambda/layer/python/ || echo "could not build lambda py dependencieslayer builder, but will build anyway on run lambda.."
   echo '💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻👩‍💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻'
   echo 'Function Up: SUCCESS: Installation/Re-Installation Complete!! Kubify for life!!'
   echo '💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻💻'

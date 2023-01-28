@@ -32,5 +32,9 @@ include .editorconfig
 include .gitmodules
 include docs/CODEOWNERS
 
+# example services and example environments folders are for testing
+# usage pattern includes your own "environments" and "services folders
 recursive-exclude services *
 recursive-exclude environments *
+# local dev king cluster for rapid coding
+recursive-exclude kubify/._kubify_work *

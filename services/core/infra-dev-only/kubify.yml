@@ -3,7 +3,7 @@ aws_only: true
 aws:
   kubify-security-bucket-art:
     -
-      Name: kubify-kubify-security-bucket-art
+      Name: kubify-security-bucket-art
 
   workspaces-directory:
     - 

@@ -27,6 +27,7 @@ test_requirements = [
     "black",
     "flake8",
     "bump2version",
+    "check-manifest",
 ]
 
 extras = {
@@ -34,6 +35,7 @@ extras = {
     "test": test_requirements,
     "develop": [
         "Sphinx",
+        "pylint",
     ]
     + test_requirements,
 }
