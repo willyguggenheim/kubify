@@ -53,7 +53,13 @@ Ideolegy
 ========
 
 
-1. DevOps/MLOps Write Code Terraform/SLS/CF/ArgoCD/Services/ML At The Same Time, The Same Way
+A Fun Project I am Building To Prove An Interesting Theory About Next Gen Self Service Rapid, 
+
+Code Delivery Platform to Solve Regression Testing Early in the Development Process,
+
+A Proof Of Concept To Show The Idea, 
+
+1. In The Kubify Platform, DevOps/MLOps/Devs/DataScientists/Researchers/Engineers Write Code Terraform/SLS/CF/ArgoCD/Services/ML At The Same Time, The Same Way, And Test The Same Way, As 1 Big Team (Same Codebase)
     * 1 Kubify Yaml in each `./services/[group][name]` Folder `kubify.yml` (Rapid Test in Local/DevContainer/CodeSpaces/NotebookServers/VSCode All Your Terraform/SLS/CF/ArgoCD/Services/ML/AWS and The Same Time)
     * 1 Environment Yaml, Each Environment Gets 1 Auto-Versioned Environment File (Easy to Rollback Multiple Services and Easy to UAT/Clone Prod Without Needing Any Access To The Data To Debug Anything, Solve/Debug Fast)
 2. Developers Leverage DevOps/MLOps CodeBase Day-In-Day-Out To Test and Contribute (If It Works On My Laptop, It Works in Prod, That's What Makes This Different, Join-At-The-Hip Your DevOps/MLOps Devs to All of Your Devs)
