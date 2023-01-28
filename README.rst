@@ -1,7 +1,7 @@
 Welcome
 =======
 
-Kubify OS, Version: 9015.0.0
+Kubify OS, Version: 9015.0.1
 
 Turn-Key DevOps/MLOps Stack
 
@@ -67,11 +67,11 @@ Ideolegy
 ========
 
 
-A Fun Project I am Building To Prove An Interesting Next Gen Self Service Platform For Devs, DevOps and MLOps, 
+A Proven PROOF OF CONCEPT (Python Port IN PROGRESS) To Show The Idea And To Productionize It Together, 
 
-Code Delivery Platform to Solve Regression Testing Early in the Development Process,
+Code Delivery Platform to Solve Regression Testing Early in the Development Process, Without The Wait,
 
-A Proof Of Concept To Show The Idea, 
+A Fun Project I am Building To Prove An Interesting Next Gen Self Service Platform For Devs, DevOps and MLOps, to All Work On The Same Code Base, 
 
 1. In The Kubify Platform, DevOps/MLOps/Devs/DataScientists/Researchers/Engineers Write Code Terraform/SLS/CF/ArgoCD/Services/ML At The Same Time, The Same Way, And Test The Same Way, As 1 Big Team (Same Codebase)
     * 1 Kubify Yaml in each `./services/[group][name]` Folder `kubify.yml` (Rapid Test in Local/DevContainer/CodeSpaces/NotebookServers/VSCode All Your Terraform/SLS/CF/ArgoCD/Services/ML/AWS and The Same Time)
