@@ -1,3 +1,9 @@
+recursive-include kubify/src *
+recursive-include kubify/ops *
+
+recursive-include conda *.yaml
+include conda/meta.yaml
+
 include *.rst
 include *.md
 include LICENSE
@@ -35,9 +41,7 @@ include .editorconfig
 include .gitmodules
 include docs/CODEOWNERS
 
-# example services and example environments folders are for testing
-# usage pattern includes your own "environments" and "services folders
-recursive-exclude services *
-recursive-exclude environments *
-# local dev king cluster for rapid coding
+recursive-include services *
+recursive-include environments *
 recursive-exclude kubify/._kubify_work *
+recursive-include conda *.yaml

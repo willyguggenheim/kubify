@@ -1,4 +1,4 @@
-from pytest_kind import KindCluster
+from kubify.src.core.cluster.local.modules.pytest_kind import KindCluster
 
 
 class Down:

@@ -65,8 +65,8 @@ format: ## format code with black
 test: ## run tests quickly with the default Python
 	pytest
 
-test-all: ## run tests on every Python version with tox
-	tox
+tox: ## run tests on every Python version with tox
+	tox -e py37,py38,py39,py310,py311,py312 -p all
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source ./kubify -m pytest || true
@@ -193,7 +193,10 @@ rapid:
 	check-manifest -u -v
 	make security
 	make tfsec
+	make conda-build
 	make develop
+	make docker
+	make tox
 	make docs
 	make format
 	make lint
@@ -281,9 +284,10 @@ clean:
 
 # test every version of python enabled
 pythons-cache:
-	tox -e py37,py38,py39,py310 -p all --notest
+	tox -e py37,py38,py39,py310,py311,py312 -p all --notest
 pythons:
-	tox -e py37,py38,py39,py310 -p all
+	make conda-build
+	make tox
 
 # mac intel, m1, m2 and other darwin-based (in case you want to install outside container while contributing) ..
 mac-direct-install:
@@ -319,6 +323,9 @@ argo-delete-services:
 conda:
 	conda --version || make conda-install
 	conda info | grep "active environment" | grep kubify || make conda-setup
+
+conda-build:
+	conda build --python 3.7 --python 3.8 --python 3.9 --python 3.10  --python 3.11  --python 3.12 --output-folder ./build/conda .
 
 conda-install:
 	bash ./kubify/ops/tools/scripts/conda_install.sh

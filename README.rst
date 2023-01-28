@@ -1,4 +1,31 @@
-rapid testing framework for k8s
+turn key autodevops automlops self service framework for rapid kubernetes development
+
+badges
+~~~~~~
+
+.. |Docker| image:: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main
+   :target: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml
+.. |PyPi| image:: https://img.shields.io/pypi/v/kubify.svg
+   :target: https://pypi.python.org/pypi/kubify
+.. |PyUp| image:: https://pyup.io/repos/github/willyguggenheim/kubify/shield.svg
+   :target: https://pyup.io/repos/github/willyguggenheim/kubify/
+.. |Docs| image:: https://readthedocs.org/projects/kubify/badge/?version=latest
+   :target: hhttps://kubify.readthedocs.io/en/latest/?version=latest
+
+.. figure:: ./docs/img/README_md_imgs/kubify-arch.drawio.png
+   :alt: TURN_KEY_DEVOPS_RAPID_TESTER
+
+aws partner network
+~~~~~~~~~~~~~~~~~~~
+
+.. figure:: ./docs/img/README_md_imgs/AWS-Partner.jpeg
+   :alt: AWSPARTNER
+
+on-boarding
+~~~~~~~~~~~
+
+1. ``make clouds``
+2. ``kubfiy start-all``
 
 welcome
 =======
@@ -42,6 +69,19 @@ b: listen for code changes on service ``kubify --start``
         * to code even faster, enable hot reloading in your ``kubify.yml:sync``
             * for example https://github.com/willyguggenheim/kubify/blob/main/services/internal-facing/example-csharp-svc/kubify.yml#L9
 
+compatible with cloud providers
+    * aws
+    * gcp
+    * azure
+
+compatible with devops tools
+    * terraform
+    * cloudformation
+    * serverless framework
+    * helm
+
+providers 
+
 stop local kubernetes kind cluster ``kubify --down`` 
 
 think docker-compose, but for kubernetes, the cloud on your laptop, while you code in it
@@ -50,4 +90,10 @@ and when you push to your named branch environment, cicd auto-versions and deplo
 
 https://kubify-os.readthedocs.io/en/latest/index.html
 
-happy coding
+happy coding and enjoy
+
+docs
+~~~~
+
+1. https://kubify-os.readthedocs.io
+2. CONTRIBUTING.rst or/and USAGE.rst

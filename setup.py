@@ -11,7 +11,6 @@ with open("USAGE.rst") as usage_file:
     usage = usage_file.read()
 
 requirements = [
-    "pytest-kind",
     "kubernetes",
     "boto3",
     "awscli",

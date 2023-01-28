@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import kubify.src.core.app_constants as app_constants
-from pytest_kind import KindCluster
+from kubify.src.core.cluster.local.modules.pytest_kind import KindCluster
 
 
 class Up:
