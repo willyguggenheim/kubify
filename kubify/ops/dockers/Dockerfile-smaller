@@ -15,7 +15,7 @@ RUN apt install -y  --no-install-recommends python3-alembic python3-flask-migrat
 # RUN apt install -y  --no-install-recommends python3.7 python3.8 python3.9 python3.10
 # APT Deps can go here:
 RUN apt install -y  --no-install-recommends python3-alembic python3-flask-migrate curl
-RUN wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | tar xvz && sudo ln -s `pwd`/flyway-8.5.13/flyway /usr/local/bin/
+RUN wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.5.13/flyway-commandline-8.5.13-linux-x64.tar.gz | tar xvz && sudo ln -sf `pwd`/flyway-8.5.13/flyway /usr/local/bin/
 
 # Install EKS Control
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -53,16 +53,16 @@ RUN pip install -e .[develop]
 # RUN echo 'export PATH="$HOME/.anyenv/bin:$PATH"' >> /etc/profile.d/anyenv.sh
 # RUN echo 'eval "$(anyenv init -)"' >> /etc/profile.d/anyenv.sh
 RUN git clone https://github.com/tfutils/tfenv ~/tools/tfenv
-RUN ln -s ~/tools/tfenv/bin/* /usr/local/bin
+RUN ln -sf ~/tools/tfenv/bin/* /usr/local/bin
 RUN apt install -y  --no-install-recommends unzip zip tar gzip
 RUN tfenv install 1.2.4
 RUN tfenv use 1.2.4
 ADD https://github.com/gruntwork-io/terragrunt/releases/download/v0.38.3/terragrunt_linux_amd64 /usr/local/bin/terragrunt-amd64
 ADD https://github.com/gruntwork-io/terragrunt/releases/download/v0.38.3/terragrunt_linux_arm64 /usr/local/bin/terragrunt-arm64
 RUN chmod +x /usr/local/bin/terragrunt-*
-RUN terragrunt-arm64 --version && ln -s /usr/local/bin/terragrunt-arm64 /usr/local/bin/terragrunt
+RUN terragrunt-arm64 --version && ln -sf /usr/local/bin/terragrunt-arm64 /usr/local/bin/terragrunt
 RUN terragrunt-amd64 --version && unlink /usr/local/bin/terragrunt
-RUN terragrunt-amd64 --version && ln -s /usr/local/bin/terragrunt-amd64 /usr/local/bin/terragrunt
+RUN terragrunt-amd64 --version && ln -sf /usr/local/bin/terragrunt-amd64 /usr/local/bin/terragrunt
 RUN chmod +x /usr/local/bin/terragrunt
 
 # Code:
