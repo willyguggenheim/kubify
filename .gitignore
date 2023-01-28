@@ -19,6 +19,9 @@ default.profraw
 # .vscode
 # **/.vscode
 
+# Docs Builds
+docs/_build
+
 # Keys
 **/id_rs*
 **/id_ds*
