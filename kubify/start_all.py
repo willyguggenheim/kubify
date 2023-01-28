@@ -1,12 +1,14 @@
 import subprocess  # nosec - B404: placeholder until ported to python fully
 
 
-class Start:
+class StartAll:
     def __init__(self):
         pass
 
-    def start(self):
-        subprocess.run(["kubify_port.sh", "start"])  # nosec: B603 B607 - placeholder
+    def start_all(self):
+        subprocess.run(  # nosec: B603 B607 - placeholder
+            ["kubify_port.sh", "start-all"]
+        )
         # tags = ([f"common,{app_constants.dir_path}"],)
         # Options = namedtuple("Options", [])
         # options = Options(verbosity=1, check=False, tags=tags)
@@ -19,9 +21,9 @@ class Start:
         # )
 
     def main(self):
-        self.start()
+        self.start_all()
 
 
 if __name__ == "__main__":
-    start = Start()
+    start = StartAll()
     start.main()

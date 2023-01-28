@@ -143,7 +143,7 @@ kubectl:
 	wget -O ~/._kubify_tools/kubesec "https://github.com/shyiko/kubesec/releases/download/0.9.2/kubesec-0.9.2-linux-amd64"
 	chmod +x ~/._kubify_tools/kubesec
 	git clone https://github.com/ahmetb/kubectx ~/._kubify_tools/src/kubectx
-	ln -s ~/._kubify_tools/src/kubectx/kubectx ~/._kubify_tools/kubectx
+	ln -sf ~/._kubify_tools/src/kubectx/kubectx ~/._kubify_tools/kubectx
 	chmod +x ~/._kubify_tools/kubectx
 	rm -rf ~/._kubify_tools/src/kubectx
 
@@ -151,7 +151,7 @@ apt:
 	apt update && xargs apt -y install <apt.lock
 
 tfenv:
-	which tfenv || brew install tfenv 2>/dev/null || anyenv install tfenv 2>/dev/null || `git clone https://github.com/tfutils/tfenv $$HOME/.tfenv && ln -s $$HOME/.tfenv/bin/* /usr/local/bin`
+	which tfenv || brew install tfenv 2>/dev/null || anyenv install tfenv 2>/dev/null || `git clone https://github.com/tfutils/tfenv $$HOME/.tfenv && ln -sf $$HOME/.tfenv/bin/* /usr/local/bin`
 	tfenv install 1.3.0
 	tfenv use 1.3.0
 
@@ -180,11 +180,23 @@ push:
 	make rapid
 sendit:
 	make rapid
+rapid_test:
+	stat services/internal-facing/example-lambda-python-svc || echo "run this in kubify dir"
+	docker ps | grep kubify-kubify-1 && kubify --down || kubify
+	kubify --up
+	kubify --start-all
+	cd services/internal-facing/example-lambda-python-svc
+	kubify --start
+	kubify --down
+
 rapid:
 	check-manifest -u -v
 	make security
+	make develop
 	make tfsec
 	make format
+	make test
+	make rapid_test
 	echo "git add and git commit your files, then press enter to push"
 	bash -c "read"
 	git push
@@ -192,7 +204,8 @@ rapid:
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
 
-clouds: # install AWS, GCP and Azure clouds in parallel (fastest)
+# clouds deploy now
+clouds:
 	make cloud-create env=dev
 
 clouds-delete:
@@ -285,10 +298,7 @@ epel-direct-install:
 aws-list:
 	aws eks list-clusters --output json
 
-# cloud deploys
-
-# todo: also (similarly) ansible kubedb changes for multi-cloud database (and that backs up in both clouds)
-# todo: route53 helm automations to failover active-active between clouds
+# cloud deploy now
 argo-create-services:
 	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $$(cat $$HOME/.argocd/token)
 	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge

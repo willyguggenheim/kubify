@@ -1,34 +1,49 @@
 Welcome
 =======
 
-Kubify OS, Version: 9013.0.2
+Kubify OS, Version: 9014.0.0
 Turn-Key DevOps/MLOps Stack
 Rapid Development Platform
 
 Getting Started
 ===============
 
-Install
+Local Install
     A: `pip install kubify`
     B: `conda install kubify`
-Start local kubernetes kind cluster `kubify --up`
-A: Start entire enviornment in multi-service code edit mode `kubify --start-all`
-    * deploys all terraform locally to localstack aws cloud services
-    * deploys all serverless framework to localstack aws cloud services
-    * deploys all services to local kind cluster using skaffold for hot reloading all services
-B: Start a service and all it's dependant services in multi-service code edit mode `kubify --start`
+Local Start Kubernetes Kind Kubify Rapid Testing Cluster `kubify --up`
+A: Local Start Entire Enviornment in Multi-Service Kubify Code Edit Mode `kubify --start-all`
+    * deploys all Terraform locally to localstack AWS Cloud Services
+    * deploys all Serverless Framework to LocalStack AWS Cloud Services
+    * deploys all Services to local Kind Cluster using Skaffold for Hot Reloading All Services
+B: Local Start a Service and all it's Dependant Services in Multi-Service Kubify Code Edit Mode `kubify --start`
     1. `cd services/[][]`
     2. `kubify --start`
-Stop local kubernetes kind cluster `kubify --down`
+Deploy/Update AWS EKS, GCP GKE & Azure AKS
+Stop local Kubernetes Kind Cluster `kubify --down`
 
-See CONTRIBUTING.rst optional dev container
+Contributing Tools
+==================
+
+It's As Simple As `make rapid` To Test All, Version And Push What You Have Committed Versioned
+
+A: CONTRIBUTING.rst
+   Includes Efficient Workflows For Contributing To This Repo (And For Any Custom Installs) Enjoy
+B: Dev Container VSCode
+   Click The Dev Container Button In Your IDE Of Choise (Example: Visual Studio Code's Green Button)
+C: GithUb Workspaces
+   Most Efficient On-Boarding Use Case (For Installs And Contributing): Click "."" Key in GitHub
 
 Ideolegy
 ========
 
 Here is the missing tool
 AutoDevOps AutoMLOps Turn-Key solution
-* Deploy the Same Way that you Code
-* Itterate Fast when Building Many-to-Many Services
-* Rapid Test Your Real Infra As You Build
-    * Know Before You Deploy
+1 Click To On-Board Developers To Your Infra And Repos
+Rapid Test Real Infra and Code Changes At The Same Time
+* Deploy the Same Way that you Code, With The Real Infra Code
+* Itterate Fast when Building Many-to-Many Services, Really Fast
+* Rapid Test Your Real Infra As You Code, Test and Itterate
+* Know How It Will Function In The Cloud, Before You Push
+
+Happy Coding

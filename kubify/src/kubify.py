@@ -18,6 +18,7 @@ import kubify.up as kubify_up
 
 import kubify.down as kubify_down
 import kubify.start as kubify_start
+import kubify.start_all as kubify_start_all
 
 import kubify.src.aws_constants as aws_constants
 
@@ -82,6 +83,11 @@ def down():
 def start():  # start service in rapid testing coding mode
     kubify_start_class = kubify_start.Start()
     kubify_start_class.start()
+
+
+def start_all():  # start service in rapid testing coding mode
+    kubify_start_all_class = kubify_start_all.StartAll()
+    kubify_start_all_class.start_all()
 
 
 # def generate_certs():
