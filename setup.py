@@ -74,6 +74,6 @@ setup(
     tests_require=test_requirements,
     extras_require=extras,
     url="https://github.com/willyguggenheim/kubify",
-    version="9015.0.3",
+    version="9016.0.0",
     zip_safe=False,
 )

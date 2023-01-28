@@ -194,6 +194,7 @@ rapid:
 	make security
 	make tfsec
 	make develop
+	make docs
 	make format
 	make lint
 	make test
