@@ -21,6 +21,8 @@ include ansible.cfg
 include tox.ini
 
 recursive-include docs *
+exclude docs/kubify.log
+recursive-exclude docs/_build *
 recursive-include kubify *
 recursive-include kubify Makefile
 
@@ -39,5 +41,3 @@ recursive-exclude services *
 recursive-exclude environments *
 # local dev king cluster for rapid coding
 recursive-exclude kubify/._kubify_work *
-
-exclude docs/kubify.log
