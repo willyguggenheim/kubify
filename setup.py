@@ -57,7 +57,7 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
     ],
-    description="Automated EKS",
+    description="Rapid Testing Framework for Kubernetes",
     entry_points={
         "console_scripts": [
             "kubify=kubify.cli:main",
@@ -74,6 +74,6 @@ setup(
     tests_require=test_requirements,
     extras_require=extras,
     url="https://github.com/willyguggenheim/kubify",
-    version="9019.0.0",
+    version="9020.0.0",
     zip_safe=False,
 )

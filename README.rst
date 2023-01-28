@@ -1,11 +1,11 @@
+rapid testing framework for k8s
+
 welcome
 =======
 
-kubify os, version: 9019.0.0
+kubify os oss, version: 9020.0.0
 
-turn-key devops/mlops stack
-
-rapid development platform
+turn-key devops/mlops stack, rapid development platform for services and infra on kubernetes
 
 
 getting started
@@ -50,4 +50,4 @@ and when you push to your named branch environment, cicd auto-versions and deplo
 
 https://kubify-os.readthedocs.io/en/latest/index.html
 
-happy coding and enjoy
+happy coding
