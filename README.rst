@@ -33,4 +33,6 @@ b: listen for code changes on the service you want to work on `kubify --start`
 
 stop local kubernetes kind cluster `kubify --down`
 
+https://kubify-os.readthedocs.io/en/latest/index.html
+
 happy coding and enjoy
