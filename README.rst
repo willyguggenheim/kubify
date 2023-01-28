@@ -1,7 +1,7 @@
 welcome
 =======
 
-kubify os, version: 9017.0.0
+kubify os, version: 9018.0.0
 
 turn-key devops/mlops stack
 
@@ -21,7 +21,7 @@ install
 
     container
 
-    a: `docker run -it --rm willyguggenheim/kubify:latest`
+    a: `docker run -it --rm willy0912/kubify:main`
 
     b: devcontainer button in your favorite ide
 
