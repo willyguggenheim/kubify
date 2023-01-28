@@ -21,6 +21,7 @@ default.profraw
 
 # Docs Builds
 docs/_build
+docs/kubify.log
 
 # Keys
 **/id_rs*
