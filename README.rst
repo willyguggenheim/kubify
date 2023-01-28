@@ -1,7 +1,7 @@
 welcome
 =======
 
-kubify os, version: 9015.0.2
+kubify os, version: 9015.0.3
 
 turn-key devops/mlops stack
 
@@ -32,5 +32,7 @@ b: listen for code changes on the service you want to work on `kubify --start`
         * to code even faster, enable hot reloading in your `kubify.yml:sync`
 
 stop local kubernetes kind cluster `kubify --down`
+
+https://kubify-os.readthedocs.io/en/latest/index.html
 
 happy coding and enjoy
