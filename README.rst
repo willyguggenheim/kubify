@@ -28,16 +28,30 @@ B: Local Start a Service and all it's Dependant Services in Multi-Service Kubify
     1. `cd services/[][]`
     2. `kubify --start`
 
-Deploy/Update AWS EKS, GCP GKE & Azure AKS
-
 Stop local Kubernetes Kind Cluster `kubify --down`
 
 
-Contributing Tools
-==================
+Contributing Command
+====================
 
 
 It's As Simple As `git commit [] && make rapid` To Test All, Version And Push
+
+
+
+Developer Context
+=================
+
+
+To (Optionally) Start 100% In A Container, DevContainer or Docker-Compose, or Similar ..
+
+To Install Directly On Mac/Linux/Windows/WSL/WSL2, Use Ansible Roles In `kubify/ops/ansible`
+
+To Install The Example Multi-Cloud MLOps DevOps Stack for Deploying with CICD to 
+
+AWS EKS, GCP GKE & Azure AKS `kubify/ops/terraform` and one Way to Deploy Those is With `make clouds`
+
+CloudFormation And Serverless Jinja Templates are in the ansible Folder for `kubify.yml` shorthand syntax
 
 Additional Workflows:
 
@@ -53,7 +67,7 @@ Ideolegy
 ========
 
 
-A Fun Project I am Building To Prove An Interesting Theory About Next Gen Self Service Rapid, 
+A Fun Project I am Building To Prove An Interesting Next Gen Self Service Platform For Devs, DevOps and MLOps, 
 
 Code Delivery Platform to Solve Regression Testing Early in the Development Process,
 
