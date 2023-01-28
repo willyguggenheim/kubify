@@ -140,10 +140,12 @@ kubectl:
 	chmod +x ~/._kubify_tools/skaffold
 	which kubectl || uname -m | grep amd && export arch_found="amd64" || export arch_found="arm64" && wget -O ~/._kubify_tools/kubectl "https://dl.k8s.io/release/`curl -L -s https://dl.k8s.io/release/stable.txt`/bin/linux/$$arch_found/kubectl"
 	chmod +x ~/._kubify_tools/kubectl
-	# git clone https://github.com/ahmetb/kubectx ~/._kubify_tools/src/kubectx
-	# ln -s ~/._kubify_tools/src/kubectx/kubectx ~/._kubify_tools/kubectx
-	# chmod +x ~/._kubify_tools/kubectx
-	# rm -rf ~/._kubify_tools/src/kubectx
+	wget -O ~/._kubify_tools/kubesec "https://github.com/shyiko/kubesec/releases/download/0.9.2/kubesec-0.9.2-linux-amd64"
+	chmod +x ~/._kubify_tools/kubesec
+	git clone https://github.com/ahmetb/kubectx ~/._kubify_tools/src/kubectx
+	ln -s ~/._kubify_tools/src/kubectx/kubectx ~/._kubify_tools/kubectx
+	chmod +x ~/._kubify_tools/kubectx
+	rm -rf ~/._kubify_tools/src/kubectx
 
 apt:
 	apt update && xargs apt -y install <apt.lock
@@ -173,6 +175,12 @@ python-rapid: # run git add first
 	git push
 	bump2version patch && git push && git push --tags
 	open "https://github.com/willyguggenheim/kubify/compare/main...python"
+
+push:
+	rapid
+
+sendit:
+	rapid
 
 rapid:
 	check-manifest -u -v
