@@ -1,7 +1,7 @@
 welcome
 =======
 
-kubify os, version: 9015.1.0
+kubify os, version: 9016.0.0
 
 turn-key devops/mlops stack
 
