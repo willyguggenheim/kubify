@@ -25,6 +25,8 @@ Stop local Kubernetes Kind Cluster `kubify --down`
 Contributing Tools
 ==================
 
+It's As Simple As `make rapid` To Test All, Version And Push What You Have Committed Versioned
+
 A: CONTRIBUTING.rst
    Includes Efficient Workflows For Contributing To This Repo (And For Any Custom Installs) Enjoy
 B: Dev Container VSCode
