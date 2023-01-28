@@ -45,3 +45,5 @@ recursive-include services *
 recursive-include environments *
 recursive-exclude kubify/._kubify_work *
 recursive-include conda *.yaml
+
+include CODEOWNERS
