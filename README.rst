@@ -21,7 +21,7 @@ install
 
     container
 
-    a: `docker run -it --rm willyguggenheim/kubify:latest`
+    a: `docker run -it --rm willy0912/kubify:main`
 
     b: devcontainer button in your favorite ide
 
