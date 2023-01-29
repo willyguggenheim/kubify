@@ -47,7 +47,6 @@ jobs:
       with:
         subdir: 'conda'
         anacondatoken: ${{ secrets.ANACONDA_TOKEN }}
-        platforms: 'win osx linux'
         envFileName: 'environment.yml'
     # pypi ship package
     - name: release-pypi
