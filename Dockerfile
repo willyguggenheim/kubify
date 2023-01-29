@@ -40,9 +40,9 @@ COPY apt.lock .
 RUN make apt
 
 ENV PATH=${PATH}:/opt/conda/bin
-COPY ./kubify/ops/tools/scripts/conda_install.sh ./kubify/ops/tools/scripts/conda_install.sh
-COPY ./kubify/ops/tools/scripts/conda_setup.sh ./kubify/ops/tools/scripts/conda_setup.sh
-RUN make conda
+# COPY ./kubify/ops/tools/scripts/conda_install.sh ./kubify/ops/tools/scripts/conda_install.sh
+# COPY ./kubify/ops/tools/scripts/conda_setup.sh ./kubify/ops/tools/scripts/conda_setup.sh
+# RUN make conda
 
 # python cache
 COPY setup.py .
