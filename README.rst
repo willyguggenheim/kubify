@@ -1,3 +1,5 @@
+dev toolkit for kubernetes multi-cloud
+
 badges
 ~~~~~~
 
@@ -51,7 +53,7 @@ install
 
 local start kubernetes kind kubify rapid testing cluster ``kubify --up``
 
-a: start all services and infra locally ``kubify --start-all``
+a: start all infra, start all services (that are not already) ``kubify --start-all``
     * deploys all terraform locally to localstack aws cloud services
     * deploys all serverless framework to localstack aws cloud services
 
