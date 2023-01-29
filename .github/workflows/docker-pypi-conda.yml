@@ -11,7 +11,7 @@ jobs:
       with:
           persist-credentials: false
     # conda build, test and ship
-    # https://anaconda.org/conda-forge/kubify
+    # https://anaconda.org/kubify/kubify
     - name: Build and publish Conda packages to Anaconda.org
       uses: amauryval/publish_conda_package_action@2.0.3
       with:
