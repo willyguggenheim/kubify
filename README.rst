@@ -1,7 +1,14 @@
 dev toolkit for kubernetes multi-cloud
 
-badges
-~~~~~~
+release targets
+~~~~~~~~~~~~~~~
+
+* conda https://anaconda.org/kubify/kubify
+* docker/podman https://hub.docker.com/repository/docker/willy0912/kubify
+* pip/pypa/poerty https://pypi.org/project/kubify
+
+build badges
+~~~~~~~~~~~~
 
 .. |Docker| image:: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml/badge.svg?branch=main
    :target: https://github.com/willyguggenheim/kubify/actions/workflows/docker-image.yml
