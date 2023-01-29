@@ -212,6 +212,7 @@ rapid:
 	make version
 	echo $$DEBIAN_FRONTEND | grep noninteractive || open "https://github.com/willyguggenheim/kubify/compare/main...python"
 full:
+	check-manifest -u -v
 	make docker
 	make conda-build
 	make rapid
