@@ -10,6 +10,7 @@ How?
 
 Full Kubernetes and Head First Delivery DevEx
 
+
 Contributing:
 ============
 
@@ -21,14 +22,6 @@ E. ``make pythons``
 F. ``make test``
 G. and more ..
 
-Summary
-=======
-
-Docker-Compose is a tool for DEVS testing. 
-
-Terraform is a tool for DEVOPS/MLOPS deploying.
-
-Kubify combines the 2 worlds AND lowers your bill.
 
 ============
 Contributing
@@ -48,7 +41,16 @@ Contributing
 
 `make rapid` # to test & optionally version+push
 
-recommended workflow: click the devcontainer 
+
+recommended workflow: 
+
+*click the devcontainer (green button) in github workspaces/vscode (or your ide of choice)!*
+
+
+most efficient on-boarding workflow: 
+
+*simply click the dot "." key on your keyboard in github to start coding!*
+
 
 contributing command
 ====================
@@ -63,6 +65,7 @@ b: dev container vscode
    * click the dev container button in your ide of choise (example: visual studio code's green button)
 c: github workspaces
    * super efficient on-boarding use case (for installs and contributing): click "."" key in github
+
 
 releasing
 =========
