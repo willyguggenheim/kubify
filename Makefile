@@ -50,7 +50,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 --max-line-length=200 --ignore E722,W503 --exclude="kubify/ops,tests,docs,build,kubify/._kubify_work,kubify.egg-*,kubify-*" ./
+	flake8 --max-line-length=200 --ignore E722,W503 --exclude=".tox,kubify/ops,tests,docs,build,kubify/._kubify_work,kubify.egg-*,kubify-*" ./
 
 lint/black: ## check style with black
 	black --check ./
