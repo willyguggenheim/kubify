@@ -12,7 +12,7 @@ jobs:
           persist-credentials: false
     # conda build, test and ship
     # https://anaconda.org/kubify/kubify
-    - name: Build and publish Conda packages to Anaconda.org
+    - name: Build, Test MultiArchMultiPy and Release Conda Packages to Anaconda.org
       uses: amauryval/publish_conda_package_action@2.0.3
       with:
         CondaDir: 'conda/cicd'
@@ -40,7 +40,7 @@ jobs:
     # docker arm/amd images build security test package
     # https://hub.docker.com/repository/docker/willy0912/kubify
     -
-      name: Build and Publish Docker Image to DockerHub
+      name: Build, Test MultiArchMultiPy and Release Docker Image to DockerHub
       uses: docker/build-push-action@v3
       with:
         context: .
@@ -50,7 +50,7 @@ jobs:
         tags: willy0912/kubify:main
     # pypi build, test and ship package
     # https://pypi.org/project/kubify
-    - name: Build and Publish to PyPi.org
+    - name: Build, Test MultiArchMultiPy and Release PyPa/Pip/Poerty Image to PyPi.org
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
