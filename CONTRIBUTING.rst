@@ -1,15 +1,17 @@
 Turn Key DevOps/MLOps DR-Enabled Scalable Lowest-Cost Full Rapid Testing Stack
 
-Ideoligy: If it works on your laptop/test/notebook, it works in prod
+Ideoligy: If it works on your laptop/test/notebook, it works in PROD (yup)
 
-How?
-===
+How??
 
 .. figure:: ./docs/img/README_md_imgs/the-future.gif
    :alt: FUTUREOFDEVOPS9000
 
-Full Kubernetes and Head First Delivery DevEx
+Full Kubernetes Local Rapid Coding Within A Real Environment, Unique Workflow to Win even Faster
 
+With Services Listening For Code Changes or Hot Reloading, On The Real Infra CodeBase While You Code
+
+In An Effort To Introduce Early Regression Testing to The Development Day, Without Slowing Anyone Down
 
 Contributing:
 ============
@@ -21,7 +23,6 @@ D. ``make pip``
 E. ``make pythons``
 F. ``make test``
 G. and more ..
-
 
 ============
 Contributing
@@ -41,16 +42,13 @@ Contributing
 
 `make rapid` # to test & optionally version+push
 
-
 recommended workflow: 
 
 *click the devcontainer (green button) in github workspaces/vscode (or your ide of choice)!*
 
-
 most efficient on-boarding workflow: 
 
 *simply click the dot "." key on your keyboard in github to start coding!*
-
 
 contributing command
 ====================
@@ -65,7 +63,6 @@ b: dev container vscode
    * click the dev container button in your ide of choise (example: visual studio code's green button)
 c: github workspaces
    * super efficient on-boarding use case (for installs and contributing): click "."" key in github
-
 
 releasing
 =========
