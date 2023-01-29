@@ -14,9 +14,7 @@ jobs:
       with:
           persist-credentials: false
     # conda tests every python isolated and ship package if it works in every python
-    conda_deployment_with_new_tag:
-      name: Conda deployment of package with Python ${{ matrix.python-version }}
-      runs-on: ubuntu-latest
+    - name: Conda deployment of package with Python ${{ matrix.python-version }}
       strategy:
         matrix:
           python-version: [3.7, 3.8, 3.9, 3.10, 3.11, 3.12] # run tests on all supported python versions
