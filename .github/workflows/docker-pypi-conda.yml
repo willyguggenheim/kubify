@@ -14,32 +14,40 @@ jobs:
       with:
           persist-credentials: false
     # conda tests every python isolated and ship package if it works in every python
-    - name: Conda deployment of package with Python ${{ matrix.python-version }}
-      strategy:
-        matrix:
-          python-version: [3.7, 3.8, 3.9, 3.10, 3.11, 3.12] # run tests on all supported python versions
-      steps:
-        - uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
-        - name: Conda environment creation and activation
-          uses: conda-incubator/setup-miniconda@v2
-          with:
-            python-version: ${{ matrix.python-version }}
-            environment-file: environment.yml    # Path to the build conda environment
-            auto-update-conda: false
-            auto-activate-base: false
-            show-channel-urls: true
-        - name: Build and upload the conda packages
-          uses: uibcdf/action-build-and-upload-conda-packages@v1.1.0
-          with:
-            meta_yaml_dir: devtools/conda-build
-            python-version: ${{ matrix.python-version }}    # Values previously defined in `matrix`
-            platform_linux-64: true
-            platform_osx-64: true
-            platform_win-64: true
-            label: auto
-            token: ${{ secrets.ANACONDA_TOKEN }}
+    - name: publish-to-conda
+      uses: MichaelsJP/conda-package-publish-action@v1.0.0
+      with:
+        subDir: 'conda'
+        AnacondaToken: ${{ secrets.ANACONDA_TOKEN }}
+        platforms: 'all'
+        override: true
+        dry_run: false
+    # - name: Conda deployment of package with Python ${{ matrix.python-version }}
+    #   strategy:
+    #     matrix:
+    #       python-version: [3.7, 3.8, 3.9, 3.10, 3.11, 3.12] # run tests on all supported python versions
+    #   steps:
+    #     - uses: actions/checkout@v2
+    #       with:
+    #         fetch-depth: 0
+    #     - name: Conda environment creation and activation
+    #       uses: conda-incubator/setup-miniconda@v2
+    #       with:
+    #         python-version: ${{ matrix.python-version }}
+    #         environment-file: environment.yml    # Path to the build conda environment
+    #         auto-update-conda: false
+    #         auto-activate-base: false
+    #         show-channel-urls: true
+    #     - name: Build and upload the conda packages
+    #       uses: uibcdf/action-build-and-upload-conda-packages@v1.1.0
+    #       with:
+    #         meta_yaml_dir: devtools/conda-build
+    #         python-version: ${{ matrix.python-version }}    # Values previously defined in `matrix`
+    #         platform_linux-64: true
+    #         platform_osx-64: true
+    #         platform_win-64: true
+    #         label: auto
+    #         token: ${{ secrets.ANACONDA_TOKEN }}
     # dockers build multi-arch setup
     -
       name: setup-qemu-multiarch-arm-amd
