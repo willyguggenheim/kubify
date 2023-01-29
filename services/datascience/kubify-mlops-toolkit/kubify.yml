@@ -8,13 +8,19 @@ metadata:
 
 # helm native
 helm:
+  # operators deploy before charts
+  operators:
+      # also used for: dask on ray
+      # also used for: spark on ray
+    - kuberay-operator
+    - sagemaker-operator
   charts:
-    # first looks in ../../charts folder, if not there then it tries bitnami/[]
     - argo-cd
     - argo-workflows
     - blazingsql
     - cloudshell
-    - dask
+    - determined-helm-chart
+    - prefect
     - data-profiler
     - delta-sharing-server
     - elastic
@@ -27,25 +33,29 @@ helm:
     - library-chart
     - mariadb
     - mlflow
+    - airflow
+    - runai-backend
+    - runai-backend
     - mongodb
     - neo4j
     - nocodb
     - openrefine
     - pgadmin
     - pinot
+    # timescaledb
     - postgresql
-    - rapidsai
-    - kuberay-operator
-    - ray-cluster
-    - redash
-    - rstudio
-    - spark-history
-    - spark-thrift-server
-    - superset
+    - kube-prometheus-stack
     - tensorflow
-    - trino
-    - ubuntu
+    - pytorch
+    - rapidsai
+    - ray-cluster
+    - rstudio
     - vscode
+  k8s-custom-resource-j2:
+    - tests/fixture_kubeflow.j2
+    - tests/fixture_kuberay.j2
+    - tests/fixture_spark_on_ray.j2
+    - tests/fixture_dask_on_ray.j2
 
 dags:
     # looks in ./dags folder

@@ -22,7 +22,9 @@ include .bumpversion.cfg
 include BrewFile
 include Dockerfile
 include Makefile
-include __version__
+include ./__v*
+include ./__l*
+
 include ansible.cfg
 include tox.ini
 
@@ -41,9 +43,16 @@ include .editorconfig
 include .gitmodules
 include docs/CODEOWNERS
 
-recursive-include services *
 recursive-include environments *
 recursive-include conda *.yaml
 recursive-exclude kubify/._kubify_work *
 
+recursive-exclude **/.pytest-kind *
+recursive-exclude **/.log *
+recursive-exclude **/secrets.*.enc.yaml *
+
+recursive-exclude services *
+
 include CODEOWNERS
+
+include ./__*

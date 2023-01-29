@@ -8,7 +8,7 @@ package:
   - defaults
 
 source:
-  path: ..
+  path: ../
 
 build:
   noarch: generic

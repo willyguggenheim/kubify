@@ -42,7 +42,7 @@ nodes:
         kind_cluster.kubectl(
             "apply",
             "-f",
-            f"{app_constants.git_dir}/../kubify/ops/templates/k8s/bootstrap.yaml",
+            f"{app_constants.root_dir}/ops/templates/k8s/bootstrap.yaml",
         )
 
     def main(self):

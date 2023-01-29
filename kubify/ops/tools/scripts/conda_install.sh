@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -o xtrace
+
+conda --version && exit 0 || echo "installing conda.."
 brew bundle || true
 mkdir -p ~/._kubify_tools
 curl -o ~/._kubify_tools/miniconda-install-aarch64.sh "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh"
@@ -10,3 +13,4 @@ uname -m | grep aarch && ~/._kubify_tools/miniconda-install-aarch64.sh -b -p /op
 uname -m | grep amd && ~/._kubify_tools/miniconda-install-x86_64.sh -b -p /opt/conda || true
 uname -m | grep x86_64 && ~/._kubify_tools/miniconda-install-x86_64.sh -b -p /opt/conda || true
 conda info
+rm -rf  ~/._kubify_tools/miniconda-*.sh

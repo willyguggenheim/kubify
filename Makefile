@@ -50,7 +50,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 --max-line-length=200 --exclude="kubify/ops/charts,tests,docs,build" ./
+	flake8 --max-line-length=200 --ignore E722,W503 --exclude="kubify/ops,tests,docs,build,kubify/._kubify_work,kubify.egg-*,kubify-*" ./
 
 lint/black: ## check style with black
 	black --check ./
@@ -60,13 +60,12 @@ lint: lint/flake8 lint/black ## check style
 format: ## format code with black
 	find . -type f -print0 | xargs -0 dos2unix
 	black ./
-	conda env update --file environment.yml --prune
+	which conda || export PATH=$$PATH:/opt/conda/bin
+	which conda || alias conda=/opt/conda/bin/conda
+	bash -c 'conda env update --file environment.yml --prune'
 
 test: ## run tests quickly with the default Python
 	pytest
-
-tox: ## run tests on every Python version with tox
-	tox -e py37,py38,py39,py310,py311,py312 -p all
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source ./kubify -m pytest || true
@@ -167,7 +166,7 @@ version:
 	make pip
 
 python-rapid: # run git add first
-	check-manifest -u -v
+	check-manifest --no-build-isolation
 	make format
 	make lint
 	make docker
@@ -178,8 +177,14 @@ python-rapid: # run git add first
 
 push:
 	make rapid
-sendit:
+latest:
 	make rapid
+stable:
+	bump2version major
+	git push
+	git push --tags
+	git commit -m "stable release"
+	make latest
 rapid_test:
 	stat services/internal-facing/example-lambda-python-svc || echo "run this in kubify dir"
 	docker ps | grep kubify-kubify-1 && kubify --down || kubify
@@ -188,20 +193,22 @@ rapid_test:
 	cd services/internal-facing/example-lambda-python-svc
 	kubify --start
 	kubify --down
-
-rapid:
-	check-manifest -u -v
+checks:
 	make security
+	make format
 	make tfsec
-	make conda-build
 	make develop
 	make docker
+	check-manifest -u -v
+	make conda-build
 	make tox
 	make docs
 	make format
 	make lint
 	make test
 	make rapid_test
+rapid:
+	make checks
 	echo "git add and git commit your files, then press enter to push"
 	bash -c "read"
 	git push
@@ -283,8 +290,12 @@ clean:
 	rm -rf ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-*
 
 # test every version of python enabled
+tox: ## run tests on every Python version with tox
+	echo $$DEBIAN_FRONTEND | grep noninteractive && tox -e py38,py310 -p all || \
+														tox -e py37,py38,py39,py310,py311,py312 -p all
 pythons-cache:
-	tox -e py37,py38,py39,py310,py311,py312 -p all --notest
+	echo $$DEBIAN_FRONTEND | grep noninteractive && tox -e py38,py310 -p all --notest || \
+														tox -e py37,py38,py39,py310,py311,py312 -p all --notest
 pythons:
 	make conda-build
 	make tox
@@ -312,20 +323,24 @@ argo-create-services:
 	argocd app patch app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
 argo-delete-services:
-	# connect to argocd and deploy to all clusters
-	# todo: eval "https://api.argoproj.io"
-	# todo: eval "$$(cat $$HOME/.argocd/token)"
 	argocd cluster add --name kubify-aws-west2-eks	  --server https://api.argoproj.io --token $$(cat $$HOME/.argocd/token)
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 	argocd cluster add --name kubify-aws-east1-eks-dr --server https://api.argoproj.io --token $$(cat $$HOME/.argocd/token)
 	argocd app delete app-of-apps --patch '{"spec": { "source": { "repoURL": "https://github.com/willyguggenheim/kubify.git" } }}' --type merge
 
 conda:
+	which conda || export PATH=$$PATH:/opt/conda/bin
+	which conda || alias conda=/opt/conda/bin/conda
 	conda --version || make conda-install
+	conda --version || conda init shell
 	conda info | grep "active environment" | grep kubify || make conda-setup
+	conda install -y -c conda-forge conda-build
 
 conda-build:
-	conda build --python 3.7 --python 3.8 --python 3.9 --python 3.10  --python 3.11  --python 3.12 --output-folder ./build/conda .
+	which conda || export PATH=$$PATH:/opt/conda/bin
+	which conda || alias conda=/opt/conda/bin/conda
+	echo $$DEBIAN_FRONTEND | grep noninteractive && conda build --python 3.8 --output-folder ./build/conda install . || \
+														conda build --python 3.7 --python 3.8 --python 3.9 --python 3.10  --python 3.11  --python 3.12 --output-folder ./build/conda .
 
 conda-install:
 	bash ./kubify/ops/tools/scripts/conda_install.sh
@@ -335,7 +350,6 @@ conda-setup:
 
 develop:
 	echo $$OSTYPE | grep arwin && make mac || make apt
-	make clean
 	make pip
 	make security
 	make kind kubectl

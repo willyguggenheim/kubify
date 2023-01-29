@@ -1,5 +1,3 @@
-turn key autodevops automlops self service framework for rapid kubernetes development
-
 badges
 ~~~~~~
 
@@ -34,7 +32,6 @@ kubify os oss, version: 9020.0.0
 
 turn-key devops/mlops stack, rapid development platform for services and infra on kubernetes
 
-
 getting started
 ~~~~~~~~~~~~~~~
 
@@ -58,7 +55,6 @@ a: start all services and infra locally ``kubify --start-all``
     * deploys all terraform locally to localstack aws cloud services
     * deploys all serverless framework to localstack aws cloud services
 
-
 b: listen for code changes on service ``kubify --start`` 
     1. ``cd services/[][]``
     2. ``kubify --start``
@@ -76,17 +72,14 @@ compatible with cloud providers
 
 compatible with devops tools
     * terraform
+    * terraform cdk
     * cloudformation
     * serverless framework
-    * helm
+    * helm and kustomize
 
-providers 
+stop local kubernetes kind cluster ``kubify --down``
 
-stop local kubernetes kind cluster ``kubify --down`` 
-
-think docker-compose, but for kubernetes, the cloud on your laptop, while you code in it
-
-and when you push to your named branch environment, cicd auto-versions and deploys
+ideolegy of this poc: "if it works on my laptop, it will work in dev/uat/prod cloud/onprem k8s the same" (making dreams come true here)
 
 https://kubify-os.readthedocs.io/en/latest/index.html
 
