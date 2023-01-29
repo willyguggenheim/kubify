@@ -12,6 +12,7 @@ jobs:
           persist-credentials: false
     # conda build, test and ship
     - name: Build and publish Conda packages to Anaconda.org
+      description: 'https://anaconda.org/conda-forge/kubify'
       uses: amauryval/publish_conda_package_action@2.0.3
       with:
         CondaDir: 'conda'
@@ -19,6 +20,7 @@ jobs:
         Platforms: 'noarch'
         CondaUsername: ${{ secrets.CONDA_USERNAME }}
         CondaPassword: ${{ secrets.CONDA_PASSWORD }}
+    # dockers build multi-arch setup
     -
       name: setup-qemu-multiarch-arm-amd
       uses: docker/setup-qemu-action@v2
@@ -38,7 +40,7 @@ jobs:
     # docker arm/amd images build security test package
     -
       name: Build and Publish Docker Image to DockerHub
-      description: https://hub.docker.com/repository/docker/willy0912/kubify
+      description: 'https://hub.docker.com/repository/docker/willy0912/kubify'
       uses: docker/build-push-action@v3
       with:
         context: .
@@ -48,7 +50,7 @@ jobs:
         tags: willy0912/kubify:main
     # pypi build, test and ship package
     - name: Build and Publish to PyPi.org
-      description: https://pypi.org/project/kubify
+      description: 'https://pypi.org/project/kubify'
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
