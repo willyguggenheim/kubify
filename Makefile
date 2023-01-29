@@ -281,7 +281,7 @@ docker-test-all-pythons:
 	docker tag kubify:latest docker.io/willy0912/kubify:latest
 
 security:
-	bandit -r . -c .bandit.yml
+	bandit -r . -c .bandit.yml --exclude ./.tox
 
 package:
 	python3 setup.py sdist bdist_wheel

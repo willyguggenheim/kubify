@@ -28,7 +28,7 @@ on-boarding
 welcome
 =======
 
-kubify os oss, version: 9020.0.3
+kubify os oss, version: 9020.0.5
 
 turn-key devops/mlops stack, rapid development platform for services and infra on kubernetes
 
