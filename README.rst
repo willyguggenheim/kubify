@@ -21,7 +21,7 @@ on-boarding
 welcome
 =======
 
-kubify os oss, version: 9020.0.21
+kubify os oss, version: 9020.0.22
 
 getting started
 ===============
