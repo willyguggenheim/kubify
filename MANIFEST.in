@@ -1,3 +1,9 @@
+recursive-include kubify/src *
+recursive-include kubify/ops *
+
+recursive-include conda *.yaml
+include conda/meta.yaml
+
 include *.rst
 include *.md
 include LICENSE
@@ -16,7 +22,9 @@ include .bumpversion.cfg
 include BrewFile
 include Dockerfile
 include Makefile
-include __version__
+include ./__v*
+include ./__l*
+
 include ansible.cfg
 include tox.ini
 
@@ -35,9 +43,16 @@ include .editorconfig
 include .gitmodules
 include docs/CODEOWNERS
 
-# example services and example environments folders are for testing
-# usage pattern includes your own "environments" and "services folders
-recursive-exclude services *
-recursive-exclude environments *
-# local dev king cluster for rapid coding
+recursive-include environments *
+recursive-include conda *.yaml
 recursive-exclude kubify/._kubify_work *
+
+recursive-exclude **/.pytest-kind *
+recursive-exclude **/.log *
+recursive-exclude **/secrets.*.enc.yaml *
+
+recursive-exclude services *
+
+include CODEOWNERS
+
+include ./__*

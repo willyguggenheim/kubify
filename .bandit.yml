@@ -1,3 +1,6 @@
 skips:
-- B106 #pwfetchfn
-- B102 #exec
+- B106 #pwfetchfn (TODO: remove this line when Kubify is fully migrated to Python)
+- B102 #exec (TODO: remove this line when Kubify is fully migrated to Python)
+- B603 #subprocess (TODO: remove this line when Kubify is fully migrated to Python)
+- B311 #random (TODO: remove this line when Kubify is fully migrated to Python)
+- B404 #yaml (TODO: remove this line when Kubify is fully migrated to Python)

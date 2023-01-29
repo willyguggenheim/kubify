@@ -11,7 +11,6 @@ with open("USAGE.rst") as usage_file:
     usage = usage_file.read()
 
 requirements = [
-    "pytest-kind",
     "kubernetes",
     "boto3",
     "awscli",
@@ -74,6 +73,6 @@ setup(
     tests_require=test_requirements,
     extras_require=extras,
     url="https://github.com/willyguggenheim/kubify",
-    version="9020.0.0",
+    version="9020.0.1",
     zip_safe=False,
 )

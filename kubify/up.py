@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import kubify.src.core.app_constants as app_constants
-from pytest_kind import KindCluster
+from kubify.src.core.cluster.local.modules.pytest_kind import KindCluster
 
 
 class Up:
@@ -42,7 +42,7 @@ nodes:
         kind_cluster.kubectl(
             "apply",
             "-f",
-            f"{app_constants.git_dir}/../kubify/ops/templates/k8s/bootstrap.yaml",
+            f"{app_constants.root_dir}/ops/templates/k8s/bootstrap.yaml",
         )
 
     def main(self):

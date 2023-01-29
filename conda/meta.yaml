@@ -3,9 +3,12 @@
 package:
   name: kubify
   version: {{ data['version'] }}
+  channels:
+  - conda-forge
+  - defaults
 
 source:
-  path: ..
+  path: ../
 
 build:
   noarch: generic

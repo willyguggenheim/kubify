@@ -6,12 +6,10 @@ from pathlib import Path
 def test_dir_paths():
     env = "dev"
     app_name = "kubify"
-    path = Path(f"{app_constants.root_dir}/__version__")
+    path = Path(f"{app_constants.root_dir}/cli.py")
     assert path.is_file()  # nosec - ✅ B101: assert used
     # os.path.isfile(fname)
-    path = Path(f"{app_constants.root_dir_full_path}/__version__")
-    assert path.is_file()  # nosec - ✅ B101: assert used
-    path = Path(f"{app_constants.git_dir}/HEAD")
+    path = Path(f"{app_constants.root_dir_full_path}/cli.py")
     assert path.is_file()  # nosec - ✅ B101: assert used
     path = Path(f"{app_constants.k8s_path}/kubify.yaml")
     assert path.is_file()  # nosec - ✅ B101: assert used
