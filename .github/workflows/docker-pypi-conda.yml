@@ -15,7 +15,7 @@ jobs:
     - name: Build and publish Conda packages to Anaconda.org
       uses: amauryval/publish_conda_package_action@2.0.3
       with:
-        CondaDir: 'conda'
+        CondaDir: 'conda/cicd'
         Channels: 'conda-forge defaults' 
         Platforms: 'noarch'
         CondaUsername: ${{ secrets.CONDA_USERNAME }}
