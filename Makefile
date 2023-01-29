@@ -211,6 +211,10 @@ rapid:
 	git push
 	make version
 	echo $$DEBIAN_FRONTEND | grep noninteractive || open "https://github.com/willyguggenheim/kubify/compare/main...python"
+full:
+	make docker
+	make conda-build
+	make rapid
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
 
