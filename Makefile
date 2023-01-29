@@ -290,7 +290,7 @@ clean:
 	rm -rf ./._* ./.aws ./build ./venv ./kubify/ops/terraform/.terra* docs/*build docs/build *.pyc *.pyo .*cache .pytest_* .pytest-*
 
 # test every version of python enabled
-tox: ## run tests on every Python version with tox
+tox:
 	echo $$DEBIAN_FRONTEND | grep noninteractive && tox -e py38,py310 -p all || \
 														tox -e py37,py38,py39,py310,py311,py312 -p all
 pythons-cache:
