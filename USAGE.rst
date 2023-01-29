@@ -35,7 +35,7 @@ Environment Isolation
 ~~~~~~~~~~~~~~~~~~~~~
 
 Security Minute: You should not give prod access to anyone (but devs
-need to debug urgent issue in prod). No Data Access, Identical Env. How?
+need to debug urgent issue in prod). Zero Trust, With No Data Access, yet Identical Env. How?
 
 .. code:: bash
 
@@ -56,8 +56,3 @@ Contributing Workflow Patterns
 2. Invoke Python Directly (pull image if missing tools)
 3. Tox (multi-python testing)
 4. Install Directly and Invoke Python Directly
-
-
-# TODO: put link to automatic gitops docs
-# TODO: multi-cloud ArgoCD Helm-Native automation README explainer here
-# TODO: rapid testing explainer here
