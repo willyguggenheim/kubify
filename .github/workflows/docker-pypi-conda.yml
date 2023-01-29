@@ -1,4 +1,4 @@
-name: Docker PyPi Conda Test Release CICD
+name: Cross-Platform NoArch Docker PyPi Conda Test Release CICD Workflow
 on:
   push:
     branches: [ "main" ]
