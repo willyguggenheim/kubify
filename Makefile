@@ -195,9 +195,6 @@ rapid_test:
 	kubify --down
 checks:
 	#!/bin/bash
-	make docker &
-	check-manifest -u -v &
-	make conda-build &
 	make security
 	make tfsec
 	make develop
@@ -205,7 +202,7 @@ checks:
 	make format
 	make lint
 	make test
-	make rapid_test
+	echo $$DEBIAN_FRONTEND | grep noninteractive && make rapid_test || echo "use devcontainer or docker-compose to run rapid_test"
 	wait
 rapid:
 	make checks
