@@ -67,6 +67,6 @@ c: github workspaces
 releasing
 =========
 
-``make latest```
+``make latest``
 
 happy coding
