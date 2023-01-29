@@ -194,25 +194,26 @@ rapid_test:
 	kubify --start
 	kubify --down
 checks:
+	#!/bin/bash
+	make docker &
+	check-manifest -u -v &
+	make conda-build &
 	make security
-	make format
 	make tfsec
 	make develop
-	make docker
-	check-manifest -u -v
-	make conda-build
-	make tox
 	make docs
 	make format
 	make lint
 	make test
 	make rapid_test
+	wait
 rapid:
 	make checks
 	echo "git add and git commit your files, then press enter to push"
 	bash -c "read"
 	git push
 	make version
+	echo $$DEBIAN_FRONTEND | grep noninteractive || open "https://github.com/willyguggenheim/kubify/compare/main...python"
 
 aws_account_id_for_state := $(shell aws sts get-caller-identity --query "Account" --output text 2>/dev/null)
 
