@@ -14,23 +14,11 @@ jobs:
     - name: Build and publish Conda packages to Anaconda.org
       uses: amauryval/publish_conda_package_action@2.0.3
       with:
-        # CondaDir: locate the directory containing your meta.yml, conda_build_config.yaml (...) files
         CondaDir: 'conda'
-        # Channels: You can add more channel with a space separator
         Channels: 'conda-forge defaults' 
-        # Platforms: remove one or more of these platforms
         Platforms: 'noarch'
         CondaUsername: ${{ secrets.CONDA_USERNAME }}
         CondaPassword: ${{ secrets.CONDA_PASSWORD }}
-      # description: https://anaconda.org/conda-forge/kubify
-      # uses: MichaelsJP/conda-package-publish-action@v1.1.0
-      # with:
-      #   subDir: 'conda'
-      #   AnacondaToken: ${{ secrets.ANACONDA_TOKEN }}
-      #   platforms: 'linux-64'
-      #   override: true
-      #   dry_run: false
-    # dockers build multi-arch setup
     -
       name: setup-qemu-multiarch-arm-amd
       uses: docker/setup-qemu-action@v2
