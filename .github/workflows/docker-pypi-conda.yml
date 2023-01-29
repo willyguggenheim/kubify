@@ -1,4 +1,4 @@
-name: Docker PyPi Conda Test Release CICD
+name: Cross-Platform NoArch Docker PyPi Conda Test Release CICD Workflow
 on:
   push:
     branches: [ "main" ]
@@ -12,13 +12,24 @@ jobs:
           persist-credentials: false
     # conda build, test and ship
     - name: Build and publish Conda packages to Anaconda.org
-      uses: MichaelsJP/conda-package-publish-action@v1.1.0
+      uses: amauryval/publish_conda_package_action@2.0.3
       with:
-        subDir: 'conda'
-        AnacondaToken: ${{ secrets.ANACONDA_TOKEN }}
-        platforms: 'all'
-        override: true
-        dry_run: false
+        # CondaDir: locate the directory containing your meta.yml, conda_build_config.yaml (...) files
+        CondaDir: 'conda'
+        # Channels: You can add more channel with a space separator
+        Channels: 'conda-forge defaults' 
+        # Platforms: remove one or more of these platforms
+        Platforms: 'noarch'
+        CondaUsername: ${{ secrets.CONDA_USERNAME }}
+        CondaPassword: ${{ secrets.CONDA_PASSWORD }}
+      # description: https://anaconda.org/conda-forge/kubify
+      # uses: MichaelsJP/conda-package-publish-action@v1.1.0
+      # with:
+      #   subDir: 'conda'
+      #   AnacondaToken: ${{ secrets.ANACONDA_TOKEN }}
+      #   platforms: 'linux-64'
+      #   override: true
+      #   dry_run: false
     # dockers build multi-arch setup
     -
       name: setup-qemu-multiarch-arm-amd
@@ -39,6 +50,7 @@ jobs:
     # docker arm/amd images build security test package
     -
       name: Build and Publish Docker Image to DockerHub
+      description: https://hub.docker.com/repository/docker/willy0912/kubify
       uses: docker/build-push-action@v3
       with:
         context: .
@@ -47,7 +59,8 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: willy0912/kubify:main
     # pypi build, test and ship package
-    - name: Build and Publish to PyPi
+    - name: Build and Publish to PyPi.org
+      description: https://pypi.org/project/kubify
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
