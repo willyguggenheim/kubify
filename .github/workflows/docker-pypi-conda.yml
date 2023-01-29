@@ -12,6 +12,7 @@ jobs:
           persist-credentials: false
     # conda build, test and ship
     - name: Build and publish Conda packages to Anaconda.org
+      description: https://anaconda.org/conda-forge/kubify
       uses: MichaelsJP/conda-package-publish-action@v1.1.0
       with:
         subDir: 'conda'
@@ -39,6 +40,7 @@ jobs:
     # docker arm/amd images build security test package
     -
       name: Build and Publish Docker Image to DockerHub
+      description: https://hub.docker.com/repository/docker/willy0912/kubify
       uses: docker/build-push-action@v3
       with:
         context: .
@@ -47,7 +49,8 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: willy0912/kubify:main
     # pypi build, test and ship package
-    - name: Build and Publish to PyPi
+    - name: Build and Publish to PyPi.org
+      description: https://pypi.org/project/kubify
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
