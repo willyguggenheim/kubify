@@ -1,4 +1,4 @@
-- name: Configure service
+- name: Start Kubify Service
   hosts: localhost
   become: false
   gather_facts: no
@@ -16,7 +16,7 @@
   roles:
     - role: common
       tags: common
-    - role: generate_configs_from_kubify_yaml
+    - role: generate_k8s
       tags: generate_k8s
     - role: build_image
       tags: build_image

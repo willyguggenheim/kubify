@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 
 env = "dev"
@@ -7,11 +8,14 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 cwd = os.getcwd()
 root_dir = os.path.join(*[dir_path, "..", ".."])
 root_dir_full_path = os.path.abspath(root_dir)
+kubify_version = sys.version
+docker_registry = os.environ.get("KUBIFY_DOCKER_REGISTRY", "willy0912")
 home = str(Path.home())
 WORK_DIR = os.path.join(*[home, ".kubify"])
 kubify_work = os.path.join(*[home, ".kubify"])
-if not os.path.exists(kubify_work):
-    os.makedirs(kubify_work)
+ansible_private_data_dir = os.path.join(*[kubify_work, "ansible"])
+if not os.path.exists(ansible_private_data_dir):
+    os.makedirs(ansible_private_data_dir)
 k8s_path = os.path.join(*[root_dir_full_path, "ops", "templates", "k8s"])
 log_path = os.path.join(kubify_work, "logs")
 certs_path = os.path.join(kubify_work, "certs")

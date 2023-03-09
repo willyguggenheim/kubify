@@ -16,5 +16,20 @@
     ],
     "python.analysis.extraPaths": [
         "./kubify"
-    ]
+    ],
+    "actionButtons": {
+        "commands": [
+            {
+                "name": "Start Kubfiy",
+                "cwd": "${workspaceFolder}/services/internal-facing/example-flask-svc",
+                "color": "white",
+                "command": "kubify --up && kubify --start",
+            },
+            {
+                "name": "Stop Kubify",
+                "color": "grey",
+                "command": "kubify --down",
+            },
+        ]
+    }
 }
