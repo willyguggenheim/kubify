@@ -4,3 +4,4 @@ skips:
 - B603 #subprocess (TODO: remove this line when Kubify is fully migrated to Python)
 - B311 #random (TODO: remove this line when Kubify is fully migrated to Python)
 - B404 #yaml (TODO: remove this line when Kubify is fully migrated to Python)
+- B607 #shlex (TODO: remove this line when Kubify is fully migrated to Python)

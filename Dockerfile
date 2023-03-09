@@ -50,6 +50,7 @@ COPY Makefile .
 COPY README.rst .
 COPY USAGE.rst .
 COPY .bandit.yml .
+RUN python3 -m pip install --upgrade pip
 RUN pip install --ignore-installed PyYAML
 RUN pip install --upgrade pip requests
 COPY kubify/ops/terraform ./ops/terraform
@@ -57,5 +58,5 @@ RUN make security pip package
 
 # python update
 COPY . .
-RUN make develop
+RUN make develop kind kubectl
 RUN make clean

@@ -61,7 +61,6 @@ def get_api_resources():
     k8s_config.load_kube_config()
     api_resource_names = []
     for api in k8s_client.ApisApi().get_api_versions().groups:
-
         versions = []
         for v in api.versions:
             name = ""

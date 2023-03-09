@@ -134,12 +134,13 @@ kind:
 	export uname_found=`uname` && uname -m | grep arm && export arch_found="arm64" || export arch_found="amd64" && which kind || brew install kind 2>/dev/null || `curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.14.0/kind-$$uname_found-$$arch_found" && chmod +x ./kind && mv ./kind /usr/local/bin/kind`
 
 kubectl:
+	export PATH=$$PATH:~/._kubify_tools
 	mkdir -p ~/._kubify_tools/src
 	which skaffold || uname -m | grep amd && export arch_found="amd64" || export arch_found="arm64" && wget -O ~/._kubify_tools/skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-$$arch_found"
 	chmod +x ~/._kubify_tools/skaffold
 	which kubectl || uname -m | grep amd && export arch_found="amd64" || export arch_found="arm64" && wget -O ~/._kubify_tools/kubectl "https://dl.k8s.io/release/`curl -L -s https://dl.k8s.io/release/stable.txt`/bin/linux/$$arch_found/kubectl"
 	chmod +x ~/._kubify_tools/kubectl
-	wget -O ~/._kubify_tools/kubesec "https://github.com/shyiko/kubesec/releases/download/0.9.2/kubesec-0.9.2-linux-amd64"
+	which kubesec || wget -O ~/._kubify_tools/kubesec "https://github.com/shyiko/kubesec/releases/download/0.9.2/kubesec-0.9.2-linux-amd64"
 	chmod +x ~/._kubify_tools/kubesec
 	git clone https://github.com/ahmetb/kubectx ~/._kubify_tools/src/kubectx
 	ln -sf ~/._kubify_tools/src/kubectx/kubectx ~/._kubify_tools/kubectx
@@ -355,6 +356,4 @@ develop:
 	echo $$OSTYPE | grep arwin && make mac || make apt
 	make pip
 	make security
-	make kind kubectl
-	make lint help
-	make coverage package
+	make coverage

@@ -8,7 +8,6 @@ class S3Utils:
 
     def get_bucket(self, bucket_name):
         try:
-
             self.client.meta.client.head_bucket(Bucket=bucket_name)
             print("Bucket Exists!")
             bucket = self.client.Bucket(bucket_name)

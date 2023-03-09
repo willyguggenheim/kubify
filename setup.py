@@ -11,6 +11,7 @@ with open("USAGE.rst") as usage_file:
     usage = usage_file.read()
 
 requirements = [
+    "pyyaml",
     "kubernetes",
     "boto3",
     "awscli",

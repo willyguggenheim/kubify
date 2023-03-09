@@ -9,6 +9,7 @@ import os
 
 import yaml
 
+
 # memoize so we only load config once
 @lru_cache()
 def _load_config():
