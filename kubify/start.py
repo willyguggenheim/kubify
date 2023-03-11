@@ -2,7 +2,6 @@ import os
 import yaml
 
 import pathlib
-import subprocess
 
 import ansible_runner
 import kubify.src.core.app_constants as app_constants
@@ -50,9 +49,9 @@ class Start:
         self._run_ansible_playbook(
             folder_path, app_env, app_name, env_domain, ansible_tags
         )
-        subprocess.run(
-            [
-                "skaffold",
+        ansible_runner.interface.run_command(
+            executable_cmd="skaffold",
+            cmdline_args=[
                 f"--namespace {namespace}",
                 skaffold_action,
                 "--cache-artifacts",
@@ -64,7 +63,7 @@ class Start:
                 "--no-prune-children",
                 "--trigger=polling",
                 "--port-forward=false",
-            ]
+            ],
         )
 
     def deploy_service(self, kubify_env, namespace="demo"):
@@ -103,7 +102,7 @@ class Start:
     ):
         ansible_runner.interface.run(
             # inventory=f"{app_constants.ops_dir}/ansible/inventory.ini",
-            private_data_dir=app_constants.ansible_private_data_dir,
+            # private_data_dir=app_constants.ansible_private_data_dir,
             playbook=f"{app_constants.ops_dir}/ansible/service.yaml",
             roles_path=f"{app_constants.ops_dir}/ansible/roles",
             extravars={
@@ -123,7 +122,7 @@ class Start:
                 "kubify_dir": app_constants.kubify_work,
                 "kubify_version": app_constants.kubify_version,
             },
-            tags=ansible_tags,
+            # tags=ansible_tags,
         )
 
     def main(self):
