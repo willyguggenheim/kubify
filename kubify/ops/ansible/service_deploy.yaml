@@ -1,0 +1,24 @@
+- name: Configure service
+  hosts: localhost
+  become: false
+  gather_facts: no
+  vars:
+    env: ''
+    app_name: ''
+    app_dir: ''
+    app_config_sha: ''
+    kubify_dir: ''
+    expose_service: 'false'
+    app_kubify_dir: "{{ kubify_dir }}/{{ env }}/{{ app_name }}"
+    config_yml_path: "{{ app_dir }}/config.yml"
+    kubify_yml: "{{ app_dir }}/kubify.yml"
+    kubify_domain_suffix: ""
+  roles:
+    - role: common
+      tags: common
+    - role: generate_configs_from_kubify_yaml
+      tags: generate_k8s
+    - role: build_image
+      tags: build_image
+    - role: deploy_service
+      tags: deploy_service
