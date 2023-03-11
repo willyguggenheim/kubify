@@ -4,6 +4,7 @@ COPY app /app
 
 WORKDIR /app
 
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 ENV FLASK_APP=flask_hello_kubify.py

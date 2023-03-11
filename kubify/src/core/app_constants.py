@@ -11,8 +11,8 @@ root_dir_full_path = os.path.abspath(root_dir)
 kubify_version = sys.version
 docker_registry = os.environ.get("KUBIFY_DOCKER_REGISTRY", "willy0912")
 home = str(Path.home())
-WORK_DIR = os.path.join(*[home, ".kubify"])
-kubify_work = os.path.join(*[home, ".kubify"])
+WORK_DIR = os.path.join(*[root_dir_full_path, ".kubify"])
+kubify_work = os.path.join(*[root_dir_full_path, ".kubify"])
 ansible_private_data_dir = os.path.join(*[kubify_work, "ansible"])
 if not os.path.exists(ansible_private_data_dir):
     os.makedirs(ansible_private_data_dir)

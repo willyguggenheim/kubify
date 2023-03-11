@@ -106,7 +106,7 @@
   vars:
     app_manifests: "{{ app_kubify_dir }}/manifests"
     manifests_glob:
-      - "../../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/manifests/*" # skaffold needs a relative path to the manifests
+      - "../../../kubify/{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/manifests/*" # skaffold needs a relative path to the manifests
       - "../../{{ app_type }}/{{ app_name }}/config/*.{{ profile }}.yaml"
       # TODO should we comment this? currently doesnt pass validation with it uncommented (since the upgrade to new kuberenets and skaffold)
       #- "../../{{ app_type }}/{{ app_name }}/kubify.yml"
@@ -121,7 +121,7 @@
   vars:
     app_manifests: "{{ app_kubify_dir }}/manifests"
     manifests_glob:
-      - "../../../{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/manifests/*" # skaffold needs a relative path to the manifests
+      - "../../../kubify/{{ kubify_dir | basename }}/{{ env }}/{{ app_name }}/manifests/*" # skaffold needs a relative path to the manifests
       - "../../{{ app_type }}/{{ app_name }}/config/*.{{ profile }}.yaml"
       # TODO should we comment this? currently doesnt pass validation with it uncommented (since the upgrade to new kuberenets and skaffold)
       #- "../../{{ app_type }}/{{ app_name }}/kubify.yml"

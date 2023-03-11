@@ -45,6 +45,10 @@ credentials
 **/._*
 
 # Kubify
+.kubify
+**/.kubify
+.kubify*
+**/.kubify*
 ._kubify_work
 **/._kubify_work
 ./._kubify_work
